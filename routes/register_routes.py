@@ -1,9 +1,21 @@
 import os
+import sys
 import base64
 import qrcode
 from datetime import datetime
 from flask import Blueprint, request, render_template, jsonify, render_template_string, send_file, session, redirect, url_for
-from config import STORAGE_DIR, ID_CARDS_DIR
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for p in [BASE_DIR, os.getcwd()]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from config import STORAGE_DIR, ID_CARDS_DIR
+except ImportError:
+    STORAGE_DIR = os.path.join(BASE_DIR, "storage")
+    ID_CARDS_DIR = os.path.join(BASE_DIR, "id_cards")
+
 from database import get_db_connection
 from utils.card import create_voter_card, create_voting_pass
 from utils.face import decode_base64_image, check_duplicate_face

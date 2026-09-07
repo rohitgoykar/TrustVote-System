@@ -4,11 +4,20 @@ import sys
 
 # Ensure root project directory is in sys.path for Linux / Gunicorn deployment
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-if BASE_DIR not in sys.path:
-    sys.path.insert(0, BASE_DIR)
+for p in [BASE_DIR, os.getcwd()]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from flask import Flask
-from config import TEMPLATE_DIR, STORAGE_DIR, ID_CARDS_DIR
+
+try:
+    from config import TEMPLATE_DIR, STORAGE_DIR, ID_CARDS_DIR, SECRET_KEY
+except ImportError:
+    TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+    STORAGE_DIR = os.path.join(BASE_DIR, "storage")
+    ID_CARDS_DIR = os.path.join(BASE_DIR, "id_cards")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "super_secret_trustvote_key")
+
 from database import init_db
 
 # Import Blueprints

@@ -6,30 +6,39 @@ echo   AUTOMATED GITHUB REPOSITORY DEPLOYMENT
 echo ========================================================
 echo.
 
+set "GIT_CMD=git"
 where git >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] Git is not found in your system PATH.
-    echo Please install Git for Windows from: https://git-scm.com/download/win
-    echo After installing Git, re-run this script.
-    echo.
-    pause
-    exit /b 1
+    if exist "C:\Program Files\Git\cmd\git.exe" (
+        set "GIT_CMD=C:\Program Files\Git\cmd\git.exe"
+    ) else if exist "C:\Program Files\Git\bin\git.exe" (
+        set "GIT_CMD=C:\Program Files\Git\bin\git.exe"
+    ) else if exist "%LOCALAPPDATA%\Programs\Git\cmd\git.exe" (
+        set "GIT_CMD=%LOCALAPPDATA%\Programs\Git\cmd\git.exe"
+    ) else (
+        echo [ERROR] Git is not found on your system.
+        echo Please install Git for Windows from: https://git-scm.com/download/win
+        echo.
+        pause
+        exit /b 1
+    )
 )
 
 echo [1/5] Initializing Git repository...
-git init
+"%GIT_CMD%" init
+
 
 echo.
 echo [2/5] Staging project files...
-git add .
+"%GIT_CMD%" add .
 
 echo.
 echo [3/5] Creating commit...
-git commit -m "SEC Maharashtra TrustVote: Immutable Blockchain Ledger, Maharashtra Map Telemetry, and Biometric Voting System"
+"%GIT_CMD%" commit -m "TrustVote Release: Fixed config imports, optimized Render cloud deployment, 2FA SMS OTP and WAL database"
 
 echo.
 echo [4/5] Setting default branch to main...
-git branch -M main
+"%GIT_CMD%" branch -M main
 
 echo.
 echo ========================================================
@@ -46,9 +55,9 @@ if "%REPO_URL%"=="" (
 
 echo.
 echo [5/5] Linking remote repository and pushing...
-git remote remove origin >nul 2>nul
-git remote add origin %REPO_URL%
-git push -u origin main
+"%GIT_CMD%" remote remove origin >nul 2>nul
+"%GIT_CMD%" remote add origin %REPO_URL%
+"%GIT_CMD%" push -u origin main --force
 
 echo.
 if %errorlevel% equ 0 (

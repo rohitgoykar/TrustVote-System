@@ -1,7 +1,22 @@
 import os
+import sys
 import sqlite3
 from datetime import datetime
-from config import DB_PATH, DATABASE_URL, DB_TYPE
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+for p in [BASE_DIR, os.getcwd()]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from config import DB_PATH, DATABASE_URL, DB_TYPE
+except ImportError:
+    DB_PATH = os.path.join(BASE_DIR, "voters.db")
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DB_TYPE = "postgres" if DATABASE_URL else "sqlite"
+
 
 def get_db_connection():
     """
