@@ -1,6 +1,17 @@
 import os
+import sys
 from flask import Blueprint, render_template, send_from_directory
-from config import ID_CARDS_DIR
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for p in [BASE_DIR, os.getcwd()]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from config import ID_CARDS_DIR
+except ImportError:
+    ID_CARDS_DIR = os.path.join(BASE_DIR, "id_cards")
+
 
 main_bp = Blueprint('main', __name__)
 
