@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 title TrustVote - Push to GitHub Repository
 echo ========================================================
 echo   TRUSTVOTE - STATE ELECTION COMMISSION MAHARASHTRA
@@ -24,9 +25,11 @@ if %errorlevel% neq 0 (
     )
 )
 
+echo Project directory: %~dp0
+echo.
+
 echo [1/5] Initializing Git repository...
 "%GIT_CMD%" init
-
 
 echo.
 echo [2/5] Staging project files...
@@ -34,7 +37,7 @@ echo [2/5] Staging project files...
 
 echo.
 echo [3/5] Creating commit...
-"%GIT_CMD%" commit -m "TrustVote Release: Fixed config imports, optimized Render cloud deployment, 2FA SMS OTP and WAL database"
+"%GIT_CMD%" commit -m "TrustVote Release: Fixed config imports, optimized Render cloud deployment, 2FA SMS OTP and WAL database" 2>nul
 
 echo.
 echo [4/5] Setting default branch to main...
@@ -42,19 +45,19 @@ echo [4/5] Setting default branch to main...
 
 echo.
 echo ========================================================
-echo   ENTER YOUR GITHUB REPOSITORY LINK:
-echo   Example: https://github.com/your-username/trustvote.git
+echo   REPOSITORY URL:
+echo   Default: https://github.com/rohitgoykar/TrustVote-System.git
 echo ========================================================
-set /p REPO_URL="Repository URL: "
+set "REPO_URL="
+set /p REPO_URL="Press Enter to use default or type custom URL: "
 
 if "%REPO_URL%"=="" (
-    echo [ERROR] No repository URL entered. Aborting.
-    pause
-    exit /b 1
+    set "REPO_URL=https://github.com/rohitgoykar/TrustVote-System.git"
 )
 
 echo.
 echo [5/5] Linking remote repository and pushing...
+echo Target: %REPO_URL%
 "%GIT_CMD%" remote remove origin >nul 2>nul
 "%GIT_CMD%" remote add origin %REPO_URL%
 "%GIT_CMD%" push -u origin main --force
