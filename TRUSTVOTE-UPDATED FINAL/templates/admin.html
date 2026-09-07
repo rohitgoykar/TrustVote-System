@@ -1,0 +1,3312 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVote - Main Election Officer Cloud Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+            color: #0f172a;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .tricolor-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            z-index: 100;
+        }
+
+        /* Top Header Navigation Bar */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 50;
+            position: sticky;
+            top: 0;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .cloud-badge {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        .logout {
+            color: #f87171;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 18px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .logout:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 25px auto 60px;
+            padding: 0 24px;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           CASCADING HIERARCHY SELECTOR PANEL
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .hierarchy-panel {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 22px 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+        }
+        .hp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 12px;
+        }
+        .hp-title {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hp-breadcrumbs {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #ea580c;
+            background: #fff7ed;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #ffedd5;
+        }
+        .hierarchy-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 1200px) {
+            .hierarchy-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .hierarchy-grid { grid-template-columns: 1fr; }
+        }
+        .h-field label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .h-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            background: #f8fafc;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .h-field select:focus {
+            border-color: #ea580c;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           BOOTHS DEEP-DIVE KPI CARDS
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 1100px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+        .kpi-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px -4px rgba(0,0,0,0.06);
+        }
+        .kpi-label { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; }
+        .kpi-value { font-size: 26px; font-weight: 800; color: #0f172a; }
+        .kpi-sub { font-size: 11.5px; font-weight: 600; margin-top: 4px; }
+
+        /* Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 1050px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Panels */
+        .panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Forms */
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #ea580c;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 9px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #ea580c; color: white; width: 100%; }
+        .btn-primary:hover { background: #c2410c; }
+        .btn-secondary { background: #1e293b; color: white; width: 100%; }
+        .btn-secondary:hover { background: #0f172a; }
+        .btn-refresh { background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155; }
+        .btn-refresh:hover { background: #e2e8f0; }
+        .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; width: 100%; }
+        .btn-danger:hover { background: #ef4444; color: white; }
+
+        /* Tables */
+        .tbl-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            text-align: left;
+        }
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 11px 13px;
+            border-bottom: 1.5px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        td {
+            padding: 11px 13px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-online  { background: #dcfce7; color: #166534; }
+        .badge-offline { background: #f1f5f9; color: #64748b; }
+        .badge-voted   { background: #fee2e2; color: #991b1b; }
+        .badge-eligible { background: #dcfce7; color: #166534; }
+        .badge-booth   { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+
+        /* Live Activity Stream */
+        .activity-feed {
+            max-height: 280px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .activity-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           BLOCKCHAIN SECURITY LEDGER & GOVERNMENT ANIMATIONS
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .blockchain-panel {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: ledgerPulse 6s infinite alternate ease-in-out;
+        }
+        @keyframes ledgerPulse {
+            0% { box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.2); }
+            100% { box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15), 0 0 0 1.5px rgba(16, 185, 129, 0.4); }
+        }
+        .bc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bc-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bc-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+        .bc-badge-immutable {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }
+        .bc-metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 800px) {
+            .bc-metrics-bar { grid-template-columns: 1fr 1fr; }
+        }
+        .bcm-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .bcm-label {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .bcm-val {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            font-family: 'Inter', monospace;
+        }
+        .btn-verify-chain {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-verify-chain:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #047857, #059669);
+        }
+
+        /* Horizontal Chain Explorer */
+        .chain-track-wrapper {
+            overflow-x: auto;
+            padding: 8px 4px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .chain-track-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .chain-track-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+        .block-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 16px;
+            min-width: 280px;
+            max-width: 280px;
+            flex-shrink: 0;
+            position: relative;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        .block-card:hover {
+            transform: translateY(-3px);
+            border-color: #34d399;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(52, 211, 153, 0.2);
+        }
+        .bc-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .bc-height {
+            font-size: 13px;
+            font-weight: 800;
+            color: #38bdf8;
+            font-family: monospace;
+        }
+        .bc-time {
+            font-size: 10.5px;
+            color: #94a3b8;
+        }
+        .bc-field {
+            font-size: 11.5px;
+            color: #cbd5e1;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .bc-field b { color: #ffffff; }
+        .bc-hash-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 8px;
+            font-family: monospace;
+            font-size: 10px;
+            color: #94a3b8;
+            word-break: break-all;
+        }
+        .bc-hash-label {
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .bc-hash-val {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .chain-connector {
+            display: flex;
+            align-items: center;
+            color: #10b981;
+            font-weight: 900;
+            font-size: 16px;
+            flex-shrink: 0;
+            animation: pulseConnector 2s infinite;
+        }
+        @keyframes pulseConnector {
+            0% { opacity: 0.4; transform: translateX(0); }
+            50% { opacity: 1; transform: translateX(3px); }
+            100% { opacity: 0.4; transform: translateX(0); }
+        }
+
+        /* Blockchain Verification Modal */
+        .bc-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .bc-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .bc-modal-card {
+            background: #0f172a;
+            border: 1.5px solid rgba(16, 185, 129, 0.4);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 580px;
+            padding: 28px;
+            color: white;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        .bc-seal-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.15);
+            border: 2px solid #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .bc-progress-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin: 20px 0 14px;
+        }
+        .bc-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #059669, #34d399);
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           MAHARASHTRA DISTRICT-WISE VOTER MAP STYLES
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           MAHARASHTRA DISTRICT-WISE VOTER MAP STYLES (WHITE BACKGROUND)
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .maha-map-panel {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: #0f172a;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .mmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid #f1f5f9;
+        }
+        .mmap-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+        .mmap-badge-live {
+            background: #e0f2fe;
+            border: 1.5px solid #38bdf8;
+            color: #0284c7;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mmap-content-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+        @media (max-width: 960px) {
+            .mmap-content-grid { grid-template-columns: 1fr; }
+        }
+        .mmap-canvas-box {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+        .mmap-legend {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #334155;
+        }
+        .mmap-leg-item { display: flex; align-items: center; gap: 6px; }
+        .mmap-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+        .dot-high { background: #16a34a; box-shadow: 0 0 6px rgba(22, 163, 74, 0.4); }
+        .dot-mid  { background: #0284c7; box-shadow: 0 0 6px rgba(2, 132, 199, 0.4); }
+        .dot-active { background: #ea580c; box-shadow: 0 0 6px rgba(234, 88, 12, 0.4); }
+
+        .maha-svg-container {
+            width: 100%;
+            height: 390px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 12px;
+        }
+        .maha-svg-map {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .state-outline {
+            fill: #f8fafc;
+            stroke: #0284c7;
+            stroke-width: 2.5;
+            stroke-dasharray: 4 2;
+            filter: drop-shadow(0 4px 12px rgba(2, 132, 199, 0.12));
+        }
+        .mmap-node {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .mmap-node:hover {
+            transform: scale(1.15);
+        }
+        .mmap-node:hover .map-pin {
+            fill: #0284c7;
+            stroke: #ffffff;
+            stroke-width: 2.5;
+        }
+        .mmap-node.active-district .map-pulse-ring {
+            stroke: #16a34a;
+            animation: mapPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .map-pulse-ring {
+            fill: none;
+            stroke: rgba(2, 132, 199, 0.35);
+            stroke-width: 1.5;
+            animation: mapPing 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes mapPing {
+            0% { r: 6px; opacity: 0.9; }
+            100% { r: 24px; opacity: 0; }
+        }
+        .map-pin {
+            stroke: #ffffff;
+            stroke-width: 2;
+            transition: all 0.2s;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.18));
+        }
+        .map-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            fill: #0f172a;
+            font-family: 'Inter', sans-serif;
+            pointer-events: none;
+            transition: fill 0.2s;
+            paint-order: stroke fill;
+            stroke: #ffffff;
+            stroke-width: 2.5px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .mmap-node:hover .map-label {
+            fill: #0284c7;
+            font-weight: 800;
+        }
+
+        /* Spotlight Card */
+        .mmap-spotlight-card {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+        .msp-badge {
+            font-size: 10px;
+            font-weight: 800;
+            color: #0284c7;
+            letter-spacing: 0.8px;
+        }
+        .msp-kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .msp-kpi-box {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .msp-kpi-lbl {
+            font-size: 10.5px;
+            color: #475569;
+            font-weight: 600;
+            display: block;
+        }
+        .msp-kpi-val {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            font-family: monospace;
+            display: block;
+            margin-top: 2px;
+        }
+        .msp-progress-track {
+            height: 7px;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .msp-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0284c7, #16a34a);
+            border-radius: 9999px;
+            transition: width 0.8s ease;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           COLUMN-WISE SIDEBAR TABS & DASHBOARD VIEWS
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .dashboard-wrapper {
+            max-width: 1560px;
+            margin: 20px auto 60px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 1080px) {
+            .dashboard-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+        .sidebar-column {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+            position: sticky;
+            top: 85px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .sidebar-header {
+            padding: 4px 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: block;
+        }
+        .sidebar-sub {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #ffffff;
+            display: block;
+            margin-top: 2px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .side-tab-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .side-tab-btn:hover {
+            background: rgba(51, 65, 85, 0.8);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateX(4px);
+        }
+        .side-tab-btn.active {
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(15, 23, 42, 0.95));
+            border-color: #38bdf8;
+            box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);
+        }
+        .tab-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .side-tab-btn.active .tab-icon-box {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.6);
+        }
+        .tab-text-wrap {
+            flex: 1;
+        }
+        .tab-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #e2e8f0;
+            letter-spacing: -0.2px;
+            transition: color 0.2s;
+        }
+        .side-tab-btn.active .tab-title {
+            color: #ffffff;
+        }
+        .tab-marathi {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .side-tab-btn.active .tab-marathi {
+            color: #7dd3fc;
+        }
+        .tab-active-indicator {
+            width: 4px;
+            height: 0%;
+            background: #38bdf8;
+            border-radius: 4px;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: height 0.25s ease;
+        }
+        .side-tab-btn.active .tab-active-indicator {
+            height: 60%;
+        }
+        .sidebar-footer-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: auto;
+        }
+
+        .tab-content-view {
+            display: none;
+            animation: fadeInView 0.35s ease;
+        }
+        .tab-content-view.active {
+            display: block;
+        }
+        @keyframes fadeInView {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           BOOTH OFFICER MAP & DISTRICT SEARCH TELEMETRY
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .booth-search-bar-wrap {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1.5px solid rgba(56, 189, 248, 0.4);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .booth-search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .booth-search-input::placeholder {
+            color: #94a3b8;
+        }
+        .district-quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .d-tag {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .d-tag:hover, .d-tag.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            transform: translateY(-1px);
+        }
+        .d-tag .booth-pill {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            font-weight: 800;
+        }
+        .d-tag.active .booth-pill {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+        .bmap-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 1100px) {
+            .bmap-grid { grid-template-columns: 1fr; }
+        }
+        .bmap-station-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .bmap-station-card:hover {
+            border-color: #0284c7;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Toast Messages */
+        #msg-box {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .msg-success { background: #16a34a; color: white; }
+        .msg-error { background: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="tricolor-stripe"></div>
+
+<!-- Topbar -->
+<div class="navbar">
+    <div class="navbar-brand">
+        TrustVote <span style="color:#ffffff; font-weight:700;">Cloud</span> <span>| Main Election Officer Control Center</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="cloud-badge">
+            <div class="pulse-dot"></div> Central Cloud Active
+        </div>
+        <a href="/admin/logout" class="logout">Logout </a>
+    </div>
+</div>
+
+<div class="dashboard-wrapper">
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LEFT-HAND SIDE COLUMN-WISE COMMAND TABS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <aside class="sidebar-column">
+        <div class="sidebar-header">
+            <span class="sidebar-title">COMMAND NAVIGATION</span>
+            <span class="sidebar-sub">State Election Commission</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- 1. Main Election Officer Control Center -->
+            <button type="button" class="side-tab-btn active" id="tabBtn-main" onclick="switchDashboardTab('main')">
+                <div class="tab-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+                <div class="tab-text-wrap">
+                    <div class="tab-title">Main Control Center</div>
+                    <div class="tab-marathi">मुख्य नियंत्रण कक्ष</div>
+                </div>
+                <div class="tab-active-indicator"></div>
+            </button>
+
+            <!-- 2. Booth Officer Dashboard -->
+            <button type="button" class="side-tab-btn" id="tabBtn-booth" onclick="switchDashboardTab('booth')">
+                <div class="tab-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </div>
+                <div class="tab-text-wrap">
+                    <div class="tab-title">Booth Officer Dashboard</div>
+                    <div class="tab-marathi">मतदान केंद्र अधिकारी</div>
+                </div>
+                <div class="tab-active-indicator"></div>
+            </button>
+
+            <!-- 3. Register Officer Dashboard -->
+            <button type="button" class="side-tab-btn" id="tabBtn-register" onclick="switchDashboardTab('register')">
+                <div class="tab-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="20" y1="8" x2="20" y2="14"/>
+                        <line x1="23" y1="11" x2="17" y2="11"/>
+                    </svg>
+                </div>
+                <div class="tab-text-wrap">
+                    <div class="tab-title">Register Officer Dashboard</div>
+                    <div class="tab-marathi">मतदार नोंदणी अधिकारी</div>
+                </div>
+                <div class="tab-active-indicator"></div>
+            </button>
+        </nav>
+
+        <!-- Sidebar Info Card -->
+        <div class="sidebar-footer-card">
+            <div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:4px; letter-spacing:0.5px;">ELEVATED COMMAND</div>
+            <div style="font-size:12px; color:#94a3b8; line-height:1.4;">Switch between Central Control, Live Booth Operations, and Registration Console with single-click authority.</div>
+        </div>
+    </aside>
+
+    <!-- Right-Hand Side Main Content Column -->
+    <main class="main-content-column">
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           TAB 1: MAIN ELECTION OFFICER CONTROL CENTER
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="tab-content-view active" id="view-main">
+    
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       1. CASCADING HIERARCHICAL DRILL-DOWN SELECTOR
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="hierarchy-panel">
+        <div class="hp-header">
+            <div class="hp-title">
+                Hierarchical Jurisdiction Drill-Down
+            </div>
+            <div class="hp-breadcrumbs" id="drilldown-scope-label">
+                Scope: All Maharashtra (Central Overview)
+            </div>
+        </div>
+        <div class="hierarchy-grid">
+            <!-- 1. Select Election -->
+            <div class="h-field">
+                <label>1. Election Cycle</label>
+                <select id="sel_election" onchange="onHierarchyChange()">
+                    <option value="all">Loading Elections...</option>
+                </select>
+            </div>
+            <!-- 2. Select District -->
+            <div class="h-field">
+                <label>2. District (जिल्हा)</label>
+                <select id="sel_district" onchange="onDistrictChange()">
+                    <option value="all">All Districts</option>
+                </select>
+            </div>
+            <!-- 3. Select Constituency -->
+            <div class="h-field">
+                <label>3. Constituency (मतदारसंघ)</label>
+                <select id="sel_constituency" onchange="onConstituencyChange()">
+                    <option value="all">All Constituencies</option>
+                </select>
+            </div>
+            <!-- 4. Select Polling Station -->
+            <div class="h-field">
+                <label>4. Polling Station (केंद्र)</label>
+                <select id="sel_station" onchange="onStationChange()">
+                    <option value="all">All Polling Stations</option>
+                </select>
+            </div>
+            <!-- 5. Select Booth -->
+            <div class="h-field">
+                <label>5. Specific Booth (बूथ)</label>
+                <select id="sel_booth" onchange="onHierarchyChange()">
+                    <option value="all">All Booths</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       2. BOOTH DRILL-DOWN INTELLIGENCE KPIS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Assigned Voters</div>
+            <div class="kpi-value" id="kpi-total-voters">0</div>
+            <div class="kpi-sub" style="color:#64748b;" id="kpi-booths-count">0 Polling Booths</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Verified & Voted</div>
+            <div class="kpi-value" id="kpi-verified" style="color: #16a34a;">0</div>
+            <div class="kpi-sub" style="color:#16a34a;" id="kpi-turnout">0% Turnout</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Rejected Attempts</div>
+            <div class="kpi-value" id="kpi-rejected" style="color: #ef4444;">0</div>
+            <div class="kpi-sub" style="color:#ef4444;">Face Mismatch / Denied</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">️ Blocked Duplicate Votes</div>
+            <div class="kpi-value" id="kpi-already-voted" style="color: #ea580c;">0</div>
+            <div class="kpi-sub" style="color:#ea580c;">Already Voted Attempts</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Stations Status</div>
+            <div class="kpi-value" id="kpi-online-booths" style="color: #0f172a;">0</div>
+            <div class="kpi-sub" style="color:#16a34a;">Active Online Now</div>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       2.5. IMMUTABLE CRYPTOGRAPHIC BLOCKCHAIN LEDGER
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="blockchain-panel">
+        <div class="bc-header">
+            <div class="bc-title-wrap">
+                <div class="bc-title">
+                    Immutable Blockchain Security Ledger (अपरिवर्तनीय ब्लॉकचेन सुरक्षा लेजर)
+                </div>
+                <span class="bc-badge-immutable">
+                    <span class="pulse-dot"></span> SHA-256 LEDGER IMMUTABLE
+                </span>
+            </div>
+            <div>
+                <button type="button" class="btn-verify-chain" onclick="startBlockchainVerification()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    Verify Blockchain Integrity (सत्यता पडताळा)
+                </button>
+            </div>
+        </div>
+
+        <!-- Ledger Metrics -->
+        <div class="bc-metrics-bar">
+            <div class="bcm-item">
+                <span class="bcm-label">Total Blocks Mined</span>
+                <span class="bcm-val" id="bc-total-blocks">0 Blocks</span>
+            </div>
+            <div class="bcm-item">
+                <span class="bcm-label">Consensus Protocol</span>
+                <span class="bcm-val" style="color:#34d399;">Proof-of-Authority (PoA)</span>
+            </div>
+            <div class="bcm-item">
+                <span class="bcm-label">Zero-Knowledge Voter Privacy</span>
+                <span class="bcm-val" style="color:#38bdf8;">SHA-256 Salted Hash</span>
+            </div>
+            <div class="bcm-item">
+                <span class="bcm-label">Latest Cryptographic Hash</span>
+                <span class="bcm-val" id="bc-latest-hash" style="font-size:11px; color:#cbd5e1; word-break:break-all;">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Horizontal Interactive Block Track -->
+        <div class="chain-track-wrapper" id="blockchain-track">
+            <div style="color:#94a3b8; font-size:12px; padding:10px;">Connecting to SEC Blockchain Ledger nodes...</div>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       2.8. MAHARASHTRA DISTRICT-WISE VOTER TELEMETRY MAP
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="maha-map-panel">
+        <div class="mmap-header">
+            <div class="mmap-title-wrap">
+                <div class="mmap-title">
+                    Maharashtra State Voter Participation Telemetry Map (महाराष्ट्र राज्य मतदार सहभाग नकाशा)
+                </div>
+                <span class="mmap-badge-live">
+                    <span class="pulse-dot"></span> 36 DISTRICTS LIVE TELEMETRY
+                </span>
+            </div>
+            <div class="mmap-actions">
+                <button type="button" class="btn btn-refresh" style="font-size:12px; padding:6px 14px; background:#1e293b; color:white; border:none;" onclick="resetMapScope()">
+                    Overview All Maharashtra
+                </button>
+            </div>
+        </div>
+
+        <div class="mmap-content-grid">
+            <!-- Left: Interactive Vector Map -->
+            <div class="mmap-canvas-box">
+                <div class="mmap-legend">
+                    <span class="mmap-leg-item"><span class="mmap-dot dot-high"></span> > 60% Turnout (उच्च सहभाग)</span>
+                    <span class="mmap-leg-item"><span class="mmap-dot dot-mid"></span> 30 - 60% Turnout (मध्यम सहभाग)</span>
+                    <span class="mmap-leg-item"><span class="mmap-dot dot-active"></span> Polling Active (सुरू)</span>
+                </div>
+                
+                <div class="maha-svg-container" id="mahaSvgWrapper">
+                    <!-- Embedded SVG Map with interactive districts -->
+                    <svg viewBox="0 0 820 620" class="maha-svg-map" id="mahaVectorMap">
+                        <!-- State Boundary Silhouette Outline -->
+                        <path class="state-outline" d="M 120 180 Q 220 120 380 130 T 640 140 Q 750 200 780 280 T 720 440 Q 620 540 480 560 T 260 580 Q 140 520 110 380 Z" />
+                        
+                        <!-- Regions & District Nodes with Radar Rings & Labels -->
+                        <!-- Konkan Division (West Coast) -->
+                        <g class="mmap-node" data-district="Mumbai City" onclick="onMapDistrictClick('Mumbai City', this)" transform="translate(130, 315)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Mumbai City (मुंबई)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Mumbai Suburban" onclick="onMapDistrictClick('Mumbai Suburban', this)" transform="translate(130, 290)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Mumbai Sub. (उपनगर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Thane" onclick="onMapDistrictClick('Thane', this)" transform="translate(145, 275)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Thane (ठाणे)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Palghar" onclick="onMapDistrictClick('Palghar', this)" transform="translate(140, 235)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Palghar (पालघर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Raigad" onclick="onMapDistrictClick('Raigad', this)" transform="translate(145, 360)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Raigad (रायगड)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Ratnagiri" onclick="onMapDistrictClick('Ratnagiri', this)" transform="translate(155, 430)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Ratnagiri (रत्नागिरी)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Sindhudurg" onclick="onMapDistrictClick('Sindhudurg', this)" transform="translate(170, 500)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Sindhudurg (सिंधुदुर्ग)</text>
+                        </g>
+
+                        <!-- Pune Division (Western/South Central) -->
+                        <g class="mmap-node active-district" data-district="Pune" onclick="onMapDistrictClick('Pune', this)" transform="translate(240, 360)">
+                            <circle class="map-pulse-ring" r="26" />
+                            <circle class="map-pin" r="10" fill="#10b981" />
+                            <text class="map-label" x="14" y="4" style="font-weight:800; fill:#34d399;">Pune (पुणे)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Satara" onclick="onMapDistrictClick('Satara', this)" transform="translate(230, 425)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Satara (सातारा)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Kolhapur" onclick="onMapDistrictClick('Kolhapur', this)" transform="translate(225, 490)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Kolhapur (कोल्हापूर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Sangli" onclick="onMapDistrictClick('Sangli', this)" transform="translate(280, 470)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Sangli (सांगली)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Solapur" onclick="onMapDistrictClick('Solapur', this)" transform="translate(340, 430)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Solapur (सोलापूर)</text>
+                        </g>
+
+                        <!-- Nashik & North Division -->
+                        <g class="mmap-node" data-district="Nashik" onclick="onMapDistrictClick('Nashik', this)" transform="translate(220, 240)">
+                            <circle class="map-pulse-ring" r="22" />
+                            <circle class="map-pin" r="8" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Nashik (नाशिक)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Ahmednagar" onclick="onMapDistrictClick('Ahmednagar', this)" transform="translate(270, 305)">
+                            <circle class="map-pulse-ring" r="22" />
+                            <circle class="map-pin" r="8" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Ahmednagar (अहिल्यानगर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Dhule" onclick="onMapDistrictClick('Dhule', this)" transform="translate(250, 175)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Dhule (धुळे)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Nandurbar" onclick="onMapDistrictClick('Nandurbar', this)" transform="translate(210, 145)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Nandurbar (नंदुरबार)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Jalgaon" onclick="onMapDistrictClick('Jalgaon', this)" transform="translate(320, 190)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Jalgaon (जळगाव)</text>
+                        </g>
+
+                        <!-- Chhatrapati Sambhajinagar / Marathwada Division -->
+                        <g class="mmap-node" data-district="Chhatrapati Sambhajinagar" onclick="onMapDistrictClick('Chhatrapati Sambhajinagar', this)" transform="translate(340, 265)">
+                            <circle class="map-pulse-ring" r="22" />
+                            <circle class="map-pin" r="8" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Chh. Sambhajinagar</text>
+                        </g>
+                        <g class="mmap-node" data-district="Jalna" onclick="onMapDistrictClick('Jalna', this)" transform="translate(390, 280)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Jalna (जालना)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Beed" onclick="onMapDistrictClick('Beed', this)" transform="translate(360, 340)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Beed (बीड)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Latur" onclick="onMapDistrictClick('Latur', this)" transform="translate(420, 390)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Latur (लातूर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Dharashiv" onclick="onMapDistrictClick('Dharashiv', this)" transform="translate(370, 400)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Dharashiv (धाराशिव)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Nanded" onclick="onMapDistrictClick('Nanded', this)" transform="translate(470, 345)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Nanded (नांदेड)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Parbhani" onclick="onMapDistrictClick('Parbhani', this)" transform="translate(430, 310)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Parbhani (परभणी)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Hingoli" onclick="onMapDistrictClick('Hingoli', this)" transform="translate(460, 275)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Hingoli (हिंगोली)</text>
+                        </g>
+
+                        <!-- Vidarbha / Amravati & Nagpur Division -->
+                        <g class="mmap-node" data-district="Amravati" onclick="onMapDistrictClick('Amravati', this)" transform="translate(470, 205)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#10b981" />
+                            <text class="map-label" x="12" y="4">Amravati (अमरावती)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Akola" onclick="onMapDistrictClick('Akola', this)" transform="translate(415, 220)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Akola (अकोला)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Buldhana" onclick="onMapDistrictClick('Buldhana', this)" transform="translate(370, 215)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Buldhana (बुलढाणा)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Washim" onclick="onMapDistrictClick('Washim', this)" transform="translate(430, 255)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Washim (वाशीम)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Yavatmal" onclick="onMapDistrictClick('Yavatmal', this)" transform="translate(500, 275)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Yavatmal (यवतमाळ)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Nagpur" onclick="onMapDistrictClick('Nagpur', this)" transform="translate(570, 195)">
+                            <circle class="map-pulse-ring" r="24" />
+                            <circle class="map-pin" r="9" fill="#10b981" />
+                            <text class="map-label" x="12" y="4" style="font-weight:700;">Nagpur (नागपूर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Wardha" onclick="onMapDistrictClick('Wardha', this)" transform="translate(530, 240)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Wardha (वर्धा)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Bhandara" onclick="onMapDistrictClick('Bhandara', this)" transform="translate(625, 205)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Bhandara (भंडारा)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Gondia" onclick="onMapDistrictClick('Gondia', this)" transform="translate(675, 200)">
+                            <circle class="map-pulse-ring" r="18" />
+                            <circle class="map-pin" r="6" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Gondia (गोंदिया)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Chandrapur" onclick="onMapDistrictClick('Chandrapur', this)" transform="translate(575, 305)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Chandrapur (चंद्रपूर)</text>
+                        </g>
+                        <g class="mmap-node" data-district="Gadchiroli" onclick="onMapDistrictClick('Gadchiroli', this)" transform="translate(660, 310)">
+                            <circle class="map-pulse-ring" r="20" />
+                            <circle class="map-pin" r="7" fill="#38bdf8" />
+                            <text class="map-label" x="12" y="4">Gadchiroli (गडचिरोली)</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Right: Live District Telemetry Spotlight Card -->
+            <div class="mmap-spotlight-card" id="mmapSpotlightCard">
+                <div class="msp-head">
+                    <span class="msp-badge">DISTRICT SPOTLIGHT</span>
+                    <h4 id="msp-dist-name" style="font-size:18px; font-weight:800; color:#0f172a; margin:6px 0 2px;">
+                        Pune District (पुणे जिल्हा)
+                    </h4>
+                    <div id="msp-div-name" style="font-size:12px; color:#64748b;">
+                        Pune Administrative Division • Western Maharashtra
+                    </div>
+                </div>
+
+                <div class="msp-kpi-grid">
+                    <div class="msp-kpi-box">
+                        <span class="msp-kpi-lbl">Registered Voters</span>
+                        <span class="msp-kpi-val" id="msp-voters">0</span>
+                    </div>
+                    <div class="msp-kpi-box">
+                        <span class="msp-kpi-lbl">Votes Cast (नोंदणी)</span>
+                        <span class="msp-kpi-val" id="msp-voted" style="color:#16a34a;">0</span>
+                    </div>
+                    <div class="msp-kpi-box">
+                        <span class="msp-kpi-lbl">Active Turnout</span>
+                        <span class="msp-kpi-val" id="msp-turnout" style="color:#0284c7;">0.0%</span>
+                    </div>
+                    <div class="msp-kpi-box">
+                        <span class="msp-kpi-lbl">Polling Stations</span>
+                        <span class="msp-kpi-val" id="msp-stations">0</span>
+                    </div>
+                </div>
+
+                <!-- Turnout Progress Bar -->
+                <div style="margin: 14px 0 8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#475569; margin-bottom:4px;">
+                        <span>Live District Participation Rate</span>
+                        <span id="msp-bar-pct" style="font-weight:700; color:#16a34a;">0.0%</span>
+                    </div>
+                    <div class="msp-progress-track">
+                        <div class="msp-progress-fill" id="msp-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 14px; display:flex; gap:10px;">
+                    <button type="button" class="btn btn-primary" style="flex:1; font-size:12px; padding:8px 12px; background:#0284c7;" onclick="drillFromMap()">
+                        🔍 Drill Into District (मतदार आणि केंद्र तपशील)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       3. REAL-TIME POLLING BOOTHS MATRIX
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">Polling Booths Status Matrix in Selected Scope</div>
+            <button class="btn btn-refresh" onclick="refreshDashboard()">↻ Refresh Matrix</button>
+        </div>
+        <div class="tbl-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booth Code</th>
+                        <th>District</th>
+                        <th>Constituency</th>
+                        <th>Polling Station Campus</th>
+                        <th>Assigned Officer</th>
+                        <th>Assigned Voters</th>
+                        <th>Verified Votes</th>
+                        <th>Status</th>
+                        <th>Quick Drill</th>
+                    </tr>
+                </thead>
+                <tbody id="booths-matrix-body">
+                    <tr><td colspan="9" style="text-align:center; color:#94a3b8;">Loading polling booths…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       4. CONTROLS, ACTIVITY STREAM & LOGS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="content-grid">
+        
+        <!-- Left Column: Live Security Feed, Booth Form, Reset -->
+        <div>
+            <!-- Live Activity Feed -->
+            <div class="panel">
+                <div class="panel-title">Live Security & Activity Stream</div>
+                <div class="activity-feed" id="live-activity-feed">
+                    <div style="text-align:center; color:#94a3b8; font-size:12px; padding:10px;">Loading live audit events…</div>
+                </div>
+            </div>
+
+            <!-- Add Polling Booth Form -->
+            <div class="panel">
+                <div class="panel-title">Register New Polling Booth</div>
+                <form id="addBoothForm" style="margin-top:12px;">
+                    <div class="form-group">
+                        <label>Booth Code / केंद्र कोड</label>
+                        <input type="text" id="b_code" placeholder="e.g. BOOTH-007" required>
+                    </div>
+                    <div class="form-group">
+                        <label>District / जिल्हा</label>
+                        <input type="text" id="b_district" placeholder="e.g. Pune" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Constituency / मतदारसंघ</label>
+                        <input type="text" id="b_constituency" placeholder="e.g. Shivaji Nagar" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Polling Station Campus / मतदान केंद्र शाळा</label>
+                        <input type="text" id="b_station" placeholder="e.g. Modern High School Room 103" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Booth Name / Description</label>
+                        <input type="text" id="b_name" placeholder="e.g. Booth 007 - West Wing" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="submitAddBooth()">+ Add Polling Booth</button>
+                </form>
+            </div>
+
+            <!-- Register Officer -->
+            <div class="panel">
+                <div class="panel-title">Register Officer & Assign Booth</div>
+                <form id="officerForm" style="margin-top:12px;">
+                    <div class="form-group">
+                        <label>Username / युजरनेम</label>
+                        <input type="text" id="username" placeholder="e.g. officer_pune2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password / पासवर्ड</label>
+                        <input type="password" id="password" placeholder="Enter password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Authorized Mobile No / अधिकृत मोबाईल नंबर (For OTP Auth)</label>
+                        <input type="text" id="officer_mobile" placeholder="e.g. 9876543210 (10 digits)" maxlength="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Officer Role / भूमिका</label>
+                        <select id="role" onchange="toggleBoothSelectForOfficer()" required>
+                            <option value="Booth Officer">Booth Officer (स्कॅनर अधिकारी)</option>
+                            <option value="Registration Officer">Registration Officer (नोंदणी अधिकारी)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="officer-booth-group">
+                        <label>Assign to Polling Station / मतदान केंद्र</label>
+                        <select id="officer_booth_id">
+                            <option value="">Select Assigned Booth</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location / केंद्र पत्ता</label>
+                        <input type="text" id="location" placeholder="e.g. Pune Central" required>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="submitAddOfficer()">Register Officer</button>
+                </form>
+            </div>
+
+            <!-- System Reset -->
+            <div class="panel" style="border-color: #fee2e2;">
+                <div class="panel-title" style="color: #ef4444;">️ सिस्टीम रीसेट (New Election Cycle)</div>
+                <p style="font-size: 12px; color: #64748b; margin: 8px 0 14px; line-height: 1.5;">
+                    पुढील निवडणुकीसाठी सर्व मतदान केंद्रांचे व्होटिंग रेकॉर्ड्स रीसेट करण्यासाठी खालील बटन दाबा.
+                </p>
+                <button type="button" class="btn btn-danger" onclick="resetSystem()">सिस्टीम रीसेट करा</button>
+            </div>
+        </div>
+
+        <!-- Right Column: Filtered Voters & Voted Log -->
+        <div>
+            <!-- Registered Voters Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Registered Voters in Selected Scope</div>
+                    <button class="btn btn-refresh" onclick="loadVoters()">↻ Refresh</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="voter-search" placeholder="Search by Voter ID, Name, District, Constituency, or Booth…" oninput="filterTable('voters-body', 'voter-search')" />
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Voter ID</th>
+                                <th>Name</th>
+                                <th>District / Constituency</th>
+                                <th>Assigned Booth</th>
+                                <th>ग्रामपंचायत</th>
+                                <th>पंचायत समिती</th>
+                                <th>जिल्हा परिषद</th>
+                                <th>महानगरपालिका</th>
+                                <th>नगरपरिषद</th>
+                                <th>नगरपंचायत</th>
+                                <th>Reg Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voters-body">
+                            <tr><td colspan="11" style="text-align:center; color:#94a3b8;">Loading voters…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Centralized Voted Log Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Centralized Voted Audit Log</div>
+                    <button class="btn btn-refresh" onclick="loadVotedLog()">↻ Refresh</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="voted-search" placeholder="Search by Voter ID, Name, Booth Code, Officer or Timestamp…" oninput="filterTable('voted-body', 'voted-search')" />
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Voter ID</th>
+                                <th>Voter Name</th>
+                                <th>Election</th>
+                                <th>Booth Station</th>
+                                <th>Officer</th>
+                                <th>Voted Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voted-body">
+                            <tr><td colspan="7" style="text-align:center; color:#94a3b8;">Loading audit log…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+        </div>
+        <!-- END OF TAB 1: MAIN CONTROL CENTER -->
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           TAB 2: BOOTH OFFICER DASHBOARD (मतदान केंद्र अधिकारी)
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="tab-content-view" id="view-booth">
+            <!-- 1. Header Banner -->
+            <div class="panel" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 18px; padding: 22px 26px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                            Booth Officer Live Verification & Centre Console (मतदान केंद्र अधिकारी थेट नियंत्रण कक्ष)
+                            <span class="mmap-badge-live" style="font-size: 10.5px; padding: 2px 8px;">REAL DATABASE RECORDS</span>
+                        </div>
+                        <div style="font-size: 12.5px; color: #94a3b8; margin-top: 4px;">
+                            Maharashtra Live Polling Stations & Centre Telemetry across 36 Districts • Search district to inspect live booths
+                        </div>
+                    </div>
+                    <div>
+                        <a href="/scan" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 12.5px; padding: 10px 20px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">
+                            Open Fullscreen Booth Scanner Kiosk (/scan) ↗
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. Main Election Officer District Search Bar -->
+                <div class="booth-search-bar-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="bmap_search_input" class="booth-search-input" placeholder="Search Maharashtra District (जिल्हा शोधा - e.g. Pune, Ahmednagar, Mumbai, Nagpur, Nashik, Satara...)" oninput="onBoothMapDistrictSearch()" />
+                    <button type="button" id="bmap_clear_search_btn" onclick="clearBoothMapDistrictSearch()" style="display:none; background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer; font-weight:700;">✕</button>
+                    <span id="bmap_search_count_badge" style="background:rgba(56, 189, 248, 0.15); border:1px solid #38bdf8; color:#7dd3fc; font-size:11px; font-weight:800; padding:3px 10px; border-radius:9999px; white-space:nowrap;">
+                        36 Districts Available
+                    </span>
+                </div>
+
+                <!-- Quick District Filter Tags -->
+                <div class="district-quick-tags" id="bmap_quick_tags">
+                    <!-- Injected dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- 3. Maharashtra Live Centre Map & Real Booths Split View -->
+            <div class="maha-map-panel" style="margin-bottom: 24px;">
+                <div class="mmap-header">
+                    <div class="mmap-title-wrap">
+                        <div class="mmap-title" id="bmap_selected_title">
+                            Maharashtra Live Polling Centre Telemetry Map (महाराष्ट्र मतदान केंद्र थेट नकाशा)
+                        </div>
+                        <span class="mmap-badge-live">
+                            <span class="pulse-dot"></span> LIVE POLLING NETWORK
+                        </span>
+                    </div>
+                    <div style="font-size:12px; color:#64748b;" id="bmap_active_division_lbl">
+                        Click or search any district below to inspect real live booths
+                    </div>
+                </div>
+
+                <div class="bmap-grid">
+                    <!-- Left: Clear & High-Contrast 36-District SVG Map -->
+                    <div class="mmap-canvas-box">
+                        <div class="mmap-legend">
+                            <span class="mmap-leg-item"><span class="mmap-dot dot-high"></span> Active Online Booths (केंद्रे सुरू)</span>
+                            <span class="mmap-leg-item"><span class="mmap-dot dot-mid"></span> Registered Stations (नोंदणीकृत)</span>
+                            <span class="mmap-leg-item"><span class="mmap-dot" style="background:#94a3b8;"></span> 0 Booths in Database (नोंद नाही)</span>
+                        </div>
+                        
+                        <div class="maha-svg-container" style="height: 420px;">
+                            <svg viewBox="0 0 820 620" class="maha-svg-map" id="bmap_svg">
+                                <!-- State Silhouette -->
+                                <path class="state-outline" d="M 120 180 Q 220 120 380 130 T 640 140 Q 750 200 780 280 T 720 440 Q 620 540 480 560 T 260 580 Q 140 520 110 380 Z" />
+                                
+                                <!-- Konkan Division -->
+                                <g class="mmap-node" data-bdist="Mumbai City" onclick="selectBoothMapDistrict('Mumbai City', this)" transform="translate(130, 315)">
+                                    <circle class="map-pulse-ring" r="20" />
+                                    <circle class="map-pin" r="7" fill="#38bdf8" />
+                                    <text class="map-label" x="12" y="4">Mumbai City (मुंबई)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Mumbai Suburban" onclick="selectBoothMapDistrict('Mumbai Suburban', this)" transform="translate(130, 290)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Mumbai Sub. (उपनगर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Thane" onclick="selectBoothMapDistrict('Thane', this)" transform="translate(145, 275)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Thane (ठाणे)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Palghar" onclick="selectBoothMapDistrict('Palghar', this)" transform="translate(140, 235)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Palghar (पालघर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Raigad" onclick="selectBoothMapDistrict('Raigad', this)" transform="translate(145, 360)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Raigad (रायगड)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Ratnagiri" onclick="selectBoothMapDistrict('Ratnagiri', this)" transform="translate(155, 430)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Ratnagiri (रत्नागिरी)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Sindhudurg" onclick="selectBoothMapDistrict('Sindhudurg', this)" transform="translate(170, 500)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Sindhudurg (सिंधुदुर्ग)</text>
+                                </g>
+
+                                <!-- Pune Division -->
+                                <g class="mmap-node active-district" data-bdist="Pune" onclick="selectBoothMapDistrict('Pune', this)" transform="translate(240, 360)">
+                                    <circle class="map-pulse-ring" r="26" />
+                                    <circle class="map-pin" r="10" fill="#10b981" />
+                                    <text class="map-label" x="14" y="4" style="font-weight:800; fill:#34d399;">Pune (पुणे)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Satara" onclick="selectBoothMapDistrict('Satara', this)" transform="translate(230, 425)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Satara (सातारा)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Kolhapur" onclick="selectBoothMapDistrict('Kolhapur', this)" transform="translate(225, 490)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Kolhapur (कोल्हापूर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Sangli" onclick="selectBoothMapDistrict('Sangli', this)" transform="translate(280, 470)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Sangli (सांगली)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Solapur" onclick="selectBoothMapDistrict('Solapur', this)" transform="translate(340, 430)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Solapur (सोलापूर)</text>
+                                </g>
+
+                                <!-- Nashik Division -->
+                                <g class="mmap-node" data-bdist="Nashik" onclick="selectBoothMapDistrict('Nashik', this)" transform="translate(220, 240)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Nashik (नाशिक)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Ahmednagar" onclick="selectBoothMapDistrict('Ahmednagar', this)" transform="translate(270, 305)">
+                                    <circle class="map-pulse-ring" r="22" />
+                                    <circle class="map-pin" r="8" fill="#10b981" />
+                                    <text class="map-label" x="12" y="4">Ahmednagar (अहिल्यानगर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Dhule" onclick="selectBoothMapDistrict('Dhule', this)" transform="translate(250, 175)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Dhule (धुळे)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Nandurbar" onclick="selectBoothMapDistrict('Nandurbar', this)" transform="translate(210, 145)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Nandurbar (नंदुरबार)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Jalgaon" onclick="selectBoothMapDistrict('Jalgaon', this)" transform="translate(320, 190)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Jalgaon (जळगाव)</text>
+                                </g>
+
+                                <!-- Chhatrapati Sambhajinagar Division -->
+                                <g class="mmap-node" data-bdist="Chhatrapati Sambhajinagar" onclick="selectBoothMapDistrict('Chhatrapati Sambhajinagar', this)" transform="translate(340, 265)">
+                                    <circle class="map-pulse-ring" r="20" />
+                                    <circle class="map-pin" r="7" fill="#38bdf8" />
+                                    <text class="map-label" x="12" y="4">Chh. Sambhajinagar</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Jalna" onclick="selectBoothMapDistrict('Jalna', this)" transform="translate(390, 280)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Jalna (जालना)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Beed" onclick="selectBoothMapDistrict('Beed', this)" transform="translate(360, 340)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Beed (बीड)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Latur" onclick="selectBoothMapDistrict('Latur', this)" transform="translate(420, 390)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Latur (लातूर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Dharashiv" onclick="selectBoothMapDistrict('Dharashiv', this)" transform="translate(370, 400)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Dharashiv (धाराशिव)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Nanded" onclick="selectBoothMapDistrict('Nanded', this)" transform="translate(470, 345)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Nanded (नांदेड)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Parbhani" onclick="selectBoothMapDistrict('Parbhani', this)" transform="translate(430, 310)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Parbhani (परभणी)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Hingoli" onclick="selectBoothMapDistrict('Hingoli', this)" transform="translate(460, 275)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Hingoli (हिंगोली)</text>
+                                </g>
+
+                                <!-- Amravati & Nagpur Division -->
+                                <g class="mmap-node" data-bdist="Amravati" onclick="selectBoothMapDistrict('Amravati', this)" transform="translate(470, 205)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Amravati (अमरावती)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Akola" onclick="selectBoothMapDistrict('Akola', this)" transform="translate(415, 220)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Akola (अकोला)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Buldhana" onclick="selectBoothMapDistrict('Buldhana', this)" transform="translate(370, 215)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Buldhana (बुलढाणा)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Washim" onclick="selectBoothMapDistrict('Washim', this)" transform="translate(430, 255)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Washim (वाशीम)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Yavatmal" onclick="selectBoothMapDistrict('Yavatmal', this)" transform="translate(500, 275)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Yavatmal (यवतमाळ)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Nagpur" onclick="selectBoothMapDistrict('Nagpur', this)" transform="translate(570, 195)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Nagpur (नागपूर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Wardha" onclick="selectBoothMapDistrict('Wardha', this)" transform="translate(530, 240)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Wardha (वर्धा)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Bhandara" onclick="selectBoothMapDistrict('Bhandara', this)" transform="translate(625, 205)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Bhandara (भंडारा)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Gondia" onclick="selectBoothMapDistrict('Gondia', this)" transform="translate(675, 200)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Gondia (गोंदिया)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Chandrapur" onclick="selectBoothMapDistrict('Chandrapur', this)" transform="translate(575, 305)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Chandrapur (चंद्रपूर)</text>
+                                </g>
+                                <g class="mmap-node" data-bdist="Gadchiroli" onclick="selectBoothMapDistrict('Gadchiroli', this)" transform="translate(660, 310)">
+                                    <circle class="map-pulse-ring" r="18" />
+                                    <circle class="map-pin" r="6" fill="#475569" />
+                                    <text class="map-label" x="12" y="4">Gadchiroli (गडचिरोली)</text>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Right: Selected District Live Polling Booths Deep-Dive -->
+                    <div class="mmap-spotlight-card" style="padding: 22px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                            <div>
+                                <span class="msp-badge">DISTRICT LIVE STATIONS</span>
+                                <h3 id="bmap_dist_name" style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 4px 0 2px;">
+                                    Pune District (पुणे)
+                                </h3>
+                                <div id="bmap_dist_sub" style="font-size: 12px; color: #64748b;">
+                                    Pune Administrative Division • Real Database Polling Centres
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span id="bmap_dist_online_badge" class="badge badge-online">
+                                    <span class="pulse-dot"></span> 1 ONLINE
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 4 Real Database Metric Boxes -->
+                        <div class="msp-kpi-grid" style="margin-bottom: 16px;">
+                            <div class="msp-kpi-box">
+                                <span class="msp-kpi-lbl">Real Registered Booths</span>
+                                <span class="msp-kpi-val" id="bmap_stat_booths" style="color:#0284c7;">0</span>
+                            </div>
+                            <div class="msp-kpi-box">
+                                <span class="msp-kpi-lbl">Real Assigned Voters</span>
+                                <span class="msp-kpi-val" id="bmap_stat_voters" style="color:#0f172a;">0</span>
+                            </div>
+                            <div class="msp-kpi-box">
+                                <span class="msp-kpi-lbl">Real Votes Cast</span>
+                                <span class="msp-kpi-val" id="bmap_stat_voted" style="color:#16a34a;">0</span>
+                            </div>
+                            <div class="msp-kpi-box">
+                                <span class="msp-kpi-lbl">Live Turnout Rate</span>
+                                <span class="msp-kpi-val" id="bmap_stat_turnout" style="color:#ea580c;">0.0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Real Polling Stations Table for Selected District -->
+                        <div style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                            <span>Active Polling Stations in Selected District</span>
+                            <span id="bmap_station_count_label" style="color: #0284c7; font-weight: 700;">0 Stations</span>
+                        </div>
+
+                        <div id="bmap_booths_list_container" style="max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                            <!-- Injected dynamically with 100% real database records -->
+                            <div style="color: #94a3b8; font-size: 12px; padding: 20px; text-align: center;">
+                                Loading district polling stations from database...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Station Live Cast Ballots Audit Stream -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">District Live Verified Voter Ballots Stream</div>
+                    <button class="btn btn-refresh" onclick="refreshBoothViewData()">↻ Refresh Station Stream</button>
+                </div>
+                <div class="tbl-wrap" style="max-height: 280px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Voter ID</th>
+                                <th>Citizen Name</th>
+                                <th>Election</th>
+                                <th>Station Campus</th>
+                                <th>Booth Code</th>
+                                <th>Officer</th>
+                                <th>Cast Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booth_view_table_body">
+                            <tr><td colspan="7" style="text-align:center; color:#94a3b8;">Loading verified votes stream...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- END OF TAB 2: BOOTH OFFICER DASHBOARD -->
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           TAB 3: REGISTER OFFICER DASHBOARD (मतदार नोंदणी अधिकारी)
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="tab-content-view" id="view-register">
+            <div class="panel" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 18px; padding: 24px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 20px;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: 800; color: #ffffff;">
+                            Citizen Voter Registration & Enrollment Console (मतदार नोंदणी अधिकारी डॅशबोर्ड)
+                        </div>
+                        <div style="font-size: 12.5px; color: #94a3b8; margin-top: 4px;">
+                            Enroll New Citizen Voters, Assign 6 Maharashtra Local Body Tiers, & Generate Official Voting Pass
+                        </div>
+                    </div>
+                    <div>
+                        <a href="/register_page" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #059669, #10b981); font-size: 12.5px; padding: 10px 18px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">
+                            Open Fullscreen Registration Kiosk (/register_page) ↗
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Registration Summary KPI Row -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Total Registered Citizens</span>
+                        <span style="font-size: 18px; font-weight: 800; color: #ffffff; display: block; margin-top: 2px;" id="reg_stat_total">0</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Gram Panchayat Voters</span>
+                        <span style="font-size: 18px; font-weight: 800; color: #34d399; display: block; margin-top: 2px;" id="reg_stat_gp">0</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Mahanagarpalika / Urban</span>
+                        <span style="font-size: 18px; font-weight: 800; color: #38bdf8; display: block; margin-top: 2px;" id="reg_stat_urban">0</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Digital Pass Status</span>
+                        <span style="font-size: 18px; font-weight: 800; color: #f59e0b; display: block; margin-top: 2px;">100% Synced</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Citizen Voter Directory & Pass Generator Section -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Maharashtra Electoral Roll - Citizen Voters Directory</div>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="reg-voter-search" placeholder="Search by Voter ID, Name, District, Ward..." oninput="filterTable('reg-voters-body', 'reg-voter-search')" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 12.5px; width: 280px;" />
+                        <button class="btn btn-refresh" onclick="loadVoters()">↻ Refresh Roll</button>
+                    </div>
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Voter ID</th>
+                                <th>Citizen Name</th>
+                                <th>District / Const.</th>
+                                <th>Assigned Booth</th>
+                                <th>ग्रामपंचायत</th>
+                                <th>पंचायत समिती</th>
+                                <th>जिल्हा परिषद</th>
+                                <th>महानगरपालिका</th>
+                                <th>नगरपरिषद</th>
+                                <th>नगरपंचायत</th>
+                                <th>Voting Pass / ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reg-voters-body">
+                            <tr><td colspan="11" style="text-align:center; color:#94a3b8;">Loading citizen voters list...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- END OF TAB 3: REGISTER OFFICER DASHBOARD -->
+
+    </main>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BLOCKCHAIN VERIFICATION MODAL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="bc-modal-overlay" id="bcVerificationModal">
+    <div class="bc-modal-card">
+        <div class="bc-seal-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M9 12l2 2 4-4"/>
+            </svg>
+        </div>
+        <h3 style="font-size:18px; font-weight:800; color:#ffffff; margin-bottom:6px;">
+            Cryptographic Blockchain Verification
+        </h3>
+        <p style="font-size:12.5px; color:#94a3b8;" id="bc-modal-status-text">
+            Executing SHA-256 recursive hash integrity audit across all blocks...
+        </p>
+
+        <!-- Animated Progress Track -->
+        <div class="bc-progress-track">
+            <div class="bc-progress-bar" id="bc-modal-progress"></div>
+        </div>
+
+        <!-- Verification Terminal / Result Box -->
+        <div id="bc-modal-terminal" style="background:rgba(15,23,42,0.95); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; text-align:left; font-family:monospace; font-size:11px; color:#cbd5e1; max-height:160px; overflow-y:auto; margin-bottom:16px;">
+            <div>> Initializing Zero-Knowledge Ledger audit...</div>
+        </div>
+
+        <button type="button" class="btn" style="background:#1e293b; color:white; padding:8px 24px; border-radius:10px; font-size:12px;" onclick="closeBlockchainModal()">
+            Close Certificate (बंद करा)
+        </button>
+    </div>
+</div>
+
+<div id="msg-box"></div>
+
+<script>
+let allHierarchyData = { elections: [], booths: [] };
+
+function showToast(msg, type='success') {
+    const box = document.getElementById('msg-box');
+    box.innerText = msg;
+    box.className = type === 'success' ? 'msg-success' : 'msg-error';
+    box.style.display = 'block';
+    setTimeout(() => { box.style.display = 'none'; }, 4000);
+}
+
+// ── 1. Initialize Hierarchy Cascading Options ──
+async function initHierarchy() {
+    try {
+        const res = await fetch('/admin/hierarchy_options');
+        const json = await res.json();
+        if (json.status === 'success') {
+            allHierarchyData = json.data;
+
+            // Populate Elections
+            const elecSel = document.getElementById('sel_election');
+            elecSel.innerHTML = allHierarchyData.elections.map(e => 
+                `<option value="${e.id}">${e.election_name} (${e.election_code})</option>`
+            ).join('');
+
+            // Populate Districts
+            populateDistricts();
+            
+            // Populate Officer Assign Dropdown
+            populateOfficerBoothSelect(allHierarchyData.booths);
+
+            // Update Map Pins and Quick Tags
+            updateMapPinColors();
+            renderBoothMapQuickTags();
+
+            // Trigger Initial Load
+            onHierarchyChange();
+        }
+    } catch (e) {
+        console.error("Hierarchy init failed", e);
+    }
+}
+
+function populateDistricts() {
+    const districts = [...new Set(allHierarchyData.booths.map(b => b.district).filter(Boolean))];
+    const distSel = document.getElementById('sel_district');
+    distSel.innerHTML = '<option value="all">All Districts (Central Overview)</option>' + 
+        districts.map(d => `<option value="${d}">${d}</option>`).join('');
+    
+    onDistrictChange();
+}
+
+function onDistrictChange() {
+    const chosenDistrict = document.getElementById('sel_district').value;
+    const filteredBooths = chosenDistrict === 'all' 
+        ? allHierarchyData.booths 
+        : allHierarchyData.booths.filter(b => b.district === chosenDistrict);
+
+    const constituencies = [...new Set(filteredBooths.map(b => b.constituency).filter(Boolean))];
+    const constSel = document.getElementById('sel_constituency');
+    constSel.innerHTML = '<option value="all">All Constituencies</option>' + 
+        constituencies.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    onConstituencyChange();
+}
+
+function onConstituencyChange() {
+    const chosenDistrict = document.getElementById('sel_district').value;
+    const chosenConst = document.getElementById('sel_constituency').value;
+
+    let filtered = allHierarchyData.booths;
+    if (chosenDistrict !== 'all') filtered = filtered.filter(b => b.district === chosenDistrict);
+    if (chosenConst !== 'all') filtered = filtered.filter(b => b.constituency === chosenConst);
+
+    const stations = [...new Set(filtered.map(b => b.polling_station).filter(Boolean))];
+    const stSel = document.getElementById('sel_station');
+    stSel.innerHTML = '<option value="all">All Polling Stations</option>' + 
+        stations.map(s => `<option value="${s}">${s}</option>`).join('');
+
+    onStationChange();
+}
+
+function onStationChange() {
+    const chosenDistrict = document.getElementById('sel_district').value;
+    const chosenConst = document.getElementById('sel_constituency').value;
+    const chosenStation = document.getElementById('sel_station').value;
+
+    let filtered = allHierarchyData.booths;
+    if (chosenDistrict !== 'all') filtered = filtered.filter(b => b.district === chosenDistrict);
+    if (chosenConst !== 'all') filtered = filtered.filter(b => b.constituency === chosenConst);
+    if (chosenStation !== 'all') filtered = filtered.filter(b => b.polling_station === chosenStation);
+
+    const bSel = document.getElementById('sel_booth');
+    bSel.innerHTML = '<option value="all">All Booths</option>' + 
+        filtered.map(b => `<option value="${b.id}">${b.booth_code}: ${b.booth_name}</option>`).join('');
+
+    onHierarchyChange();
+}
+
+function populateOfficerBoothSelect(booths) {
+    const sel = document.getElementById('officer_booth_id');
+    sel.innerHTML = '<option value="">Select Assigned Booth</option>' + 
+        booths.map(b => `<option value="${b.id}">${b.booth_code}: ${b.booth_name} (${b.district})</option>`).join('');
+}
+
+// ── 2. Handle Hierarchy Filter Change & Refresh ──
+function getHierarchyParams() {
+    const d = document.getElementById('sel_district').value;
+    const c = document.getElementById('sel_constituency').value;
+    const s = document.getElementById('sel_station').value;
+    const b = document.getElementById('sel_booth').value;
+    return `district=${encodeURIComponent(d)}&constituency=${encodeURIComponent(c)}&station=${encodeURIComponent(s)}&booth_id=${encodeURIComponent(b)}`;
+}
+
+async function onHierarchyChange() {
+    updateBreadcrumbs();
+    await refreshDashboard();
+}
+
+function updateBreadcrumbs() {
+    const d = document.getElementById('sel_district').value;
+    const c = document.getElementById('sel_constituency').value;
+    const s = document.getElementById('sel_station').value;
+    const b = document.getElementById('sel_booth');
+    const bText = b.options[b.selectedIndex]?.text || 'All Booths';
+
+    let parts = [];
+    if (d !== 'all') parts.push(d);
+    if (c !== 'all') parts.push(c);
+    if (s !== 'all') parts.push(s);
+    if (b.value !== 'all') parts.push(bText.split(':')[0]);
+
+    document.getElementById('drilldown-scope-label').innerText = parts.length > 0 
+        ? `Scope: ${parts.join(' ➔ ')}`
+        : 'Scope: All Maharashtra (Central Overview)';
+}
+
+async function refreshDashboard() {
+    await Promise.all([
+        loadDrilldownStats(),
+        loadBoothsMatrix(),
+        loadVoters(),
+        loadVotedLog(),
+        loadBlockchainLedger()
+    ]);
+}
+
+// ── Government Metric Count-Up Animation Helper ──
+function animateCounter(elementId, targetValue, duration = 800, suffix = '') {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const isPercent = suffix.includes('%') || (typeof targetValue === 'number' && targetValue % 1 !== 0);
+    const startValue = parseFloat(el.innerText.replace(/[^0-9.-]/g, '')) || 0;
+    const startTime = performance.now();
+
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // Ease Out Cubic
+        const current = startValue + (targetValue - startValue) * ease;
+
+        if (isPercent) {
+            el.innerText = current.toFixed(1) + suffix;
+        } else {
+            el.innerText = Math.round(current).toLocaleString() + suffix;
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            el.innerText = (isPercent ? targetValue.toFixed(1) : Math.round(targetValue).toLocaleString()) + suffix;
+        }
+    }
+    requestAnimationFrame(update);
+}
+
+// ── 3. Load Booth Intelligence KPIs & Live Stream ──
+async function loadDrilldownStats() {
+    const q = getHierarchyParams();
+    try {
+        const res = await fetch(`/admin/booth_drilldown_stats?${q}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+            const d = json.data;
+            animateCounter('kpi-total-voters', d.total_voters);
+            document.getElementById('kpi-booths-count').innerText = `${d.total_booths} Polling Booths`;
+            animateCounter('kpi-verified', d.verified);
+            animateCounter('kpi-turnout', d.turnout_pct, 800, '% Turnout');
+            animateCounter('kpi-rejected', d.rejected);
+            animateCounter('kpi-already-voted', d.already_voted);
+            document.getElementById('kpi-online-booths').innerText = `${d.online_booths} / ${d.total_booths}`;
+
+            // Render live activity feed
+            renderActivityFeed(d.activities);
+        }
+    } catch (e) {
+        console.error("Stats fetch error", e);
+    }
+}
+
+function renderActivityFeed(activities) {
+    const feed = document.getElementById('live-activity-feed');
+    if (!activities || activities.length === 0) {
+        feed.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:15px;">No recent activity logs for this scope.</div>';
+        return;
+    }
+    feed.innerHTML = activities.map(a => {
+        let badgeColor = '#16a34a';
+        let icon = '✓';
+        if (a.action.includes('FAILED') || a.action.includes('REJECTED')) { badgeColor = '#ef4444'; icon = '✕'; }
+        if (a.action.includes('BLOCKED')) { badgeColor = '#ea580c'; icon = '️'; }
+
+        return `
+            <div class="activity-item">
+                <div>
+                    <div class="act-details">
+                        <span style="color:${badgeColor}; font-weight:800; margin-right:4px;">${icon}</span>
+                        ${a.details}
+                    </div>
+                    <div class="act-meta">
+                        <b>${a.booth_code || 'BOOTH'}</b> (${a.district || ''}) • ${a.officer_username}
+                    </div>
+                </div>
+                <div style="font-size:11px; color:#64748b; white-space:nowrap;">
+                    ${a.timestamp ? a.timestamp.split(' ')[1] : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ── 4. Polling Booths Matrix ──
+async function loadBoothsMatrix() {
+    const q = getHierarchyParams();
+    try {
+        const res = await fetch(`/admin/get_booths?${q}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+            const tbody = document.getElementById('booths-matrix-body');
+            if (json.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#94a3b8;">No polling booths matching current filter.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = json.data.map(b => `
+                <tr>
+                    <td><span class="badge badge-booth"><b>${b.booth_code}</b></span></td>
+                    <td><b>${b.district}</b></td>
+                    <td>${b.constituency}</td>
+                    <td><b>${b.polling_station}</b><br><small style="color:#64748b;">${b.booth_name}</small></td>
+                    <td>${b.officer_username ? `<span style="font-weight:600;">${b.officer_username}</span>` : '<span style="color:#94a3b8;">Unassigned</span>'}</td>
+                    <td><b>${b.assigned_voters}</b></td>
+                    <td><b style="color:#16a34a;">${b.votes_recorded}</b></td>
+                    <td>
+                        <span class="badge ${b.status === 'ONLINE' ? 'badge-online' : 'badge-offline'}">
+                            ${b.status === 'ONLINE' ? '<span class="pulse-dot"></span> ONLINE' : 'OFFLINE'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-refresh" style="padding: 3px 8px; font-size:11px;" onclick="drillIntoBooth('${b.district}', '${b.constituency}', '${b.polling_station}', '${b.id}')">
+                            Focus Booth
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error("Booths load error", e);
+    }
+}
+
+function drillIntoBooth(district, constituency, station, boothId) {
+    document.getElementById('sel_district').value = district;
+    onDistrictChange();
+    document.getElementById('sel_constituency').value = constituency;
+    onConstituencyChange();
+    document.getElementById('sel_station').value = station;
+    onStationChange();
+    document.getElementById('sel_booth').value = boothId;
+    onHierarchyChange();
+}
+
+// ── 5. Registered Voters Roster ──
+async function loadVoters() {
+    const q = getHierarchyParams();
+    try {
+        const res = await fetch(`/admin/get_voters?${q}`);
+        const json = await res.json();
+        const tbody = document.getElementById('voters-body');
+        const regTbody = document.getElementById('reg-voters-body');
+
+        if (json.status === 'success') {
+            const data = json.data;
+
+            // Update Registration Officer KPI stats
+            if (document.getElementById('reg_stat_total')) {
+                animateCounter('reg_stat_total', data.length);
+                const gpCount = data.filter(v => v.gram_panchayat === 1 || v.gram_panchayat === 0).length;
+                const urbanCount = data.filter(v => v.mahanagarpalika === 1 || v.mahanagarpalika === 0 || v.nagar_parishad === 1 || v.nagar_panchayat === 1).length;
+                animateCounter('reg_stat_gp', gpCount);
+                animateCounter('reg_stat_urban', urbanCount);
+            }
+
+            if (data.length === 0) {
+                const emptyRow = '<tr><td colspan="11" style="text-align:center; color:#94a3b8;">No voters registered in this selection.</td></tr>';
+                if (tbody) tbody.innerHTML = emptyRow;
+                if (regTbody) regTbody.innerHTML = emptyRow;
+                return;
+            }
+
+            // Main Control Center Table
+            if (tbody) {
+                tbody.innerHTML = data.map(v => `
+                    <tr>
+                        <td><b style="color:#0f172a;">${v.v_id}</b></td>
+                        <td><b>${v.name}</b><br><small style="color:#64748b;">DOB: ${v.dob || 'N/A'}</small></td>
+                        <td>${v.district || 'Pune'} / ${v.constituency || 'Shivaji Nagar'}</td>
+                        <td><span class="badge badge-booth">${v.booth_code || 'BOOTH-001'}</span></td>
+                        <td>${renderBadge(v.gram_panchayat)}</td>
+                        <td>${renderBadge(v.panchayat_samiti)}</td>
+                        <td>${renderBadge(v.zilha_parishad)}</td>
+                        <td>${renderBadge(v.mahanagarpalika)}</td>
+                        <td>${renderBadge(v.nagar_parishad)}</td>
+                        <td>${renderBadge(v.nagar_panchayat)}</td>
+                        <td style="color:#64748b; font-size:11.5px;">${v.reg_date || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Registration Officer Console Table
+            if (regTbody) {
+                regTbody.innerHTML = data.map(v => `
+                    <tr>
+                        <td><b style="color:#0284c7;">${v.v_id}</b></td>
+                        <td><b>${v.name}</b><br><small style="color:#64748b;">DOB: ${v.dob || 'N/A'}</small></td>
+                        <td>${v.district || 'Pune'} / ${v.constituency || 'Shivaji Nagar'}</td>
+                        <td><span class="badge badge-booth">${v.booth_code || 'BOOTH-001'}</span></td>
+                        <td>${renderBadge(v.gram_panchayat)}</td>
+                        <td>${renderBadge(v.panchayat_samiti)}</td>
+                        <td>${renderBadge(v.zilha_parishad)}</td>
+                        <td>${renderBadge(v.mahanagarpalika)}</td>
+                        <td>${renderBadge(v.nagar_parishad)}</td>
+                        <td>${renderBadge(v.nagar_panchayat)}</td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <a href="/download_card/${v.v_id}" target="_blank" class="btn btn-refresh" style="padding:3px 8px; font-size:11px; text-decoration:none;" title="Download Dual-Sided EPIC Card">
+                                    EPIC Card
+                                </a>
+                                <a href="/download_qr/${v.v_id}" target="_blank" class="btn btn-primary" style="padding:3px 8px; font-size:11px; text-decoration:none; background:#0284c7;" title="Download QR Pass">
+                                    QR Pass
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        console.error("Voters error", e);
+    }
+}
+
+function renderBadge(val) {
+    if (val === 1) return '<span class="badge badge-eligible">Eligible</span>';
+    if (val === 0) return '<span class="badge badge-voted">Voted</span>';
+    return '<span style="color:#94a3b8; font-size:11px;">-</span>';
+}
+
+// ── 6. Centralized Voted Log ──
+async function loadVotedLog() {
+    const q = getHierarchyParams();
+    try {
+        const res = await fetch(`/admin/get_voted_log?${q}`);
+        const json = await res.json();
+        const tbody = document.getElementById('voted-body');
+        if (json.status === 'success') {
+            if (json.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">No votes cast in this selection yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = json.data.map(l => `
+                <tr>
+                    <td>${l.id}</td>
+                    <td><b>${l.v_id}</b></td>
+                    <td><b>${l.voter_name}</b></td>
+                    <td><span style="font-weight:700; color:#ea580c;">${l.election}</span></td>
+                    <td><span class="badge badge-booth">${l.booth_code || 'BOOTH-001'}</span></td>
+                    <td>${l.booth_officer}</td>
+                    <td style="color:#475569; font-weight:500;">${l.voted_at}</td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error("Voted log error", e);
+    }
+}
+
+// ── 7. Operations Forms ──
+async function submitAddBooth() {
+    const code = document.getElementById('b_code').value.trim();
+    const district = document.getElementById('b_district').value.trim();
+    const constituency = document.getElementById('b_constituency').value.trim();
+    const station = document.getElementById('b_station').value.trim();
+    const name = document.getElementById('b_name').value.trim();
+
+    if (!code || !district || !constituency || !station || !name) {
+        showToast("Please fill all booth fields!", "error"); return;
+    }
+
+    try {
+        const res = await fetch('/admin/add_booth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                booth_code: code,
+                district: district,
+                constituency: constituency,
+                polling_station: station,
+                booth_name: name
+            })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+            showToast(json.message);
+            document.getElementById('addBoothForm').reset();
+            initHierarchy();
+        } else {
+            showToast(json.message, "error");
+        }
+    } catch (e) {
+        showToast("Server error", "error");
+    }
+}
+
+async function submitAddOfficer() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const mobile = document.getElementById('officer_mobile').value.trim();
+    const role = document.getElementById('role').value;
+    const location = document.getElementById('location').value.trim();
+    const booth_id = document.getElementById('officer_booth_id').value;
+
+    if (!username || !password || !mobile || !role || !location) {
+        showToast("Please fill all required officer fields including mobile number!", "error"); return;
+    }
+
+    const cleanMobile = mobile.replace(/[^0-9]/g, '');
+    if (cleanMobile.length !== 10) {
+        showToast("Please enter a valid 10-digit mobile number for OTP authorization!", "error"); return;
+    }
+
+    try {
+        const res = await fetch('/admin/add_officer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, mobile: cleanMobile, role, location, booth_id })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+            showToast(json.message);
+            document.getElementById('officerForm').reset();
+            refreshDashboard();
+        } else {
+            showToast(json.message, "error");
+        }
+    } catch (e) {
+        showToast("Server error", "error");
+    }
+}
+
+function toggleBoothSelectForOfficer() {
+    const role = document.getElementById('role').value;
+    const grp = document.getElementById('officer-booth-group');
+    grp.style.display = role === 'Booth Officer' ? 'block' : 'none';
+}
+
+async function resetSystem() {
+    if (!confirm("️ सिस्टीम रीसेट करायची खात्री आहे का? सर्व मतदारांचे मतदान रेकॉर्ड्स रीसेट होतील.")) return;
+    try {
+        const res = await fetch('/reset_system', { method: 'POST' });
+        const json = await res.json();
+        if (json.status === 'success') {
+            showToast(json.message);
+            refreshDashboard();
+        } else {
+            showToast(json.message, "error");
+        }
+    } catch (e) {
+        showToast("Error resetting system", "error");
+    }
+}
+
+function filterTable(tbodyId, inputId) {
+    const q = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.getElementById(tbodyId).getElementsByTagName('tr');
+    for (let r of rows) {
+        r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+    }
+}
+
+// ── 8. Blockchain Security Ledger Visualizer & Verification ──
+async function loadBlockchainLedger() {
+    try {
+        const res = await fetch('/admin/blockchain_ledger');
+        const json = await res.json();
+        if (json.status === 'success') {
+            const data = json.data;
+            document.getElementById('bc-total-blocks').innerText = `${data.total_blocks} Blocks`;
+            document.getElementById('bc-latest-hash').innerText = data.latest_hash ? `${data.latest_hash.substring(0, 16)}...${data.latest_hash.substring(data.latest_hash.length - 8)}` : '0x000...';
+            document.getElementById('bc-latest-hash').title = data.latest_hash;
+
+            renderBlockchainTrack(data.blocks);
+        }
+    } catch (e) {
+        console.error("Blockchain ledger load error", e);
+    }
+}
+
+function renderBlockchainTrack(blocks) {
+    const track = document.getElementById('blockchain-track');
+    if (!blocks || blocks.length === 0) {
+        track.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding:10px;">No blocks mined yet.</div>';
+        return;
+    }
+
+    let html = '';
+    blocks.forEach((b, idx) => {
+        const isGenesis = b.block_index === 0;
+        const shortHash = `${b.block_hash.substring(0, 10)}...${b.block_hash.substring(b.block_hash.length - 6)}`;
+        const shortPrev = `${b.previous_hash.substring(0, 10)}...${b.previous_hash.substring(b.previous_hash.length - 6)}`;
+        const shortVoter = isGenesis ? 'SEC-ROOT-AUTHORITY' : (b.voter_id_hash ? `${b.voter_id_hash.substring(0, 12)}...` : b.voter_id_masked);
+
+        html += `
+            <div class="block-card">
+                <div class="bc-top">
+                    <span class="bc-height">${isGenesis ? 'GENESIS BLOCK #0' : `BLOCK #${b.block_index}`}</span>
+                    <span class="bc-time">${b.timestamp.split(' ')[1] || b.timestamp}</span>
+                </div>
+                <div class="bc-field">
+                    <span>Election:</span>
+                    <b>${b.election}</b>
+                </div>
+                <div class="bc-field">
+                    <span>Booth / Region:</span>
+                    <b>${b.booth_code}</b>
+                </div>
+                <div class="bc-field">
+                    <span>Voter Anon Hash:</span>
+                    <b style="font-family:monospace; color:#38bdf8;">${shortVoter}</b>
+                </div>
+                <div class="bc-hash-box">
+                    <div class="bc-hash-label">Prev Hash:</div>
+                    <div style="color:#94a3b8;">${shortPrev}</div>
+                    <div class="bc-hash-label" style="margin-top:4px;">Block Hash:</div>
+                    <div class="bc-hash-val">${shortHash}</div>
+                </div>
+            </div>
+        `;
+
+        if (idx < blocks.length - 1) {
+            html += `
+                <div class="chain-connector">
+                    ➔
+                </div>
+            `;
+        }
+    });
+
+    track.innerHTML = html;
+}
+
+async function startBlockchainVerification() {
+    const modal = document.getElementById('bcVerificationModal');
+    const bar = document.getElementById('bc-modal-progress');
+    const term = document.getElementById('bc-modal-terminal');
+    const statusText = document.getElementById('bc-modal-status-text');
+
+    modal.classList.add('active');
+    bar.style.width = '0%';
+    term.innerHTML = '<div>> Connecting to SEC Blockchain consensus nodes...</div>';
+    statusText.innerText = 'Executing SHA-256 recursive hash integrity audit across all blocks...';
+
+    setTimeout(() => {
+        bar.style.width = '35%';
+        term.innerHTML += '<div>> Validating Block #0 (Genesis Root Anchor)... [OK]</div>';
+    }, 400);
+
+    setTimeout(() => {
+        bar.style.width = '70%';
+        term.innerHTML += '<div>> Verifying cryptographic hash pointers (H_prev == H_curr)... [OK]</div>';
+        term.innerHTML += '<div>> Verifying Zero-Knowledge Voter ID nonces & signatures... [OK]</div>';
+    }, 900);
+
+    try {
+        const res = await fetch('/admin/verify_blockchain', { method: 'POST' });
+        const json = await res.json();
+        
+        setTimeout(() => {
+            bar.style.width = '100%';
+            if (json.status === 'success' && json.data.is_valid) {
+                term.innerHTML += `<div style="color:#34d399; font-weight:700; margin-top:6px;">> SUCCESS: ${json.data.verified_blocks} Blocks Verified 100% Intact.</div>`;
+                term.innerHTML += `<div style="color:#38bdf8;">> Certificate: SEC-MAHA-IMMUTABLE-${Date.now()}</div>`;
+                statusText.innerHTML = '<span style="color:#34d399; font-weight:700;">Cryptographic Audit Passed: 100% Immutable & Tamper-Proof</span>';
+            } else {
+                term.innerHTML += `<div style="color:#ef4444; font-weight:700;">> WARNING: Integrity breach detected! ${json.data.tamper_details}</div>`;
+                statusText.innerHTML = '<span style="color:#ef4444; font-weight:700;">Integrity Warning: Chain Inconsistency</span>';
+            }
+        }, 1400);
+    } catch (e) {
+        term.innerHTML += `<div style="color:#ef4444;">> Error connecting to audit endpoint: ${e}</div>`;
+    }
+}
+
+function closeBlockchainModal() {
+    document.getElementById('bcVerificationModal').classList.remove('active');
+}
+
+// ── 9. Maharashtra Interactive District Map Telemetry ──
+let activeMapDistrict = 'Pune';
+
+const districtDivisions = {
+    'Pune': 'Pune Administrative Division • Western Maharashtra',
+    'Satara': 'Pune Administrative Division • Western Maharashtra',
+    'Sangli': 'Pune Administrative Division • Western Maharashtra',
+    'Kolhapur': 'Pune Administrative Division • Western Maharashtra',
+    'Solapur': 'Pune Administrative Division • Western Maharashtra',
+    'Mumbai City': 'Konkan Administrative Division • West Coast',
+    'Mumbai Suburban': 'Konkan Administrative Division • West Coast',
+    'Thane': 'Konkan Administrative Division • West Coast',
+    'Palghar': 'Konkan Administrative Division • North Konkan',
+    'Raigad': 'Konkan Administrative Division • Coastal Konkan',
+    'Ratnagiri': 'Konkan Administrative Division • South Konkan',
+    'Sindhudurg': 'Konkan Administrative Division • South Konkan',
+    'Nashik': 'Nashik Administrative Division • North Maharashtra',
+    'Ahmednagar': 'Nashik Administrative Division • Central Western',
+    'Jalgaon': 'Nashik Administrative Division • Khandesh',
+    'Dhule': 'Nashik Administrative Division • Khandesh',
+    'Nandurbar': 'Nashik Administrative Division • Tribal North',
+    'Chhatrapati Sambhajinagar': 'Chh. Sambhajinagar Division • Marathwada',
+    'Jalna': 'Chh. Sambhajinagar Division • Marathwada',
+    'Parbhani': 'Chh. Sambhajinagar Division • Marathwada',
+    'Hingoli': 'Chh. Sambhajinagar Division • Marathwada',
+    'Nanded': 'Chh. Sambhajinagar Division • Marathwada',
+    'Beed': 'Chh. Sambhajinagar Division • Marathwada',
+    'Latur': 'Chh. Sambhajinagar Division • Marathwada',
+    'Dharashiv': 'Chh. Sambhajinagar Division • Marathwada',
+    'Amravati': 'Amravati Administrative Division • Western Vidarbha',
+    'Akola': 'Amravati Administrative Division • Western Vidarbha',
+    'Buldhana': 'Amravati Administrative Division • Western Vidarbha',
+    'Washim': 'Amravati Administrative Division • Western Vidarbha',
+    'Yavatmal': 'Amravati Administrative Division • Western Vidarbha',
+    'Nagpur': 'Nagpur Administrative Division • Eastern Vidarbha',
+    'Wardha': 'Nagpur Administrative Division • Central Vidarbha',
+    'Bhandara': 'Nagpur Administrative Division • Eastern Vidarbha',
+    'Gondia': 'Nagpur Administrative Division • Eastern Vidarbha',
+    'Chandrapur': 'Nagpur Administrative Division • South Vidarbha',
+    'Gadchiroli': 'Nagpur Administrative Division • Eastern Vidarbha'
+};
+
+function onMapDistrictClick(distName, element) {
+    activeMapDistrict = distName;
+    document.querySelectorAll('.mmap-node').forEach(node => node.classList.remove('active-district'));
+    if (element) element.classList.add('active-district');
+    
+    updateMapSpotlight(distName);
+
+    // Auto-update District Selector
+    const distSel = document.getElementById('sel_district');
+    if (distSel) {
+        distSel.value = distName;
+        onDistrictChange();
+    }
+}
+
+async function updateMapSpotlight(distName) {
+    document.getElementById('msp-dist-name').innerText = `${distName} District (${distName} जिल्हा)`;
+    document.getElementById('msp-div-name').innerText = districtDivisions[distName] || 'State Election Commission Jurisdiction';
+
+    try {
+        const res = await fetch(`/admin/booth_drilldown_stats?district=${encodeURIComponent(distName)}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+            const d = json.data;
+            animateCounter('msp-voters', d.total_voters);
+            animateCounter('msp-voted', d.verified);
+            animateCounter('msp-turnout', d.turnout_pct, 800, '%');
+            animateCounter('msp-stations', d.total_booths);
+
+            document.getElementById('msp-bar-pct').innerText = `${d.turnout_pct}%`;
+            document.getElementById('msp-progress-fill').style.width = `${Math.min(d.turnout_pct, 100)}%`;
+        }
+    } catch (e) {
+        console.error("Map spotlight error", e);
+    }
+}
+
+function resetMapScope() {
+    activeMapDistrict = 'All Maharashtra';
+    document.querySelectorAll('.mmap-node').forEach(node => node.classList.remove('active-district'));
+    document.getElementById('sel_district').value = 'all';
+    onDistrictChange();
+    updateMapSpotlight('Pune');
+}
+
+function drillFromMap() {
+    const tableEl = document.getElementById('voters-body');
+    if (tableEl) {
+        tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// ── 10. Multi-Dashboard Tab Switching ──
+function switchDashboardTab(tabKey) {
+    // 1. Update tab buttons
+    document.querySelectorAll('.side-tab-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`tabBtn-${tabKey}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // 2. Update content views
+    document.querySelectorAll('.tab-content-view').forEach(view => view.classList.remove('active'));
+    const activeView = document.getElementById(`view-${tabKey}`);
+    if (activeView) activeView.classList.add('active');
+
+    // 3. Trigger specific data loading
+    if (tabKey === 'main') {
+        refreshDashboard();
+    } else if (tabKey === 'booth') {
+        initBoothView();
+    } else if (tabKey === 'register') {
+        initRegisterView();
+    }
+}
+
+// ── 11. Booth Officer 36-District Live Telemetry Map & Search ──
+const MAHA_36_DISTRICTS = [
+    { name: "Ahmednagar", mr: "अहिल्यानगर", div: "Nashik Division • Central Western" },
+    { name: "Akola", mr: "अकोला", div: "Amravati Division • Western Vidarbha" },
+    { name: "Amravati", mr: "अमरावती", div: "Amravati Division • Western Vidarbha" },
+    { name: "Beed", mr: "बीड", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Bhandara", mr: "भंडारा", div: "Nagpur Division • Eastern Vidarbha" },
+    { name: "Buldhana", mr: "बुलढाणा", div: "Amravati Division • Western Vidarbha" },
+    { name: "Chandrapur", mr: "चंद्रपूर", div: "Nagpur Division • South Vidarbha" },
+    { name: "Chhatrapati Sambhajinagar", mr: "छत्रपती संभाजीनगर", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Dharashiv", mr: "धाराशिव", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Dhule", mr: "धुळे", div: "Nashik Division • Khandesh" },
+    { name: "Gadchiroli", mr: "गडचिरोली", div: "Nagpur Division • Eastern Vidarbha" },
+    { name: "Gondia", mr: "गोंदिया", div: "Nagpur Division • Eastern Vidarbha" },
+    { name: "Hingoli", mr: "हिंगोली", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Jalgaon", mr: "जळगाव", div: "Nashik Division • Khandesh" },
+    { name: "Jalna", mr: "जालना", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Kolhapur", mr: "कोल्हापूर", div: "Pune Division • Western Maharashtra" },
+    { name: "Latur", mr: "लातूर", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Mumbai City", mr: "मुंबई शहर", div: "Konkan Division • West Coast" },
+    { name: "Mumbai Suburban", mr: "मुंबई उपनगर", div: "Konkan Division • West Coast" },
+    { name: "Nagpur", mr: "नागपूर", div: "Nagpur Division • Eastern Vidarbha" },
+    { name: "Nanded", mr: "नांदेड", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Nandurbar", mr: "नंदुरबार", div: "Nashik Division • Tribal North" },
+    { name: "Nashik", mr: "नाशिक", div: "Nashik Division • North Maharashtra" },
+    { name: "Palghar", mr: "पालघर", div: "Konkan Division • North Konkan" },
+    { name: "Parbhani", mr: "परभणी", div: "Chh. Sambhajinagar Division • Marathwada" },
+    { name: "Pune", mr: "पुणे", div: "Pune Division • Western Maharashtra" },
+    { name: "Raigad", mr: "रायगड", div: "Konkan Division • Coastal Konkan" },
+    { name: "Ratnagiri", mr: "रत्नागिरी", div: "Konkan Division • South Konkan" },
+    { name: "Sangli", mr: "सांगली", div: "Pune Division • Western Maharashtra" },
+    { name: "Satara", mr: "सातारा", div: "Pune Division • Western Maharashtra" },
+    { name: "Sindhudurg", mr: "सिंधुदुर्ग", div: "Konkan Division • South Konkan" },
+    { name: "Solapur", mr: "सोलापूर", div: "Pune Division • Western Maharashtra" },
+    { name: "Thane", mr: "ठाणे", div: "Konkan Division • West Coast" },
+    { name: "Wardha", mr: "वर्धा", div: "Nagpur Division • Central Vidarbha" },
+    { name: "Washim", mr: "वाशीम", div: "Amravati Division • Western Vidarbha" },
+    { name: "Yavatmal", mr: "यवतमाळ", div: "Amravati Division • Western Vidarbha" }
+];
+
+let selectedBoothDistrict = 'Pune';
+
+function initBoothView() {
+    renderBoothMapQuickTags();
+    updateMapPinColors();
+    selectBoothMapDistrict(selectedBoothDistrict);
+}
+
+// Update pin colors on the SVG map based on real database records
+function updateMapPinColors() {
+    const booths = allHierarchyData.booths || [];
+    const districtBoothCounts = {};
+    const districtOnlineCounts = {};
+
+    booths.forEach(b => {
+        if (!b.district) return;
+        districtBoothCounts[b.district] = (districtBoothCounts[b.district] || 0) + 1;
+        if (b.status === 'ONLINE') {
+            districtOnlineCounts[b.district] = (districtOnlineCounts[b.district] || 0) + 1;
+        }
+    });
+
+    document.querySelectorAll('#bmap_svg .mmap-node').forEach(node => {
+        const dist = node.getAttribute('data-bdist');
+        const pin = node.querySelector('.map-pin');
+        if (!pin) return;
+
+        const count = districtBoothCounts[dist] || 0;
+        const online = districtOnlineCounts[dist] || 0;
+
+        if (online > 0) {
+            pin.setAttribute('fill', '#16a34a'); // Active Online
+        } else if (count > 0) {
+            pin.setAttribute('fill', '#0284c7'); // Registered
+        } else {
+            pin.setAttribute('fill', '#94a3b8'); // 0 in database
+        }
+    });
+}
+
+function renderBoothMapQuickTags(filterQuery = '') {
+    const container = document.getElementById('bmap_quick_tags');
+    if (!container) return;
+
+    const booths = allHierarchyData.booths || [];
+    const districtBoothCounts = {};
+    booths.forEach(b => {
+        if (b.district) {
+            districtBoothCounts[b.district] = (districtBoothCounts[b.district] || 0) + 1;
+        }
+    });
+
+    const q = filterQuery.toLowerCase().trim();
+    const filtered = MAHA_36_DISTRICTS.filter(d => 
+        !q || d.name.toLowerCase().includes(q) || d.mr.includes(q) || d.div.toLowerCase().includes(q)
+    );
+
+    // Update count badge
+    const badge = document.getElementById('bmap_search_count_badge');
+    if (badge) {
+        badge.innerText = q ? `${filtered.length} District${filtered.length === 1 ? '' : 's'} Matched` : '36 Districts Available';
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<span style="color:#94a3b8; font-size:12px; padding:6px;">No districts found matching your search.</span>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(d => {
+        const boothCount = districtBoothCounts[d.name] || 0;
+        const isActive = (d.name === selectedBoothDistrict) ? 'active' : '';
+        const pillColor = boothCount > 0 ? 'background:rgba(16,185,129,0.25); color:#34d399;' : 'background:rgba(255,255,255,0.1); color:#94a3b8;';
+
+        return `
+            <button type="button" class="d-tag ${isActive}" data-tagdist="${d.name}" onclick="selectBoothMapDistrict('${d.name}')">
+                <span>${d.name} (${d.mr})</span>
+                <span class="booth-pill" style="${pillColor}">${boothCount} ${boothCount === 1 ? 'Booth' : 'Booths'}</span>
+            </button>
+        `;
+    }).join('');
+}
+
+function onBoothMapDistrictSearch() {
+    const input = document.getElementById('bmap_search_input');
+    const clearBtn = document.getElementById('bmap_clear_search_btn');
+    const query = input.value.trim();
+
+    if (clearBtn) {
+        clearBtn.style.display = query ? 'inline-block' : 'none';
+    }
+
+    renderBoothMapQuickTags(query);
+
+    // Filter SVG Map Nodes visually
+    const qLower = query.toLowerCase();
+    document.querySelectorAll('#bmap_svg .mmap-node').forEach(node => {
+        const dist = node.getAttribute('data-bdist');
+        if (!query) {
+            node.style.opacity = '1';
+            node.style.pointerEvents = 'auto';
+        } else if (dist && (dist.toLowerCase().includes(qLower) || node.innerText.toLowerCase().includes(qLower))) {
+            node.style.opacity = '1';
+            node.style.pointerEvents = 'auto';
+        } else {
+            node.style.opacity = '0.25';
+            node.style.pointerEvents = 'none';
+        }
+    });
+
+    // If query matches a single district exactly or is top match, auto-select it
+    const matching = MAHA_36_DISTRICTS.filter(d => 
+        d.name.toLowerCase().includes(qLower) || d.mr.includes(query)
+    );
+    if (matching.length === 1) {
+        selectBoothMapDistrict(matching[0].name);
+    }
+}
+
+function clearBoothMapDistrictSearch() {
+    const input = document.getElementById('bmap_search_input');
+    if (input) input.value = '';
+    const clearBtn = document.getElementById('bmap_clear_search_btn');
+    if (clearBtn) clearBtn.style.display = 'none';
+    onBoothMapDistrictSearch();
+}
+
+async function selectBoothMapDistrict(distName, element) {
+    selectedBoothDistrict = distName;
+
+    const districtObj = MAHA_36_DISTRICTS.find(d => d.name === distName) || { name: distName, mr: distName, div: 'Maharashtra Division' };
+
+    // 1. Update Map Nodes Active Class
+    document.querySelectorAll('#bmap_svg .mmap-node').forEach(node => {
+        if (node.getAttribute('data-bdist') === distName) {
+            node.classList.add('active-district');
+        } else {
+            node.classList.remove('active-district');
+        }
+    });
+
+    // 2. Update Quick Tags Active Class
+    document.querySelectorAll('#bmap_quick_tags .d-tag').forEach(tag => {
+        if (tag.getAttribute('data-tagdist') === distName) {
+            tag.classList.add('active');
+        } else {
+            tag.classList.remove('active');
+        }
+    });
+
+    // 3. Update Header & Subtitles
+    const titleEl = document.getElementById('bmap_selected_title');
+    if (titleEl) titleEl.innerText = `${districtObj.name} Live Polling Centre Telemetry (${districtObj.mr} थेट नकाशा)`;
+
+    const divLbl = document.getElementById('bmap_active_division_lbl');
+    if (divLbl) divLbl.innerText = districtObj.div;
+
+    const distNameEl = document.getElementById('bmap_dist_name');
+    if (distNameEl) distNameEl.innerText = `${districtObj.name} District (${districtObj.mr})`;
+
+    const distSubEl = document.getElementById('bmap_dist_sub');
+    if (distSubEl) distSubEl.innerText = `${districtObj.div} • 100% Real Database Polling Centres`;
+
+    // 4. Fetch Real Stats for this District
+    try {
+        const statsRes = await fetch(`/admin/booth_drilldown_stats?district=${encodeURIComponent(distName)}`);
+        const statsJson = await statsRes.json();
+        if (statsJson.status === 'success') {
+            const d = statsJson.data;
+            animateCounter('bmap_stat_booths', d.total_booths);
+            animateCounter('bmap_stat_voters', d.total_voters);
+            animateCounter('bmap_stat_voted', d.verified);
+            animateCounter('bmap_stat_turnout', d.turnout_pct, 800, '%');
+
+            const onlineBadge = document.getElementById('bmap_dist_online_badge');
+            if (onlineBadge) {
+                if (d.online_booths > 0) {
+                    onlineBadge.className = 'badge badge-online';
+                    onlineBadge.innerHTML = `<span class="pulse-dot"></span> ${d.online_booths} ONLINE`;
+                } else {
+                    onlineBadge.className = 'badge badge-offline';
+                    onlineBadge.innerHTML = '0 ONLINE';
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Failed to fetch district stats", e);
+    }
+
+    // 5. Fetch Real Polling Booths for this District
+    await loadDistrictBoothsList(distName, districtObj);
+
+    // 6. Fetch Verified Cast Ballots for this District
+    await loadDistrictVotedLog(distName);
+}
+
+async function loadDistrictBoothsList(distName, districtObj) {
+    const container = document.getElementById('bmap_booths_list_container');
+    const countLbl = document.getElementById('bmap_station_count_label');
+    if (!container) return;
+
+    container.innerHTML = '<div style="color: #94a3b8; font-size: 12px; padding: 20px; text-align: center;">Querying real database records for ' + distName + '...</div>';
+
+    try {
+        const res = await fetch(`/admin/get_booths?district=${encodeURIComponent(distName)}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+            const booths = json.data || [];
+            if (countLbl) {
+                countLbl.innerText = `${booths.length} Polling ${booths.length === 1 ? 'Station' : 'Stations'}`;
+            }
+
+            if (booths.length === 0) {
+                container.innerHTML = `
+                    <div style="background: rgba(15,23,42,0.6); border: 1.5px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 26px 18px; text-align: center; color: #94a3b8; margin-top: 6px;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🏛️</div>
+                        <div style="font-size: 13.5px; font-weight: 800; color: #e2e8f0;">0 Polling Booths in ${distName}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.5;">
+                            No polling booths are registered in <b>${distName}</b> in the live database. (Zero mock data policy).
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = booths.map(b => {
+                const isOnline = b.status === 'ONLINE';
+                const assigned = b.assigned_voters || 0;
+                const voted = b.votes_recorded || 0;
+                const pct = assigned > 0 ? ((voted / assigned) * 100).toFixed(1) : '0.0';
+
+                return `
+                    <div class="bmap-station-card">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                                <span class="badge badge-booth"><b>${b.booth_code}</b></span>
+                                <span style="font-weight: 800; font-size: 13.5px; color: #0f172a;">${b.polling_station}</span>
+                            </div>
+                            <div style="font-size: 11.5px; color: #64748b;">
+                                <span>${b.booth_name}</span> • <span>${b.constituency}</span>
+                            </div>
+                            <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                                Officer: <b>${b.officer_username ? b.officer_username : '<span style="color:#94a3b8;">Unassigned</span>'}</b>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="badge ${isOnline ? 'badge-online' : 'badge-offline'}" style="margin-bottom: 4px;">
+                                ${isOnline ? '<span class="pulse-dot"></span> LIVE ONLINE' : 'OFFLINE'}
+                            </span>
+                            <div style="font-size: 11.5px; font-weight: 700; color: #0f172a; margin-top: 2px;">
+                                <span style="color: #16a34a;">${voted}</span> / <span>${assigned}</span> Voted
+                            </div>
+                            <div style="font-size: 10.5px; color: #64748b;">${pct}% Turnout</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (e) {
+        console.error("Failed to load district booths list", e);
+        container.innerHTML = '<div style="color:#ef4444; font-size:12px; padding:15px; text-align:center;">Error loading database records.</div>';
+    }
+}
+
+async function loadDistrictVotedLog(distName) {
+    const tbody = document.getElementById('booth_view_table_body');
+    if (!tbody) return;
+
+    try {
+        const res = await fetch(`/admin/get_voted_log?district=${encodeURIComponent(distName)}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+            const logs = json.data || [];
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:16px;">No cast ballots recorded in ${distName} yet. (Real database query)</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = logs.map(l => `
+                <tr>
+                    <td><b style="color:#0284c7;">${l.v_id}</b></td>
+                    <td><b>${l.voter_name}</b></td>
+                    <td><span style="color:#ea580c; font-weight:700;">${l.election}</span></td>
+                    <td><b>${l.polling_station || 'Central Campus'}</b></td>
+                    <td><span class="badge badge-booth">${l.booth_code || 'BOOTH'}</span></td>
+                    <td>${l.booth_officer || '-'}</td>
+                    <td style="color:#475569; font-size:11.5px; font-weight:500;">${l.voted_at}</td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error("District voted log error", e);
+    }
+}
+
+function refreshBoothViewData() {
+    selectBoothMapDistrict(selectedBoothDistrict);
+}
+
+function initRegisterView() {
+    loadVoters();
+}
+
+// ── Startup & Auto-Heartbeat Loop ──
+initHierarchy();
+updateMapSpotlight('Pune');
+setInterval(() => {
+    loadDrilldownStats();
+    loadBoothsMatrix();
+    loadBlockchainLedger();
+}, 8000);
+</script>
+
+</body>
+</html>

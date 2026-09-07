@@ -1,0 +1,8 @@
+{
+    "twofactor_api_key": "2bd471f8-aac7-11f1-9cb1-0200cd936042",
+    "fast2sms_api_key": "oXu2UivKfFDnVlxCwmM7hT38QZjqB51HYEzcNgLa9d4O6kRryee29qRfE0P3DuFiswcjX85vJIm7HSG1",
+    "twilio_account_sid": "",
+    "twilio_auth_token": "",
+    "twilio_phone_number": "",
+    "note": "2Factor.in API key configured as primary SMS gateway with active credits."
+}

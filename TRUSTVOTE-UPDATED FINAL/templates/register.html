@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVote - महाराष्ट्र राज्य निवडणूक आयोग | मतदार नोंदणी प्रणाली</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', 'Noto Sans Devanagari', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 40%, #eff6ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .tricolor-stripe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #ff9933 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%);
+            z-index: 999;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Full-Screen Container */
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1.5px solid rgba(226, 232, 240, 0.95);
+            width: 100%;
+            max-width: 1620px;
+            padding: 28px 36px 36px;
+            border-radius: 28px;
+            box-shadow: 
+                0 30px 70px -15px rgba(15, 23, 42, 0.08),
+                0 0 40px rgba(255, 255, 255, 0.6) inset;
+            position: relative;
+            z-index: 10;
+            margin-top: 10px;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top Header Bar */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .emblem-icon {
+            font-size: 38px;
+            line-height: 1;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .brand-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-subtitle {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .sec-badge {
+            background: #ecfdf5;
+            color: #059669;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #a7f3d0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .officer-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #bfdbfe;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-link {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 12.5px;
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logout-link:hover {
+            background: #fee2e2;
+            transform: translateY(-1px);
+        }
+
+        /* 3-Column Executive Grid */
+        .form-grid-layout {
+            display: grid;
+            grid-template-columns: 1.05fr 1.35fr 1.05fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1280px) {
+            .form-grid-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-col:nth-child(3) {
+                grid-column: 1 / -1;
+            }
+        }
+        @media (max-width: 860px) {
+            .form-grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Column Panels */
+        .panel-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1.5px solid #f1f5f9;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .form-row.full { grid-template-columns: 1fr; }
+
+        label {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+            color: #334155;
+            font-size: 13px;
+        }
+        label span.req { color: #ef4444; }
+
+        input[type=text], input[type=date], select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        input[type=text]:focus, input[type=date]:focus, select:focus {
+            border-color: #16a34a;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 7px 12px !important;
+            margin-bottom: 5px;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 9px !important;
+            font-size: 12px !important;
+            background: #ffffff !important;
+        }
+
+        /* Checkbox Grid */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+        }
+        .checkbox-item input[type=checkbox] {
+            width: 16px;
+            height: 16px;
+            accent-color: #16a34a;
+            cursor: pointer;
+        }
+
+        /* Dynamic Local Bodies Container */
+        .local-bodies-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .local-bodies-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+        .local-bodies-wrap::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Camera Box */
+        .video-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            background: #000;
+            border: 3px solid #cbd5e1;
+        }
+        #video {
+            width: 100%;
+            display: block;
+            height: 250px;
+            object-fit: cover;
+        }
+        #preview-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: none;
+            border: 4px solid #16a34a;
+        }
+        .cam-hint {
+            font-size: 11.5px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn-capture, .btn-retake {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+        .btn-capture {
+            background: #1e293b;
+            color: #ffffff;
+        }
+        .btn-capture:hover {
+            background: #0f172a;
+        }
+        .btn-retake {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1.5px solid #bfdbfe;
+            display: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.4);
+            transition: all 0.2s ease;
+            margin-top: auto;
+        }
+        .btn-submit:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(22, 163, 74, 0.5);
+        }
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-badge {
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+        .status-ok { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .status-wait { background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; display: block; }
+        .status-err { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body>
+    <div class="tricolor-stripe"></div>
+
+    <div class="container">
+        
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div class="brand-box">
+                <div class="emblem-icon"></div>
+                <div>
+                    <div class="brand-title">
+                        महाराष्ट्र राज्य निवडणूक आयोग
+                        <span class="sec-badge">SEC Maharashtra Portal</span>
+                    </div>
+                    <div class="brand-subtitle">State Election Commission of Maharashtra • Citizen Electoral Roll System</div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="officer-badge">
+                    <span></span> Registration Officer Active
+                </div>
+                <a href="/admin/login" class="logout-link" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
+                    Admin Control
+                </a>
+                <a href="/logout" class="logout-link">
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <form id="regForm" onsubmit="return false;">
+            <div class="form-grid-layout">
+                
+                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     COLUMN 1: CITIZEN PROFILE & JURISDICTION
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        १. मतदाराची वैयक्तिक माहिती व मतदारसंघ
+                    </div>
+
+                    <div>
+                        <label>Voter ID (EPIC Number) <span class="req">*</span></label>
+                        <input type="text" name="v_id" id="v_id" placeholder="उदा. MH14ABC1234" required oninput="this.value=this.value.toUpperCase()">
+                        <div id="vid-status" class="status-badge"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div>
+                            <label>First Name <span class="req">*</span></label>
+                            <input type="text" id="first_name" placeholder="First Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                        </div>
+                        <div>
+                            <label>Last Name <span class="req">*</span></label>
+                            <input type="text" id="last_name" placeholder="Last Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Father's / Husband's Name <span class="req">*</span></label>
+                        <input type="text" id="father_name" placeholder="Father's / Husband's Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                    </div>
+                    <input type="hidden" name="name" id="full_name_hidden">
+
+                    <div class="form-row">
+                        <div>
+                            <label>Gender / लिंग <span class="req">*</span></label>
+                            <select name="gender">
+                                <option value="Male">Male / पुरुष</option>
+                                <option value="Female">Female / महिला</option>
+                                <option value="Other">Other / इतर</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Date of Birth / जन्म तारीख <span class="req">*</span></label>
+                            <input type="date" name="dob" id="dob" required>
+                        </div>
+                    </div>
+                    <div id="dob-error" style="color:#ef4444;font-size:12px;display:none;font-weight:700;">️ You must be 18 years of age or older to register.</div>
+
+                    <div style="border-top: 1px dashed #cbd5e1; padding-top: 14px;">
+                        <label>Voter's Home District / जिल्हा (३६ जिल्हे) <span class="req">*</span></label>
+                        <input type="text" class="search-box" placeholder="जिल्हा शोधा (Search 36 Districts)..." oninput="filterDropdown('reg_district', this.value); onDistrictSelect();">
+                        <select name="district" id="reg_district" onchange="onDistrictSelect()" required>
+                            <option value="">-- जिल्हा निवडा / Select District --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Voter's Constituency / मतदारसंघ / प्रभाग <span class="req">*</span></label>
+                        <input type="text" class="search-box" placeholder="मतदारसंघ शोधा (Search Constituency)..." oninput="filterDropdown('reg_constituency', this.value);">
+                        <select name="constituency" id="reg_constituency" required>
+                            <option value="">-- मतदारसंघ निवडा / Select Constituency --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     COLUMN 2: LOCAL SELF-GOVERNMENT ELECTIONS
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        २. स्थानिक स्वराज्य संस्था निवडणूक निवड
+                    </div>
+
+                    <div>
+                        <label style="margin-bottom: 8px;">लागू असलेल्या निवडणुका निवडा (Select Applicable Tiers):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-item"><input type="checkbox" id="chk_mnc" name="mnc" onchange="toggleLocalBodyFields()" checked> महानगरपालिका (29)</label>
+                            <label class="checkbox-item"><input type="checkbox" id="chk_zp" name="zp" onchange="toggleLocalBodyFields()" checked> जिल्हा परिषद (36)</label>
+                            <label class="checkbox-item"><input type="checkbox" id="chk_ps" name="ps" onchange="toggleLocalBodyFields()" checked> पंचायत समिती (351)</label>
+                            <label class="checkbox-item"><input type="checkbox" id="chk_np" name="np" onchange="toggleLocalBodyFields()"> नगरपालिका परिषद</label>
+                            <label class="checkbox-item"><input type="checkbox" id="chk_npt" name="npt" onchange="toggleLocalBodyFields()"> नगरपंचायत</label>
+                            <label class="checkbox-item"><input type="checkbox" id="chk_gp" name="gp" onchange="toggleLocalBodyFields()"> ग्रामपंचायत</label>
+                        </div>
+                    </div>
+
+                    <div class="local-bodies-wrap">
+                        
+                        <!-- 1. Mahanagarpalika -->
+                        <div id="grp_mnc">
+                            <label>महानगरपालिका निवडा / Select Mahanagarpalika</label>
+                            <input type="text" class="search-box" placeholder="महानगरपालिका शोधा (Search Corporation)..." oninput="filterDropdown('sel_mnc', this.value)">
+                            <select name="mahanagarpalika_name" id="sel_mnc">
+                                <option value="">-- महानगरपालिका निवडा --</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. Zilha Parishad -->
+                        <div id="grp_zp">
+                            <label>जिल्हा परिषद निवडा / Select Zilha Parishad</label>
+                            <input type="text" class="search-box" placeholder="जिल्हा परिषद शोधा (Search ZP)..." oninput="filterDropdown('sel_zp', this.value)">
+                            <select name="zilha_parishad_name" id="sel_zp">
+                                <option value="">-- जिल्हा परिषद निवडा --</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Panchayat Samiti -->
+                        <div id="grp_ps">
+                            <label>तालुका पंचायत समिती निवडा (जिल्ह्यानुसार)</label>
+                            <input type="text" class="search-box" placeholder="पंचायत समिती शोधा (Search Samiti)..." oninput="filterDropdown('sel_ps', this.value)">
+                            <select name="panchayat_samiti_name" id="sel_ps">
+                                <option value="">-- तालुका पंचायत समिती निवडा --</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. Nagar Parishad -->
+                        <div id="grp_np" style="display: none;">
+                            <label>नगरपालिका / नगरपरिषद निवडा (जिल्ह्यानुसार)</label>
+                            <input type="text" class="search-box" placeholder="नगरपालिका शोधा (Search Parishad)..." oninput="filterDropdown('sel_np', this.value)">
+                            <select name="nagar_parishad_name" id="sel_np">
+                                <option value="">-- नगरपालिका / नगरपरिषद निवडा --</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Nagar Panchayat -->
+                        <div id="grp_npt" style="display: none;">
+                            <label>नगरपंचायत निवडा (जिल्ह्यानुसार)</label>
+                            <input type="text" class="search-box" placeholder="नगरपंचायत शोधा (Search Panchayat)..." oninput="filterDropdown('sel_npt', this.value)">
+                            <select name="nagar_panchayat_name" id="sel_npt">
+                                <option value="">-- नगरपंचायत निवडा --</option>
+                            </select>
+                        </div>
+
+                        <!-- 6. Gram Panchayat -->
+                        <div id="grp_gp" style="display: none;">
+                            <label>ग्रामपंचायत गाव व प्रभाग (Searchable & Open Entry)</label>
+                            <input list="gp_list" name="gram_panchayat_name" id="txt_gp" placeholder="गाव निवडा किंवा टाईप करा (उदा. मौजे शिर्डी / प्रभाग १)">
+                            <datalist id="gp_list"></datalist>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     COLUMN 3: BIOMETRICS & SUBMISSION
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+                <div class="panel-card" style="justify-content: space-between;">
+                    <div>
+                        <div class="panel-title">
+                            ३. बायोमेट्रिक छायाचित्र व पडताळणी
+                        </div>
+
+                        <div class="video-wrap" style="margin-top: 10px;">
+                            <video id="video" autoplay playsinline muted></video>
+                            <img id="preview-img" alt="Captured Photo">
+                        </div>
+                        <p class="cam-hint">कॅमेऱ्याकडे थेट पहा. व्यवस्थित प्रकाश असल्याची खात्री करा.</p>
+                        
+                        <div id="photo-status" class="status-badge status-wait">️ कृपया छायाचित्र कॅप्चर करा</div>
+
+                        <button type="button" class="btn-capture" id="btn-capture" onclick="capturePhoto()">
+                            Capture Live Photo
+                        </button>
+                        <button type="button" class="btn-retake" id="btn-retake" onclick="retakePhoto()">
+                            Retake Photo
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <input type="hidden" name="photo" id="photo_input">
+                        <button type="submit" class="btn-submit" id="btn-submit">
+                            Complete Voter Registration
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+<script>
+    // ── DOB Age >= 18 check ──
+    const dobInput = document.getElementById('dob');
+    const dobError = document.getElementById('dob-error');
+    dobInput.addEventListener('change', function() {
+        if (!this.value) return;
+        const dob = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+        if (age < 18) {
+            dobError.style.display = 'block';
+            this.setCustomValidity('Must be 18+');
+        } else {
+            dobError.style.display = 'none';
+            this.setCustomValidity('');
+        }
+    });
+
+    // ── Voter ID Duplicate Real-time Check ──
+    let vidTimer = null;
+    document.getElementById('v_id').addEventListener('input', function() {
+        clearTimeout(vidTimer);
+        const val = this.value.trim();
+        const statusDiv = document.getElementById('vid-status');
+        if (val.length < 4) {
+            statusDiv.style.display = 'none';
+            return;
+        }
+        vidTimer = setTimeout(() => {
+            fetch('/check_voter_id?v_id=' + encodeURIComponent(val))
+                .then(r => r.json())
+                .then(d => {
+                    if (d.exists) {
+                        statusDiv.className = 'status-badge status-err';
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerText = d.message || '️ Voter ID already registered!';
+                    } else {
+                        statusDiv.className = 'status-badge status-ok';
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerText = 'Voter ID is available';
+                    }
+                })
+                .catch(() => {});
+        }, 400);
+    });
+
+    // ── WebCam Photo Capture ──
+    const video = document.getElementById('video');
+    const previewImg = document.getElementById('preview-img');
+    const photoInput = document.getElementById('photo_input');
+    const photoStatus = document.getElementById('photo-status');
+    const btnCapture = document.getElementById('btn-capture');
+    const btnRetake = document.getElementById('btn-retake');
+
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => {
+            photoStatus.className = 'status-badge status-err';
+            photoStatus.innerText = 'Camera access error: ' + err.message;
+        });
+
+    function capturePhoto() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 480;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 640, 480);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+        photoInput.value = dataUrl;
+        previewImg.src = dataUrl;
+        video.style.display = 'none';
+        previewImg.style.display = 'block';
+
+        btnCapture.style.display = 'none';
+        btnRetake.style.display = 'block';
+
+        photoStatus.className = 'status-badge status-ok';
+        photoStatus.innerText = 'Photo captured successfully';
+    }
+
+    function retakePhoto() {
+        photoInput.value = '';
+        previewImg.style.display = 'none';
+        video.style.display = 'block';
+
+        btnCapture.style.display = 'block';
+        btnRetake.style.display = 'none';
+
+        photoStatus.className = 'status-badge status-wait';
+        photoStatus.innerText = '️ Please capture a photo before submitting';
+    }
+
+    // ── Load 36 Districts of Maharashtra & Full Local Bodies Data ──
+    let mahaDistricts = {};
+    let districtLocalBodies = {};
+
+    function toggleLocalBodyFields() {
+        document.getElementById('grp_mnc').style.display = document.getElementById('chk_mnc').checked ? 'block' : 'none';
+        document.getElementById('grp_zp').style.display = document.getElementById('chk_zp').checked ? 'block' : 'none';
+        document.getElementById('grp_ps').style.display = document.getElementById('chk_ps').checked ? 'block' : 'none';
+        document.getElementById('grp_np').style.display = document.getElementById('chk_np').checked ? 'block' : 'none';
+        document.getElementById('grp_npt').style.display = document.getElementById('chk_npt').checked ? 'block' : 'none';
+        document.getElementById('grp_gp').style.display = document.getElementById('chk_gp').checked ? 'block' : 'none';
+    }
+
+    function setDropdownOptions(selectId, items, placeholder) {
+        const sel = document.getElementById(selectId);
+        if (!sel) return;
+        
+        const opts = [{ value: '', text: placeholder }];
+        (items || []).forEach(item => {
+            opts.push({ value: item, text: item });
+        });
+        sel._allOptions = opts;
+        filterDropdown(selectId, '');
+    }
+
+    function filterDropdown(selectId, query) {
+        const sel = document.getElementById(selectId);
+        if (!sel || !sel._allOptions) return;
+        const q = (query || '').toLowerCase().trim();
+        
+        const currentVal = sel.value;
+        sel.innerHTML = '';
+        
+        const filtered = sel._allOptions.filter(opt => 
+            !q || opt.text.toLowerCase().includes(q) || (opt.value && opt.value.toLowerCase().includes(q))
+        );
+        
+        if (filtered.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = "";
+            opt.innerText = "-- Result Not Found / सापडले नाही --";
+            sel.appendChild(opt);
+        } else {
+            filtered.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt.value;
+                el.innerText = opt.text;
+                if (opt.value === currentVal) el.selected = true;
+                sel.appendChild(el);
+            });
+        }
+    }
+
+    // Load Local Bodies & Districts
+    Promise.all([
+        fetch('/get_district_local_bodies').then(r => r.json()),
+        fetch('/get_maharashtra_districts').then(r => r.json())
+    ]).then(([lbRes, distRes]) => {
+        if (lbRes.status === 'success' && lbRes.data) {
+            districtLocalBodies = lbRes.data;
+        }
+        if (distRes.status === 'success' && distRes.data) {
+            mahaDistricts = distRes.data;
+            const districtList = Object.keys(mahaDistricts);
+            setDropdownOptions('reg_district', districtList, '-- जिल्हा निवडा / Select District (36 Districts) --');
+            
+            // Default select Pune
+            const puneKey = districtList.find(k => k.toLowerCase().includes('pune')) || districtList[0];
+            if (puneKey) {
+                document.getElementById('reg_district').value = puneKey;
+                onDistrictSelect();
+            }
+        }
+    }).catch(err => console.log("Data load error:", err));
+
+    function onDistrictSelect() {
+        const selectedDistrict = document.getElementById('reg_district').value;
+        const distData = districtLocalBodies[selectedDistrict] || {};
+        const distNameShort = selectedDistrict ? selectedDistrict.split('(')[0].trim() : '';
+
+        // 1. Update Constituencies for Selected District
+        const consts = mahaDistricts[selectedDistrict] || [];
+        setDropdownOptions('reg_constituency', consts, '-- मतदारसंघ निवडा / Select Constituency --');
+        if (consts.length > 0) {
+            document.getElementById('reg_constituency').value = consts[0];
+        }
+
+        // 2. District-wise Panchayat Samitis (351 Total)
+        const psList = distData.panchayat_samiti || [];
+        const psPlaceholder = psList.length 
+            ? `-- ${distNameShort} पंचायत समित्या (${psList.length} उपलब्ध) --`
+            : '-- तालुका पंचायत समिती निवडा --';
+        setDropdownOptions('sel_ps', psList, psPlaceholder);
+        if (psList.length > 0) document.getElementById('sel_ps').value = psList[0];
+
+        // 3. District-wise Nagar Parishads (Municipal Councils)
+        const npList = distData.nagar_parishad || [];
+        const npPlaceholder = npList.length
+            ? `-- ${distNameShort} नगरपालिका / नगरपरिषद (${npList.length} उपलब्ध) --`
+            : '-- नगरपालिका / नगरपरिषद निवडा --';
+        setDropdownOptions('sel_np', npList, npPlaceholder);
+        if (npList.length > 0) document.getElementById('sel_np').value = npList[0];
+
+        // 4. District-wise Nagar Panchayats
+        const nptList = distData.nagar_panchayat || [];
+        const nptPlaceholder = nptList.length
+            ? `-- ${distNameShort} नगरपंचायती (${nptList.length} उपलब्ध) --`
+            : '-- नगरपंचायत निवडा --';
+        setDropdownOptions('sel_npt', nptList, nptPlaceholder);
+        if (nptList.length > 0) document.getElementById('sel_npt').value = nptList[0];
+
+        // 5. District-wise Mahanagarpalika (Municipal Corporations)
+        const mncList = distData.mahanagarpalika || [];
+        const allMnc = [];
+        Object.values(districtLocalBodies).forEach(d => {
+            (d.mahanagarpalika || []).forEach(m => { if (!allMnc.includes(m)) allMnc.push(m); });
+        });
+        const mncToDisplay = mncList.length ? mncList : allMnc;
+        const mncPlaceholder = mncList.length
+            ? `-- ${distNameShort} महानगरपालिका (${mncList.length}) --`
+            : '-- महानगरपालिका निवडा (२९ शहरे) --';
+        setDropdownOptions('sel_mnc', mncToDisplay, mncPlaceholder);
+        if (mncList.length > 0) document.getElementById('sel_mnc').value = mncList[0];
+
+        // 6. District-wise Zilha Parishad
+        const zpList = distData.zilha_parishad || [];
+        const allZp = [];
+        Object.values(districtLocalBodies).forEach(d => {
+            (d.zilha_parishad || []).forEach(z => { if (!allZp.includes(z)) allZp.push(z); });
+        });
+        setDropdownOptions('sel_zp', zpList.length ? zpList : allZp, '-- जिल्हा परिषद निवडा (36 Zilha Parishads) --');
+        if (zpList.length > 0) document.getElementById('sel_zp').value = zpList[0];
+
+        // 7. District-wise Gram Panchayats Datalist & Search
+        const gpList = distData.gram_panchayat || [];
+        const datalist = document.getElementById('gp_list');
+        if (datalist) {
+            datalist.innerHTML = gpList.map(g => `<option value="${g}">`).join('');
+        }
+    }
+
+    // ── Submit Form Handler ──
+    document.getElementById('regForm').onsubmit = async function(e) {
+        e.preventDefault();
+
+        // Validate Full Name
+        const fn = document.getElementById('first_name').value.trim();
+        const ln = document.getElementById('last_name').value.trim();
+        const fa = document.getElementById('father_name').value.trim();
+        if (!fn || !ln || !fa) {
+            alert('Please fill out all First Name, Last Name and Father/Husband Name fields.');
+            return;
+        }
+        document.getElementById('full_name_hidden').value = `${fn} ${fa} ${ln}`;
+
+        // Validate Photo Captured
+        if (!photoInput.value) {
+            alert('Please capture a biometric photo before submitting.');
+            return;
+        }
+
+        const btnSubmit = document.getElementById('btn-submit');
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = 'Processing Registration & Encrypting QR...';
+
+        const formData = new FormData(this);
+
+        try {
+            const resp = await fetch('/register', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await resp.json();
+
+            if (data.status === 'Success') {
+                window.location.href = '/success/' + data.v_id;
+            } else {
+                alert('Registration Blocked: ' + (data.message || 'Registration failed'));
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Complete Voter Registration';
+            }
+        } catch (err) {
+            alert('Server error. Please check server connection.');
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = 'Complete Voter Registration';
+        }
+    };
+</script>
+</body>
+</html>

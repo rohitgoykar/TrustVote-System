@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVote - Government of India</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Tricolor Background Blobs */
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.16;
+            z-index: 1;
+        }
+        #rainCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .blob-orange {
+            top: -10%;
+            left: -10%;
+            width: 550px;
+            height: 550px;
+            background: #f97316; /* Saffron Orange */
+            animation: float-orange 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blob-green {
+            bottom: -10%;
+            right: -10%;
+            width: 650px;
+            height: 650px;
+            background: #22c55e; /* Emerald Green */
+            animation: float-green 22s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes float-orange {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(100px, 80px) scale(1.15) rotate(45deg); }
+            100% { transform: translate(-50px, 120px) scale(0.9) rotate(90deg); }
+        }
+        @keyframes float-green {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(-120px, -70px) scale(0.85) rotate(-60deg); }
+            100% { transform: translate(80px, -40px) scale(1.1) rotate(-120deg); }
+        }
+
+        .tricolor-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            z-index: 100;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 32px;
+            padding: 55px 45px;
+            width: 90%;
+            max-width: 980px;
+            text-align: center;
+            box-shadow: 
+                0 30px 60px -15px rgba(15, 23, 42, 0.1),
+                0 0 50px rgba(255, 255, 255, 0.4) inset;
+            z-index: 10;
+            position: relative;
+            opacity: 0;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Language Bar */
+        .language-bar {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            display: flex;
+            background: rgba(15, 23, 42, 0.05);
+            padding: 4px;
+            border-radius: 12px;
+            gap: 2px;
+        }
+        .lang-btn {
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .lang-btn:hover {
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        .active-lang {
+            background: #ffffff;
+            color: #0f172a !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            width: 90px;
+            height: 90px;
+            background: #ffffff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+            opacity: 0;
+            animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+        }
+        
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.6) rotate(-10deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        
+        .logo-container:hover {
+            transform: rotate(10deg) scale(1.05);
+        }
+        .logo-img {
+            width: 60px;
+            height: auto;
+        }
+
+        .heading-group {
+            opacity: 0;
+            animation: textSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+        }
+        
+        @keyframes textSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 38px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 45px;
+        }
+
+        /* Grid portal selection */
+        .btn-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .portal-card {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            border-radius: 24px;
+            padding: 35px 24px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+            animation: 
+                cardSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards,
+                cardFloat 6s infinite ease-in-out alternate;
+        }
+        
+        .portal-card:nth-child(2) {
+            animation-delay: 0.6s, 1.5s;
+        }
+        .portal-card:nth-child(3) {
+            animation-delay: 0.7s, 3s;
+        }
+        
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes cardFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+        
+        /* Glass Shine Sweep */
+        .portal-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -150%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            transform: skewX(-25deg);
+            pointer-events: none;
+            transition: none;
+        }
+        .portal-card:hover::after {
+            left: 150%;
+            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        .portal-card.card-register::before { background: #16a34a; }
+        .portal-card.card-scan::before     { background: #0f172a; }
+        .portal-card.card-admin::before    { background: #ea580c; }
+
+        .portal-card:hover {
+            animation-play-state: paused;
+            transform: translateY(-12px) scale(1.03);
+            border-color: rgba(203, 213, 225, 0.8);
+        }
+        
+        .portal-card.card-register:hover {
+            box-shadow: 
+                0 25px 40px -15px rgba(22, 163, 74, 0.18),
+                0 0 30px rgba(22, 163, 74, 0.1);
+            border-color: rgba(22, 163, 74, 0.4);
+        }
+        .portal-card.card-scan:hover {
+            box-shadow: 
+                0 25px 40px -15px rgba(15, 23, 42, 0.18),
+                0 0 30px rgba(15, 23, 42, 0.1);
+            border-color: rgba(15, 23, 42, 0.4);
+        }
+        .portal-card.card-admin:hover {
+            box-shadow: 
+                0 25px 40px -15px rgba(234, 88, 12, 0.18),
+                0 0 30px rgba(234, 88, 12, 0.1);
+            border-color: rgba(234, 88, 12, 0.4);
+        }
+        
+        .portal-card:hover::before {
+            opacity: 1;
+        }
+
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .portal-card:hover .icon-box {
+            transform: translateY(-4px) scale(1.08);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+        .card-register .icon-box { background: #f0fdf4; color: #16a34a; }
+        .card-scan .icon-box     { background: #f1f5f9; color: #0f172a; }
+        .card-admin .icon-box    { background: #fff7ed; color: #ea580c; }
+
+        .portal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .portal-desc {
+            font-size: 12.5px;
+            color: #64748b;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 35px;
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .btn-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .main-card {
+                padding: 40px 20px;
+            }
+            h1 { font-size: 30px; }
+            .language-bar { position: static; margin-bottom: 25px; display: inline-flex; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="tricolor-stripe"></div>
+<div class="bg-blob blob-orange"></div>
+<div class="bg-blob blob-green"></div>
+<canvas id="rainCanvas"></canvas>
+
+<div class="main-card">
+    <div class="language-bar">
+        <span id="mr" class="lang-btn active-lang" onclick="updateLanguage('mr')">मराठी</span>
+        <span id="hi" class="lang-btn" onclick="updateLanguage('hi')">हिंदी</span>
+        <span id="en" class="lang-btn" onclick="updateLanguage('en')">English</span>
+    </div>
+    
+    <div class="logo-container">
+        <img src="/static/logo.png" class="logo-img" alt="Logo">
+    </div>
+    
+    <div class="heading-group">
+        <h1 id="main-h1">महाराष्ट्र राज्य निवडणूक आयोग</h1>
+        <h2 id="main-h2">TrustVote - स्थानिक स्वराज्य संस्था निवडणूक पोर्टल</h2>
+    </div>
+    
+    <div class="btn-container">
+        <!-- PORTAL 1 -->
+        <a href="/officer/login" class="portal-card card-register">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+            </div>
+            <div class="portal-title" id="btn-1">नवीन मतदार नोंदणी</div>
+            <div class="portal-desc" id="desc-1">मतदार नाव, फोटो व प्रभाग/केंद्र नोंदणी पोर्टल</div>
+        </a>
+
+        <!-- PORTAL 2 -->
+        <a href="/booth/login" class="portal-card card-scanner">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+            </div>
+            <div class="portal-title" id="btn-2">मतदान केंद्र स्कॅनर</div>
+            <div class="portal-desc" id="desc-2">QR कोड आणि बायोमेट्रिक चेहरा पडताळणी सिस्टीम</div>
+        </a>
+
+        <!-- PORTAL 3 -->
+        <a href="/admin/login" class="portal-card card-admin">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            </div>
+            <div class="portal-title" id="btn-3">मुख्य निवडणूक अधिकारी पॅनेल</div>
+            <div class="portal-desc" id="desc-3">सर्व जिल्हा व प्रभाग मतदान केंद्रे नियंत्रण कक्ष</div>
+        </a>
+    </div>
+    
+    <div class="footer">© 2026 Maharashtra State Election Commission (महाराष्ट्र राज्य निवडणूक आयोग) | SEC Maharashtra</div>
+</div>
+
+<script>
+function updateLanguage(lang) {
+    ["mr","hi","en"].forEach(l => document.getElementById(l).classList.remove("active-lang"));
+    document.getElementById(lang).classList.add("active-lang");
+    const trans = {
+        "mr":{ h1:"महाराष्ट्र राज्य निवडणूक आयोग", h2:"TrustVote - स्थानिक स्वराज्य संस्था निवडणूक पोर्टल", b1:"नवीन मतदार नोंदणी", b2:"मतदान केंद्र स्कॅनर", b3:"मुख्य निवडणूक अधिकारी पॅनेल", d1:"मतदार नाव, फोटो व प्रभाग/केंद्र नोंदणी पोर्टल", d2:"QR कोड आणि बायोमेट्रिक चेहरा पडताळणी सिस्टीम", d3:"सर्व जिल्हा व प्रभाग मतदान केंद्रे नियंत्रण कक्ष" },
+        "hi":{ h1:"महाराष्ट्र राज्य चुनाव आयोग", h2:"TrustVote - स्थानीय निकाय चुनाव पोर्टल", b1:"नया मतदाता पंजीकरण", b2:"मतदान केंद्र स्कैनर", b3:"मुख्य चुनाव अधिकारी कक्ष", d1:"मतदाता नाम, फोटो और प्रभाग पंजीकरण पोर्टल", d2:"QR कोड और बायोमेट्रिक चेहरा सत्यापन प्रणाली", d3:"सभी जिला और प्रभाग मतदान केंद्र नियंत्रण कक्ष" },
+        "en":{ h1:"State Election Commission, Maharashtra", h2:"TrustVote - Local Self-Government Election Portal", b1:"New Voter Registration", b2:"Polling Booth Scanner", b3:"Main Election Officer Center", d1:"Voter details & ward registration portal", d2:"QR code and facial biometric verification system", d3:"Central multi-district polling stations control room" }
+    };
+    document.getElementById("main-h1").innerText = trans[lang].h1;
+    document.getElementById("main-h2").innerText = trans[lang].h2;
+    document.getElementById("btn-1").innerText   = trans[lang].b1;
+    document.getElementById("btn-2").innerText   = trans[lang].b2;
+    document.getElementById("btn-3").innerText   = trans[lang].b3;
+    document.getElementById("desc-1").innerText  = trans[lang].d1;
+    document.getElementById("desc-2").innerText  = trans[lang].d2;
+    document.getElementById("desc-3").innerText  = trans[lang].d3;
+}
+
+// ── Background Rain Particle Effect ──
+(function() {
+    const canvas = document.getElementById('rainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    const raindrops = [];
+    const maxDrops = 110;
+    
+    for (let i = 0; i < maxDrops; i++) {
+        raindrops.push({
+            x: Math.random() * width,
+            y: Math.random() * height - height,
+            vy: 6 + Math.random() * 8,
+            length: 12 + Math.random() * 15,
+            opacity: 0.08 + Math.random() * 0.12
+        });
+    }
+    
+    function animateRain() {
+        ctx.clearRect(0, 0, width, height);
+        
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        
+        for (let i = 0; i < maxDrops; i++) {
+            const p = raindrops[i];
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + (p.vy * 0.1), p.y + p.length);
+            ctx.strokeStyle = `rgba(186, 230, 253, ${p.opacity})`;
+            ctx.stroke();
+            
+            p.y += p.vy;
+            p.x += p.vy * 0.1;
+            
+            if (p.y > height) {
+                p.y = -p.length;
+                p.x = Math.random() * width;
+                p.vy = 6 + Math.random() * 8;
+            }
+        }
+        requestAnimationFrame(animateRain);
+    }
+    animateRain();
+})();
+</script>
+</body>
+</html>

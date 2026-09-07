@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVote - मतदान स्कॅनर</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background Gradient Blobs */
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: 1;
+        }
+        #rainCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .blob-orange {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: #f97316;
+            animation: float-orange 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blob-green {
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: #22c55e;
+            animation: float-green 22s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes float-orange {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(80px, 60px) scale(1.1) rotate(45deg); }
+            100% { transform: translate(-40px, 100px) scale(0.9) rotate(90deg); }
+        }
+        @keyframes float-green {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(-100px, -60px) scale(0.85) rotate(-60deg); }
+            100% { transform: translate(60px, -30px) scale(1.08) rotate(-120deg); }
+        }
+
+        .tricolor-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            z-index: 100;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            width: 100%;
+            max-width: 640px;
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: 
+                0 30px 60px -15px rgba(15, 23, 42, 0.1),
+                0 0 50px rgba(255, 255, 255, 0.4) inset;
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+
+        .logout-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            background: #fef2f2;
+            border: 1.5px solid #fee2e2;
+            padding: 6px 12px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .logout-link:hover {
+            background: #fee2e2;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .page-header h2 { font-size: 22px; font-weight: 800; color: #0f172a; }
+        .page-header p  { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500; }
+
+        /* Steps indicator */
+        .steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .step-circle {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700;
+            border: 2px solid #cbd5e1;
+            background: white;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+        .step-circle.active  { border-color: #1a73e8; color: #1a73e8; background: #eff6ff; box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15); }
+        .step-circle.done    { border-color: #16a34a; background: #16a34a; color: white; }
+        .step-label { font-size: 11px; font-weight: 600; color: #64748b; text-align: center; }
+        .step-connector {
+            width: 70px; height: 2px;
+            background: #e2e8f0;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .step-connector.done { background: #16a34a; }
+
+        /* Cards */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            display: none;
+        }
+        .card.active { display: block; }
+        .card h3 { color: #0f172a; margin-bottom: 15px; font-size: 16px; font-weight: 700; }
+
+        select {
+            width: 100%; padding: 12px; margin: 8px 0 20px;
+            border-radius: 12px; border: 1.5px solid #cbd5e1; font-size: 15px;
+            background: #ffffff; color: #1e293b; outline: none; font-weight: 500;
+        }
+        select:focus { border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1); }
+
+        #reader { border-radius: 12px; overflow: hidden; border: 1.5px solid #cbd5e1; }
+        #reader__status_span, #reader__status_span_parent, #reader__header_message, [id$="__status_span"], [id$="__header_message"] {
+            display: none !important;
+        }
+
+        /* Face Instruction styles */
+        .instruction-container {
+            margin: 20px 0;
+        }
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        .instruction-img {
+            width: 54px;
+            height: 54px;
+            margin-right: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #fff8f0;
+            flex-shrink: 0;
+        }
+        .instruction-text {
+            font-weight: 700;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        /* Circle Face Camera */
+        .auth-camera-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 6px solid #ef4444; /* red */
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+            background: #000;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: cameraPulseRed 2s infinite alternate ease-in-out;
+        }
+        .auth-camera-container.verified-border {
+            border-color: #16a34a !important; /* emerald green */
+            animation: cameraPulseGreen 2.5s infinite alternate ease-in-out !important;
+        }
+        @keyframes cameraPulseRed {
+            0% { box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.2), 0 0 0 0px rgba(239, 68, 68, 0.25); }
+            100% { box-shadow: 0 15px 35px -5px rgba(239, 68, 68, 0.35), 0 0 0 12px rgba(239, 68, 68, 0); }
+        }
+        @keyframes cameraPulseGreen {
+            0% { box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.2), 0 0 0 0px rgba(22, 163, 74, 0.25); }
+            100% { box-shadow: 0 15px 35px -5px rgba(22, 163, 74, 0.35), 0 0 0 12px rgba(22, 163, 74, 0); }
+        }
+        
+        .scan-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #16a34a, transparent);
+            box-shadow: 0 0 12px #16a34a;
+            z-index: 10;
+            animation: laserSweep 2.5s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes laserSweep {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        #liveVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .camera-guidelines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .blink-prompt {
+            font-size: 21px;
+            font-weight: 800;
+            color: #e53e3e;
+            text-align: center;
+            letter-spacing: 1.5px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            animation: textPulse 0.8s infinite alternate;
+        }
+        @keyframes textPulse {
+            0% { opacity: 0.3; transform: scale(0.96); }
+            100% { opacity: 1; transform: scale(1.04); }
+        }
+        .face-hint {
+            text-align: center;
+            color: #4a5568;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block; width: 100%;
+            padding: 14px;
+            border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-blue    { background: #1a73e8; color: white; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15); }
+        .btn-blue:hover { background: #1558b0; }
+        .btn-green   { background: #16a34a; color: white; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15); }
+        .btn-green:hover { background: #15803d; }
+        .btn-orange  { background: #ff9933; color: white; margin-top: 10px; box-shadow: 0 4px 12px rgba(255, 153, 51, 0.15); }
+        .btn-orange:hover { background: #e07b16; }
+        .btn:hover   { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Result boxes */
+        #result {
+            font-weight: 700; font-size: 15px;
+            padding: 16px; border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+            display: none;
+        }
+        .res-ok  { background: #f0fdf4; color: #166534; border: 1.5px solid #dcfce7; }
+        .res-err { background: #fef2f2; color: #991b1b; border: 1.5px solid #fee2e2; }
+        .res-info{ background: #eff6ff; color: #1e40af; border: 1.5px solid #dbeafe; }
+
+        #qrResult {
+            font-weight: 700; font-size: 14px;
+            padding: 14px; border-radius: 10px;
+            margin-top: 16px;
+            text-align: center;
+            display: block;
+        }
+
+        /* Voter preview card */
+        #voterPreview {
+            display: none;
+            background: #f0fdf4;
+            border: 1.5px solid #16a34a;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+        }
+        #voterPreview .vname { font-size: 16px; font-weight: 700; color: #0f172a; }
+        #voterPreview .vid   { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500; }
+        #voterPreview .vstatus { margin-top: 8px; font-size: 12px; color: #16a34a; font-weight: 700; }
+
+        .home-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 25px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .home-link:hover {
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tricolor-stripe"></div>
+<div class="bg-blob blob-orange"></div>
+<div class="bg-blob blob-green"></div>
+<canvas id="rainCanvas"></canvas>
+
+<div class="container">
+    <a href="/booth/logout" class="logout-link">Logout </a>
+    
+    <div class="page-header">
+        <h2>TrustVote - मतदान स्कॅनर</h2>
+        <div style="background: rgba(15, 23, 42, 0.04); border: 1.5px solid rgba(226, 232, 240, 0.9); border-radius: 14px; padding: 10px 16px; margin: 12px 0 16px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <span style="font-weight: 800; color: #0f172a;">{{ session.get('booth_code', 'BOOTH-001') }}:</span>
+                <span style="font-weight: 600; color: #475569;">{{ session.get('booth_name', 'Pune Polling Station') }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 700; color: #0f172a;">{{ session.get('booth_username', 'Booth Officer') }}</span>
+                <span style="background: #dcfce7; color: #166534; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; border: 1px solid #bbf7d0;">Cloud Synced</span>
+            </div>
+        </div>
+        <p>QR Scan → Face Verify → Vote Record — Three-Step Secure Voting</p>
+    </div>
+
+    <!-- Step Indicators -->
+    <div class="steps">
+        <div class="step">
+            <div class="step-circle active" id="sc1">1</div>
+            <div class="step-label">QR स्कॅन</div>
+        </div>
+        <div class="step-connector" id="conn1"></div>
+        <div class="step">
+            <div class="step-circle" id="sc2">2</div>
+            <div class="step-label">चेहरा पडताळणी</div>
+        </div>
+        <div class="step-connector" id="conn2"></div>
+        <div class="step">
+            <div class="step-circle" id="sc3">✓</div>
+            <div class="step-label">मतदान नोंद</div>
+        </div>
+    </div>
+
+    <!-- STEP 1: Election select + QR scan -->
+    <div class="card active" id="step1Card">
+        <h3>Step 1: निवडणूक निवडा आणि QR स्कॅन करा</h3>
+        <label><b>आजची निवडणूक / Choose Election:</b></label>
+        <select id="election_type">
+            <option value="gram_panchayat">ग्रामपंचायत (Gram Panchayat)</option>
+            <option value="panchayat_samiti">पंचायत समिती (Panchayat Samiti)</option>
+            <option value="zilha_parishad">जिल्हा परिषद (Zilha Parishad)</option>
+            <option value="mahanagarpalika">महानगरपालिका (Mahanagarpalika)</option>
+            <option value="nagar_parishad">नगरपालिका / नगरपरिषद (Nagarpalika / Nagar Parishad)</option>
+            <option value="nagar_panchayat">नगरपंचायत (Nagar Panchayat)</option>
+        </select>
+        <div id="reader"></div>
+        <div id="qrResult" class="res-info">
+            QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...
+        </div>
+
+        <!-- Robust QR Image File Upload Zone -->
+        <div class="qr-upload-section" style="margin-top: 16px; border: 2px dashed #94a3b8; border-radius: 14px; padding: 16px; text-align: center; background: #f8fafc;">
+            <div style="font-size: 13.5px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
+                किंवा Voter Card / QR फाईल निवडा (Upload Card or QR Image)
+            </div>
+            <p style="font-size: 11.5px; color: #64748b; margin-bottom: 10px;">
+                Supports full Voter Card (<strong>_final_card.png</strong>), Scanner QR (<strong>_qr.png</strong>), or mobile camera photo
+            </p>
+            <input type="file" id="customQrFileInput" accept="image/*" onchange="uploadAndScanQrImage(this.files[0])" style="display: none;">
+            <button type="button" class="btn btn-blue" onclick="document.getElementById('customQrFileInput').click()" style="padding: 10px 20px; font-size: 13px; width: auto; display: inline-flex; align-items: center; gap: 8px; margin: 0 auto; background: #0f172a;">
+                Choose Voter Card / QR Image...
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 2: Face verification (with sub-steps matching mAadhaar) -->
+    <div class="card" id="step2Card">
+        
+        <!-- SUB-STEP B: Face Instructions -->
+        <div id="step2_face_instructions" class="sub-step" style="display:block;">
+            <div style="display:flex; gap:6px; margin-bottom:20px;">
+                <div style="flex:1; height:4px; background:#16a34a; border-radius:2px;"></div>
+                <div style="flex:1; height:4px; background:#16a34a; border-radius:2px;"></div>
+                <div style="flex:1; height:4px; background:#ccc; border-radius:2px;"></div>
+            </div>
+            
+            <h3 style="color:#0f172a; font-size:18px; margin-bottom:15px; text-align:center;">Face Authenticate Easily</h3>
+            
+            <div class="instruction-container">
+                <div class="instruction-item">
+                    <div class="instruction-img">
+                        <svg viewBox="0 0 60 60" width="45" height="45">
+                            <circle cx="30" cy="30" r="22" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+                            <path d="M20 28 Q24 33 26 28" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <path d="M34 28 Q36 33 40 28" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <path d="M23 38 Q30 43 37 38" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <rect x="44" y="32" width="10" height="18" rx="2" fill="#1e88e5"/>
+                            <circle cx="49" cy="46" r="1.5" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">Blink when prompted</div>
+                </div>
+                
+                <div class="instruction-item">
+                    <div class="instruction-img">
+                        <svg viewBox="0 0 60 60" width="45" height="45">
+                            <circle cx="30" cy="30" r="22" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+                            <path d="M20 28 Q23 26 26 28" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <path d="M34 28 Q37 26 40 28" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <path d="M23 38 Q30 42 37 38" stroke="#3E2723" stroke-width="2" fill="none"/>
+                            <circle cx="23" cy="28" r="5" stroke="#E53935" stroke-width="1.5" fill="none"/>
+                            <circle cx="37" cy="28" r="5" stroke="#E53935" stroke-width="1.5" fill="none"/>
+                            <line x1="28" y1="28" x2="32" y2="28" stroke="#E53935" stroke-width="1.5"/>
+                            <line x1="15" y1="15" x2="45" y2="45" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">Remove glasses</div>
+                </div>
+                
+                <div class="instruction-item">
+                    <div class="instruction-img">
+                        <svg viewBox="0 0 60 60" width="45" height="45">
+                            <path d="M30 8 A22 22 0 0 1 30 52 Z" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+                            <path d="M30 8 A22 22 0 0 0 30 52 Z" fill="#757575" stroke="#424242" stroke-width="1.5"/>
+                            <circle cx="45" cy="18" r="4" fill="#FFB300"/>
+                            <line x1="45" y1="11" x2="45" y2="13" stroke="#FFB300" stroke-width="1.5"/>
+                            <line x1="45" y1="23" x2="45" y2="25" stroke="#FFB300" stroke-width="1.5"/>
+                            <line x1="38" y1="18" x2="40" y2="18" stroke="#FFB300" stroke-width="1.5"/>
+                            <line x1="50" y1="18" x2="52" y2="18" stroke="#FFB300" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">Ensure adequate Lighting</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-blue" onclick="startFaceAuthenticationScan()" style="margin-top:20px; background:#0f172a;">Start Face Authentication</button>
+            <button class="btn btn-orange" onclick="resetAll()">Cancel</button>
+        </div>
+
+        <!-- SUB-STEP C: Live Face Scan -->
+        <div id="step2_face_scan" class="sub-step" style="display:none;">
+            <div style="display:flex; gap:6px; margin-bottom:15px;">
+                <div style="flex:1; height:4px; background:#16a34a; border-radius:2px;"></div>
+                <div style="flex:1; height:4px; background:#16a34a; border-radius:2px;"></div>
+                <div style="flex:1; height:4px; background:#16a34a; border-radius:2px;"></div>
+            </div>
+            
+            <h3 style="color:#0f172a; font-size:18px; text-align:center; margin-bottom:2px;">Face Authentication</h3>
+            <p style="font-size:12px; color:#64748b; text-align:center; margin-bottom:12px;">Hold still and align your face within the frame</p>
+
+            <div id="voterPreview">
+                <div class="vname" id="previewName">—</div>
+                <div class="vid" id="previewId">Voter ID: —</div>
+                <div class="vstatus">ID Verified — Align face to authenticate</div>
+            </div>
+
+            <div class="auth-camera-container" id="authCamFrame">
+                <div class="scan-laser"></div>
+                <video id="liveVideo" autoplay playsinline muted></video>
+                <svg class="camera-guidelines" viewBox="0 0 280 280">
+                    <ellipse cx="140" cy="140" rx="70" ry="95" stroke="white" stroke-width="2.5" stroke-dasharray="8,6" fill="none" opacity="0.8"/>
+                    <path d="M98 122 Q112 114 124 122" stroke="white" stroke-width="2.5" fill="none" opacity="0.85"/>
+                    <path d="M156 122 Q168 114 182 122" stroke="white" stroke-width="2.5" fill="none" opacity="0.85"/>
+                    <circle cx="111" cy="130" r="8" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+                    <circle cx="111" cy="130" r="3.5" fill="white" opacity="0.85"/>
+                    <circle cx="169" cy="130" r="8" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+                    <circle cx="169" cy="130" r="3.5" fill="white" opacity="0.85"/>
+                </svg>
+            </div>
+            <canvas id="snapCanvas" style="display:none;"></canvas>
+
+            <div id="blinkPromptContainer" style="display:none; text-align:center; margin:8px 0;">
+                <div class="blink-prompt" id="blinkPromptText">PLEASE BLINK</div>
+            </div>
+
+            <p class="face-hint" id="cameraStatus" style="color:#1a73e8; font-weight:bold; margin-top:8px; text-align:center;">कॅमेरा सुरू होत आहे...</p>
+
+            <div style="display:flex; justify-content:center; margin:10px 0;">
+                <button class="btn btn-blue" id="captureBtn" onclick="captureFace()" disabled style="width:60px; height:60px; border-radius:50%; border:none; background:#f1f5f9; box-shadow:0 3px 10px rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#1a73e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button class="btn btn-orange" onclick="resetAll()">Cancel / Restart</button>
+
+            <div id="faceResult" class="res-info" style="display:none; margin-top:14px;"></div>
+            
+            <div style="text-align:center; margin-top:20px; font-size:11px; font-weight:700; color:#94a3b8; letter-spacing:0.5px;">
+                AADHAAR AUTH V1.2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: Vote confirmed -->
+    <div class="card" id="step3Card">
+        <h3>Step 3: मतदान नोंद</h3>
+        <div id="result"></div>
+        <button class="btn btn-green" onclick="resetAll()" style="margin-top:20px;">पुढील मतदार / Next Voter</button>
+    </div>
+
+    <a href="/" class="home-link">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to Home
+    </a>
+</div>
+
+<script>
+// ── State ──
+let currentVoterId  = null;
+let currentVoterName = "";
+let faceVerified    = false;
+let qrScanner       = null;
+let cameraStream    = null;
+let scannerPaused   = false;
+
+// ── QR Scanner ──
+function startQRScanner() {
+    qrScanner = new Html5QrcodeScanner("reader", { fps: 15 });
+    qrScanner.render(onScanSuccess, onScanFailure);
+}
+
+function onScanFailure(error) {
+    // If user selected file in Html5Qrcode built-in input and JS decoder couldn't find it, fallback to multi-strategy server decoder
+    const fileInput = document.querySelector('#reader input[type="file"]');
+    if (fileInput && fileInput.files && fileInput.files.length > 0 && !fileInput._handled) {
+        fileInput._handled = true;
+        uploadAndScanQrImage(fileInput.files[0]);
+    }
+}
+
+// ── Direct Multi-Strategy Image Upload Scanner ──
+function uploadAndScanQrImage(file) {
+    if (!file) return;
+    
+    if (scannerPaused) return;
+    scannerPaused = true;
+
+    const qrResult = document.getElementById('qrResult');
+    qrResult.className = 'res-info';
+    qrResult.style.display = 'block';
+    qrResult.innerText = `Extracting and decrypting QR from ${file.name}...`;
+
+    const currentElection = document.getElementById('election_type').value;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('election', currentElection);
+
+    fetch('/api/scan_qr_image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'Success') {
+            if (data.already_voted) {
+                qrResult.className = 'res-err';
+                qrResult.innerText = data.prev_vote_msg || `Duplicate Vote Blocked: ${data.name} has ALREADY voted in this election!`;
+                setTimeout(() => {
+                    scannerPaused = false;
+                    qrResult.className = 'res-info';
+                    qrResult.innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+                }, 7000);
+                return;
+            }
+
+            currentVoterId = data.v_id;
+            currentVoterName = data.name;
+            qrResult.className = 'res-ok';
+            qrResult.innerText = `Verified! ID: ${data.v_id} (${data.name})`;
+            setTimeout(() => goToStep2(data.v_id, data.name), 600);
+        } else {
+            qrResult.className = 'res-err';
+            qrResult.innerText = `${data.message || 'Could not detect QR code in this file.'}`;
+            setTimeout(() => {
+                scannerPaused = false;
+                qrResult.className = 'res-info';
+                qrResult.innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+            }, 4000);
+        }
+    })
+    .catch(err => {
+        qrResult.className = 'res-err';
+        qrResult.innerText = `Upload failed: ${err}`;
+        scannerPaused = false;
+    });
+}
+
+function onScanSuccess(decodedText) {
+    if (scannerPaused) return;
+    scannerPaused = true;
+
+    document.getElementById('qrResult').className = 'res-info';
+    document.getElementById('qrResult').style.display = 'block';
+    document.getElementById('qrResult').innerText = "Checking voter card credentials...";
+
+    const currentElection = document.getElementById('election_type').value;
+
+    // Decrypt and verify the QR code token with election context
+    fetch('/decrypt_qr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr_token: decodedText, election: currentElection })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'Success') {
+            if (data.already_voted) {
+                // Cross-Ward Duplicate Vote Blocked immediately!
+                document.getElementById('qrResult').className = 'res-err';
+                document.getElementById('qrResult').innerText = data.prev_vote_msg || `Duplicate Vote Blocked: ${data.name} has ALREADY voted in this election!`;
+                setTimeout(() => {
+                    if (scannerPaused) {
+                        scannerPaused = false;
+                        document.getElementById('qrResult').className = 'res-info';
+                        document.getElementById('qrResult').innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+                    }
+                }, 7000);
+                return;
+            }
+
+            currentVoterId = data.v_id;
+            currentVoterName = data.name;
+            
+            document.getElementById('qrResult').className = 'res-ok';
+            document.getElementById('qrResult').innerText = `Verified! ID: ${data.v_id}`;
+            
+            // Transition directly to instructions and face verification step
+            setTimeout(() => goToStep2(data.v_id, data.name), 800);
+        } else {
+            // Invalid QR code or random scan! Block flow and show custom error message
+            document.getElementById('qrResult').className = 'res-err';
+            document.getElementById('qrResult').innerText = `${data.message || 'The QR code which is scanned is not valid. Please use the voter card QR code.'}`;
+            
+            // Resume scanner after 3 seconds so they can try a correct QR code
+            setTimeout(() => {
+                if (scannerPaused) {
+                    scannerPaused = false;
+                    document.getElementById('qrResult').className = 'res-info';
+                    document.getElementById('qrResult').innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+                }
+            }, 3000);
+        }
+    })
+    .catch(err => {
+        document.getElementById('qrResult').className = 'res-err';
+        document.getElementById('qrResult').innerText = `Connection Error: ${err}`;
+        scannerPaused = false;
+    });
+}
+
+function goToStep2(vid, name) {
+    // Update step indicators
+    document.getElementById('sc1').className = 'step-circle done';
+    document.getElementById('conn1').className = 'step-connector done';
+    document.getElementById('sc2').className = 'step-circle active';
+
+    // Show voter preview details
+    document.getElementById('previewId').innerText = 'Voter ID: ' + vid;
+    document.getElementById('previewName').innerText = name;
+    
+    // Stop QR scanner
+    if (qrScanner) { try { qrScanner.clear(); } catch(e){} }
+
+    // Switch view to Step 2 Card and show instructions directly
+    document.getElementById('step1Card').classList.remove('active');
+    document.getElementById('step2Card').classList.add('active');
+    
+    document.getElementById('step2_face_instructions').style.display = 'block';
+    document.getElementById('step2_face_scan').style.display = 'none';
+}
+
+// ── Start Face Authentication Scan ──
+function startFaceAuthenticationScan() {
+    document.getElementById('step2_face_instructions').style.display = 'none';
+    document.getElementById('step2_face_scan').style.display = 'block';
+    
+    // Show voter preview details inside camera section
+    document.getElementById('voterPreview').style.display = 'block';
+    
+    // Reset camera frame border to red
+    document.getElementById('authCamFrame').style.borderColor = '#e53e3e';
+    document.getElementById('blinkPromptContainer').style.display = 'none';
+
+    // Start face camera
+    startFaceCamera();
+}
+
+// ── Face Camera ──
+let livenessTimer = null;
+
+function startFaceCamera() {
+    const video = document.getElementById('liveVideo');
+    const statusEl = document.getElementById('cameraStatus');
+    const captureBtn = document.getElementById('captureBtn');
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } })
+            .then(stream => {
+                cameraStream = stream;
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    statusEl.innerText = 'Aligning face... Keep still.';
+                    statusEl.style.color = '#1a73e8';
+                    captureBtn.disabled = false;
+                    
+                    // Trigger liveness verification sequence
+                    startLivenessCheck();
+                };
+            })
+            .catch(err => {
+                statusEl.innerText = 'Camera not available: ' + err.message;
+                statusEl.style.color = 'red';
+            });
+    } else {
+        statusEl.innerText = 'ya browser la camera support nahi.';
+        statusEl.style.color = 'red';
+    }
+}
+
+function startLivenessCheck() {
+    const statusEl = document.getElementById('cameraStatus');
+    const promptContainer = document.getElementById('blinkPromptContainer');
+    const promptText = document.getElementById('blinkPromptText');
+    const captureBtn = document.getElementById('captureBtn');
+
+    // Step A: Keep aligning for 1.5 seconds
+    livenessTimer = setTimeout(() => {
+        statusEl.innerText = 'Face aligned! Ready.';
+        statusEl.style.color = '#138808';
+        
+        // Step B: Show "PLEASE BLINK" prompt
+        promptContainer.style.display = 'block';
+        promptText.innerText = 'PLEASE BLINK';
+        promptText.style.color = '#e53e3e';
+        
+        // Step C: Simulate blink detection after 2.2 seconds
+        livenessTimer = setTimeout(() => {
+            promptText.innerText = 'BLINK DETECTED!';
+            promptText.style.color = '#138808';
+            statusEl.innerText = 'Blink verified! Capturing face...';
+            statusEl.style.color = '#138808';
+            document.getElementById('authCamFrame').classList.add('verified-border');
+            
+            // Automatically capture and verify face
+            livenessTimer = setTimeout(() => {
+                captureFace();
+            }, 800);
+            
+        }, 2200);
+
+    }, 1500);
+}
+
+function stopFaceCamera() {
+    if (livenessTimer) {
+        clearTimeout(livenessTimer);
+        livenessTimer = null;
+    }
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+    }
+}
+
+// ── Capture + Face Verify ──
+function captureFace() {
+    const video  = document.getElementById('liveVideo');
+    const canvas = document.getElementById('snapCanvas');
+    const btn    = document.getElementById('captureBtn');
+    const resDiv = document.getElementById('faceResult');
+
+    if (!video.videoWidth) {
+        showFaceResult('Camera not ready.', 'err');
+        return;
+    }
+
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const livePhoto = canvas.toDataURL('image/jpeg', 0.85);
+
+    btn.disabled   = true;
+    resDiv.style.display = 'block';
+    resDiv.className = 'res-info';
+    resDiv.innerText = 'Verifying face details with server...';
+
+    // Verify face sending both voter ID, live photo, and decrypted name (for fallbacks)
+    fetch('/face_verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            v_id: currentVoterId, 
+            live_photo: livePhoto,
+            name: currentVoterName
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.match) {
+            if (data.name) document.getElementById('previewName').innerText = data.name;
+
+            showFaceResult(data.message, 'ok');
+
+            // Update step indicators
+            document.getElementById('sc2').className = 'step-circle done';
+            document.getElementById('conn2').className = 'step-connector done';
+            document.getElementById('sc3').className = 'step-circle active';
+
+            faceVerified = true;
+            stopFaceCamera();
+
+            // Auto-proceed to vote recording after 1.5s
+            setTimeout(recordVote, 1500);
+        } else {
+            showFaceResult(data.message, 'err');
+            btn.disabled  = false;
+            // Restart liveness sequence to retry
+            startLivenessCheck();
+        }
+    })
+    .catch(err => {
+        showFaceResult('Server connection error: ' + err, 'err');
+        btn.disabled  = false;
+    });
+}
+
+function showFaceResult(msg, type) {
+    const el = document.getElementById('faceResult');
+    el.style.display = 'block';
+    el.className = type === 'ok' ? 'res-ok' : (type === 'err' ? 'res-err' : 'res-info');
+    el.innerText = msg;
+}
+
+// ── Vote Recording ──
+function recordVote() {
+    const election = document.getElementById('election_type').value;
+
+    document.getElementById('step2Card').classList.remove('active');
+    document.getElementById('step3Card').classList.add('active');
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.className = 'res-info';
+    resultDiv.innerText = 'Recording your vote in the system...';
+
+    fetch('/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            qr: 'ID:' + currentVoterId,
+            election: election,
+            face_verified: faceVerified
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'Success') {
+            resultDiv.className = 'res-ok';
+            let receiptHtml = `<div>${data.message}</div>`;
+            if (data.blockchain_receipt) {
+                const b = data.blockchain_receipt;
+                const shortHash = `${b.block_hash.substring(0, 14)}...${b.block_hash.substring(b.block_hash.length - 8)}`;
+                receiptHtml += `
+                    <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px; color: white; text-align: left; font-size: 12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px;">
+                            <span style="font-weight: 800; color: #34d399; letter-spacing:0.5px;">CRYPTOGRAPHIC BLOCKCHAIN RECEIPT</span>
+                            <span style="background: rgba(16,185,129,0.2); border: 1px solid #10b981; padding: 2px 8px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; color: #34d399;">BLOCK #${b.block_index} IMMUTABLE</span>
+                        </div>
+                        <div style="font-family: monospace; font-size: 11px; margin-bottom: 4px; color: #cbd5e1;">
+                            <span style="color:#94a3b8;">Block SHA-256 Hash:</span> <strong style="color: #38bdf8;">${shortHash}</strong>
+                        </div>
+                        <div style="font-family: monospace; font-size: 11px; color: #cbd5e1;">
+                            <span style="color:#94a3b8;">Zero-Knowledge Voter Hash:</span> <strong style="color: #a7f3d0;">${b.voter_hash.substring(0, 16)}...</strong>
+                        </div>
+                        <div style="font-size: 10px; color: #94a3b8; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px;">
+                            Verified & Chained to SEC Maharashtra Master Ledger • ${b.timestamp}
+                        </div>
+                    </div>
+                `;
+            }
+            resultDiv.innerHTML = receiptHtml;
+        } else {
+            resultDiv.innerText = data.message;
+            resultDiv.className = 'res-err';
+        }
+    })
+    .catch(err => {
+        resultDiv.innerText = 'Error recording vote: ' + err;
+        resultDiv.className = 'res-err';
+    });
+}
+
+// ── Reset ──
+function resetAll() {
+    currentVoterId = null;
+    currentVoterName = "";
+    faceVerified   = false;
+    scannerPaused  = false;
+    stopFaceCamera();
+
+    const camFrame = document.getElementById('authCamFrame');
+    if (camFrame) {
+        camFrame.classList.remove('verified-border');
+    }
+
+    // Reset step indicators
+    document.getElementById('sc1').className = 'step-circle active';
+    document.getElementById('sc2').className = 'step-circle';
+    document.getElementById('sc3').className = 'step-circle';
+    document.getElementById('conn1').className = 'step-connector';
+    document.getElementById('conn2').className = 'step-connector';
+
+    // Reset UI
+    document.getElementById('voterPreview').style.display = 'none';
+    document.getElementById('faceResult').style.display  = 'none';
+    document.getElementById('result').style.display      = 'none';
+    document.getElementById('captureBtn').disabled  = true;
+    document.getElementById('cameraStatus').innerText = 'कॅमेरा सुरू होत आहे...';
+    document.getElementById('cameraStatus').style.color = '#1a73e8';
+    
+    // Reset sub-steps
+    document.getElementById('step2_face_instructions').style.display = 'block';
+    document.getElementById('step2_face_scan').style.display = 'none';
+    document.getElementById('blinkPromptContainer').style.display = 'none';
+
+    // Reset QR card scanner result
+    document.getElementById('qrResult').className = 'res-info';
+    document.getElementById('qrResult').innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+
+    // Show step 1
+    document.getElementById('step1Card').classList.add('active');
+    document.getElementById('step2Card').classList.remove('active');
+    document.getElementById('step3Card').classList.remove('active');
+
+    // Restart QR scanner
+    document.getElementById('reader').innerHTML = '';
+    startQRScanner();
+}
+
+// ── Init ──
+startQRScanner();
+
+// ── Cloud Heartbeat ──
+setInterval(() => {
+    fetch('/booth/heartbeat', { method: 'POST' }).catch(() => {});
+}, 15000);
+
+// ── Background Rain Particle Effect ──
+(function() {
+    const canvas = document.getElementById('rainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    const raindrops = [];
+    const maxDrops = 110;
+    
+    for (let i = 0; i < maxDrops; i++) {
+        raindrops.push({
+            x: Math.random() * width,
+            y: Math.random() * height - height,
+            vy: 6 + Math.random() * 8,
+            length: 12 + Math.random() * 15,
+            opacity: 0.08 + Math.random() * 0.12
+        });
+    }
+    
+    function animateRain() {
+        ctx.clearRect(0, 0, width, height);
+        
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        
+        for (let i = 0; i < maxDrops; i++) {
+            const p = raindrops[i];
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + (p.vy * 0.1), p.y + p.length);
+            ctx.strokeStyle = `rgba(186, 230, 253, ${p.opacity})`;
+            ctx.stroke();
+            
+            p.y += p.vy;
+            p.x += p.vy * 0.1;
+            
+            if (p.y > height) {
+                p.y = -p.length;
+                p.x = Math.random() * width;
+                p.vy = 6 + Math.random() * 8;
+            }
+        }
+        requestAnimationFrame(animateRain);
+    }
+    animateRain();
+})();
+</script>
+
+</body>
+</html>
