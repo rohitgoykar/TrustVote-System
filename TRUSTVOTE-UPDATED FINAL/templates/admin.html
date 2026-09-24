@@ -9,14 +9,24 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
         html { overflow-x: hidden; max-width: 100vw; }
 
-        
         body {
-            background: #f1f5f9;
+            background: #020206;
             min-height: 100vh;
             color: #0f172a;
             position: relative;
             overflow-x: hidden;
             width: 100%;
+        }
+
+        /* Astro Background Canvas */
+        #astroCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .tricolor-stripe {
@@ -31,7 +41,7 @@
 
         /* Top Header Navigation Bar */
         .navbar {
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(10, 18, 38, 0.88);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -42,7 +52,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
             z-index: 50;
             position: sticky;
             top: 0;
@@ -1221,6 +1231,7 @@
 </head>
 <body>
 
+<canvas id="astroCanvas"></canvas>
 <div class="tricolor-stripe"></div>
 
 <!-- Topbar -->
@@ -3454,6 +3465,250 @@ setInterval(() => {
     loadBoothsMatrix();
     loadBlockchainLedger();
 }, 8000);
+
+// ══════════════════════════════════════════════════════════════════════
+//  OpenAI Astra High-Fidelity 3D Starfield & Constellation Background
+// ══════════════════════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('astroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let W = 0, H = 0, dpr = window.devicePixelRatio || 1;
+    let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+    let t = 0;
+
+    function resize() {
+        dpr = window.devicePixelRatio || 1;
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        initStars();
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => {
+        targetMouseX = (e.clientX - W / 2) * 0.04;
+        targetMouseY = (e.clientY - H / 2) * 0.04;
+    });
+
+    // ── Starfield Data Structure ──
+    const STAR_COUNT = 320;
+    const stars = [];
+
+    function initStars() {
+        stars.length = 0;
+        for (let i = 0; i < STAR_COUNT; i++) {
+            const z = Math.random() * 1000 + 1;
+            stars.push({
+                x: (Math.random() - 0.5) * W * 2,
+                y: (Math.random() - 0.5) * H * 2,
+                z: z,
+                baseZ: z,
+                r: Math.random() * 1.5 + 0.3,
+                vx: (Math.random() - 0.5) * 0.15,
+                vy: (Math.random() - 0.5) * 0.15,
+                twinkleSpeed: Math.random() * 0.003 + 0.001,
+                twinklePhase: Math.random() * Math.PI * 2,
+                baseAlpha: Math.random() * 0.65 + 0.25,
+                isHero: Math.random() < 0.05, // 5% bright Astra stars with diffraction cross
+                color: Math.random() < 0.2 ? 'rgba(165, 180, 252,' : (Math.random() < 0.4 ? 'rgba(196, 181, 253,' : 'rgba(255, 255, 255,')
+            });
+        }
+    }
+
+    // ── Meteors / Shooting Stars ──
+    const meteors = [];
+    function spawnMeteor() {
+        if (meteors.length < 3 && Math.random() < 0.4) {
+            meteors.push({
+                x: Math.random() * W * 0.9,
+                y: Math.random() * H * 0.4,
+                len: Math.random() * 120 + 80,
+                speed: Math.random() * 6 + 7,
+                angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
+                alpha: 1,
+                decay: Math.random() * 0.015 + 0.012
+            });
+        }
+    }
+    setInterval(spawnMeteor, 2200);
+
+    // ── Astra Ambient Cosmic Nebula Glows ──
+    const nebulas = [
+        { xRatio: 0.25, yRatio: 0.30, rad: 0.45, color: [99, 102, 241], pulseSpd: 0.0006 },
+        { xRatio: 0.75, yRatio: 0.65, rad: 0.50, color: [168, 85, 247], pulseSpd: 0.0008 },
+        { xRatio: 0.50, yRatio: 0.85, rad: 0.40, color: [14, 165, 233], pulseSpd: 0.0005 },
+        { xRatio: 0.85, yRatio: 0.20, rad: 0.35, color: [249, 115, 22], pulseSpd: 0.0007 }
+    ];
+
+    function drawNebulas() {
+        for (const neb of nebulas) {
+            const cx = neb.xRatio * W + mouseX * 0.3;
+            const cy = neb.yRatio * H + mouseY * 0.3;
+            const radius = neb.rad * Math.max(W, H);
+            const pulse = 0.07 + Math.sin(t * neb.pulseSpd) * 0.025;
+
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            const [r, gr, b] = neb.color;
+            g.addColorStop(0, `rgba(${r},${gr},${b},${pulse})`);
+            g.addColorStop(0.5, `rgba(${r},${gr},${b},${pulse * 0.35})`);
+            g.addColorStop(1, `rgba(${r},${gr},${b},0)`);
+
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // ── Starfield & Constellation Links ──
+    function drawStars() {
+        const cx = W / 2 + mouseX;
+        const cy = H / 2 + mouseY;
+
+        // 1. Draw Subtle Constellation Links between nearby stars
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < stars.length; i += 2) {
+            const s1 = stars[i];
+            const sx1 = cx + s1.x;
+            const sy1 = cy + s1.y;
+
+            if (sx1 < -50 || sx1 > W + 50 || sy1 < -50 || sy1 > H + 50) continue;
+
+            for (let j = i + 1; j < Math.min(i + 8, stars.length); j++) {
+                const s2 = stars[j];
+                const sx2 = cx + s2.x;
+                const sy2 = cy + s2.y;
+                const dx = sx1 - sx2;
+                const dy = sy1 - sy2;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 90) {
+                    const linkAlpha = (1 - dist / 90) * 0.12;
+                    ctx.strokeStyle = `rgba(165, 180, 252, ${linkAlpha})`;
+                    ctx.beginPath();
+                    ctx.moveTo(sx1, sy1);
+                    ctx.lineTo(sx2, sy2);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // 2. Draw Stars with Twinkle & Cross Spikes
+        for (const s of stars) {
+            s.x += s.vx;
+            s.y += s.vy;
+
+            // Wrap around screen boundaries with margin
+            if (s.x < -W) s.x = W;
+            if (s.x > W) s.x = -W;
+            if (s.y < -H) s.y = H;
+            if (s.y > H) s.y = -H;
+
+            const sx = cx + s.x;
+            const sy = cy + s.y;
+
+            if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+
+            const twinkle = Math.sin(t * s.twinkleSpeed + s.twinklePhase);
+            const alpha = Math.max(0.1, Math.min(1, s.baseAlpha + twinkle * 0.35));
+
+            if (s.isHero) {
+                // Bright Astra Hero Star with 4-point diffraction spike
+                const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, s.r * 6);
+                haloGrad.addColorStop(0, `${s.color}${alpha})`);
+                haloGrad.addColorStop(0.3, `${s.color}${alpha * 0.4})`);
+                haloGrad.addColorStop(1, `${s.color}0)`);
+                ctx.fillStyle = haloGrad;
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r * 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Core pinpoint
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 4-point cross diffraction flare
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.75})`;
+                ctx.lineWidth = 0.75;
+                const flareLen = s.r * 8 + twinkle * 3;
+                ctx.beginPath();
+                ctx.moveTo(sx - flareLen, sy);
+                ctx.lineTo(sx + flareLen, sy);
+                ctx.moveTo(sx, sy - flareLen);
+                ctx.lineTo(sx, sy + flareLen);
+                ctx.stroke();
+                ctx.restore();
+            } else {
+                // Standard needle star
+                ctx.fillStyle = `${s.color}${alpha})`;
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    // ── Draw Meteors ──
+    function drawMeteors() {
+        for (let i = meteors.length - 1; i >= 0; i--) {
+            const m = meteors[i];
+            m.x += Math.cos(m.angle) * m.speed;
+            m.y += Math.sin(m.angle) * m.speed;
+            m.alpha -= m.decay;
+
+            if (m.alpha <= 0 || m.x > W + 100 || m.y > H + 100) {
+                meteors.splice(i, 1);
+                continue;
+            }
+
+            const tailX = m.x - Math.cos(m.angle) * m.len;
+            const tailY = m.y - Math.sin(m.angle) * m.len;
+
+            const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+            grad.addColorStop(0, `rgba(255, 255, 255, ${m.alpha * 0.95})`);
+            grad.addColorStop(0.2, `rgba(165, 180, 252, ${m.alpha * 0.6})`);
+            grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            ctx.save();
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(m.x, m.y);
+            ctx.lineTo(tailX, tailY);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // ── Main Render Loop ──
+    function render(time) {
+        t = time;
+
+        // Smooth mouse parallax interpolation
+        mouseX += (targetMouseX - mouseX) * 0.05;
+        mouseY += (targetMouseY - mouseY) * 0.05;
+
+        // Deep obsidian space base
+        ctx.fillStyle = '#020206';
+        ctx.fillRect(0, 0, W, H);
+
+        drawNebulas();
+        drawStars();
+        drawMeteors();
+
+        requestAnimationFrame(render);
+    }
+
+    resize();
+    requestAnimationFrame(render);
+})();
 </script>
 
 </body>
