@@ -34,6 +34,8 @@ from routes.officer_routes import officer_bp
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 app.secret_key = 'super_secret_trustvote_key'
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024   # 32MB for base64 images
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
 
 @app.after_request
 def add_header(response):
