@@ -121,16 +121,19 @@
            CASCADING HIERARCHY SELECTOR PANEL
            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         .hierarchy-panel {
-            background: #ffffff;
-            border: 1.5px solid #cbd5e1;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 20px 22px;
             margin-bottom: 22px;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             max-width: 100%;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            color: #f1f5f9;
         }
         .hp-header {
             display: flex;
@@ -139,13 +142,13 @@
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 14px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 10px;
         }
         .hp-title {
             font-size: 15px;
             font-weight: 800;
-            color: #0f172a;
+            color: #f8fafc;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -154,10 +157,10 @@
             font-size: 12px;
             font-weight: 700;
             color: #ea580c;
-            background: #fff7ed;
+            background: rgba(234, 88, 12, 0.12);
             padding: 4px 10px;
             border-radius: 8px;
-            border: 1px solid #ffedd5;
+            border: 1px solid rgba(234, 88, 12, 0.25);
         }
         .hierarchy-grid {
             display: grid;
@@ -182,7 +185,7 @@
             display: block;
             font-size: 11px;
             font-weight: 700;
-            color: #475569;
+            color: #94a3b8;
             margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -196,11 +199,11 @@
             min-width: 0;
             padding: 9px 10px;
             border-radius: 10px;
-            border: 1.5px solid #cbd5e1;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
             font-size: 12.5px;
             font-weight: 600;
-            color: #0f172a;
-            background: #f8fafc;
+            color: #f8fafc;
+            background: rgba(10, 18, 38, 0.85);
             outline: none;
             cursor: pointer;
             transition: all 0.2s;
@@ -210,9 +213,9 @@
             box-sizing: border-box;
         }
         .h-field select:focus {
-            border-color: #ea580c;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
         }
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -237,21 +240,25 @@
             .kpi-grid { grid-template-columns: 1fr; }
         }
         .kpi-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
             min-width: 0;
             box-sizing: border-box;
+            color: #f1f5f9;
         }
         .kpi-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 18px -4px rgba(0,0,0,0.06);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .kpi-label { font-size: 11.5px; font-weight: 700; color: #64748b; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .kpi-value { font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1.1; }
+        .kpi-label { font-size: 11.5px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-value { font-size: 24px; font-weight: 800; color: #f8fafc; line-height: 1.1; }
         .kpi-sub { font-size: 11px; font-weight: 600; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Content Layout */
@@ -270,12 +277,15 @@
 
         /* Panels */
         .panel {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 22px;
             margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            color: #f1f5f9;
         }
         .panel-header {
             display: flex;
@@ -286,7 +296,7 @@
         .panel-title {
             font-size: 15px;
             font-weight: 800;
-            color: #0f172a;
+            color: #f8fafc;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -294,21 +304,23 @@
 
         /* Forms */
         .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 5px; }
         input[type="text"], input[type="password"], select {
             width: 100%;
             padding: 9px 12px;
-            border: 1.5px solid #cbd5e1;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
             border-radius: 10px;
             font-size: 13px;
             font-weight: 500;
-            color: #0f172a;
+            color: #f8fafc;
+            background: rgba(10, 18, 38, 0.85);
             outline: none;
             transition: all 0.2s;
         }
         input:focus, select:focus {
-            border-color: #ea580c;
-            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+            background: rgba(15, 23, 42, 0.95);
         }
 
         /* Buttons */
@@ -327,19 +339,19 @@
         }
         .btn-primary { background: #ea580c; color: white; width: 100%; }
         .btn-primary:hover { background: #c2410c; }
-        .btn-secondary { background: #1e293b; color: white; width: 100%; }
+        .btn-secondary { background: #1e293b; color: white; width: 100%; border: 1px solid rgba(255,255,255,0.1); }
         .btn-secondary:hover { background: #0f172a; }
-        .btn-refresh { background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155; }
-        .btn-refresh:hover { background: #e2e8f0; }
-        .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; width: 100%; }
+        .btn-refresh { background: rgba(30, 41, 59, 0.8); border: 1.5px solid rgba(255,255,255,0.12); color: #e2e8f0; }
+        .btn-refresh:hover { background: rgba(51, 65, 85, 0.9); }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); width: 100%; }
         .btn-danger:hover { background: #ef4444; color: white; }
 
         /* Tables */
         .tbl-wrap {
             overflow-x: auto;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(10, 18, 38, 0.6);
             margin-top: 10px;
         }
         table {
@@ -347,23 +359,24 @@
             border-collapse: collapse;
             font-size: 12.5px;
             text-align: left;
+            color: #e2e8f0;
         }
         th {
-            background: #f8fafc;
-            color: #475569;
+            background: rgba(30, 41, 59, 0.8);
+            color: #94a3b8;
             font-weight: 700;
             padding: 11px 13px;
-            border-bottom: 1.5px solid #e2e8f0;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.1);
             white-space: nowrap;
         }
         td {
             padding: 11px 13px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #334155;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: #e2e8f0;
             vertical-align: middle;
         }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #f8fafc; }
+        tr:hover td { background: rgba(51, 65, 85, 0.35); }
 
         /* Badges */
         .badge {
@@ -376,11 +389,11 @@
             font-weight: 700;
             white-space: nowrap;
         }
-        .badge-online  { background: #dcfce7; color: #166534; }
-        .badge-offline { background: #f1f5f9; color: #64748b; }
-        .badge-voted   { background: #fee2e2; color: #991b1b; }
-        .badge-eligible { background: #dcfce7; color: #166534; }
-        .badge-booth   { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+        .badge-online  { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-offline { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+        .badge-voted   { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .badge-eligible { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-booth   { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
 
         /* Live Activity Stream */
         .activity-feed {
@@ -392,14 +405,15 @@
             margin-top: 10px;
         }
         .activity-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 10px;
             padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
+            color: #cbd5e1;
         }
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
            BLOCKCHAIN SECURITY LEDGER & GOVERNMENT ANIMATIONS
@@ -661,17 +675,17 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
            MAHARASHTRA DISTRICT-WISE VOTER MAP STYLES
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           MAHARASHTRA DISTRICT-WISE VOTER MAP STYLES (WHITE BACKGROUND)
            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         .maha-map-panel {
-            background: #ffffff;
-            border: 1.5px solid #cbd5e1;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 24px;
-            color: #0f172a;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+            color: #f1f5f9;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             position: relative;
             overflow: hidden;
         }
@@ -683,18 +697,18 @@
             gap: 12px;
             margin-bottom: 18px;
             padding-bottom: 14px;
-            border-bottom: 1.5px solid #f1f5f9;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
         }
         .mmap-title {
             font-size: 16px;
             font-weight: 800;
-            color: #0f172a;
+            color: #f8fafc;
             letter-spacing: -0.3px;
         }
         .mmap-badge-live {
-            background: #e0f2fe;
+            background: rgba(56, 189, 248, 0.15);
             border: 1.5px solid #38bdf8;
-            color: #0284c7;
+            color: #38bdf8;
             font-size: 11px;
             font-weight: 800;
             padding: 4px 10px;
@@ -713,12 +727,12 @@
             .mmap-content-grid { grid-template-columns: 1fr; }
         }
         .mmap-canvas-box {
-            background: #ffffff;
-            border: 1.5px solid #cbd5e1;
+            background: rgba(10, 18, 38, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 16px;
             position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         .mmap-legend {
             display: flex;
@@ -727,7 +741,7 @@
             margin-bottom: 12px;
             font-size: 11.5px;
             font-weight: 600;
-            color: #334155;
+            color: #cbd5e1;
         }
         .mmap-leg-item { display: flex; align-items: center; gap: 6px; }
         .mmap-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
@@ -741,7 +755,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #ffffff;
+            background: rgba(10, 18, 38, 0.5);
             border-radius: 12px;
         }
         .maha-svg-map {
@@ -750,7 +764,7 @@
             overflow: visible;
         }
         .state-outline {
-            fill: #f8fafc;
+            fill: rgba(30, 41, 59, 0.35);
             stroke: #0284c7;
             stroke-width: 2.5;
             stroke-dasharray: 4 2;
@@ -791,37 +805,37 @@
         .map-label {
             font-size: 10.5px;
             font-weight: 700;
-            fill: #0f172a;
+            fill: #f1f5f9;
             font-family: 'Inter', sans-serif;
             pointer-events: none;
             transition: fill 0.2s;
             paint-order: stroke fill;
-            stroke: #ffffff;
+            stroke: rgba(15, 23, 42, 0.9);
             stroke-width: 2.5px;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
         .mmap-node:hover .map-label {
-            fill: #0284c7;
+            fill: #38bdf8;
             font-weight: 800;
         }
 
         /* Spotlight Card */
         .mmap-spotlight-card {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
+            background: rgba(10, 18, 38, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 22px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            color: #0f172a;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            color: #f1f5f9;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         .msp-badge {
             font-size: 10px;
             font-weight: 800;
-            color: #0284c7;
+            color: #38bdf8;
             letter-spacing: 0.8px;
         }
         .msp-kpi-grid {
@@ -831,22 +845,22 @@
             margin: 14px 0;
         }
         .msp-kpi-box {
-            background: #ffffff;
-            border: 1.5px solid #e2e8f0;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             padding: 10px 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .msp-kpi-lbl {
             font-size: 10.5px;
-            color: #475569;
+            color: #94a3b8;
             font-weight: 600;
             display: block;
         }
         .msp-kpi-val {
             font-size: 16px;
             font-weight: 800;
-            color: #0f172a;
+            color: #f8fafc;
             font-family: monospace;
             display: block;
             margin-top: 2px;
@@ -1232,6 +1246,251 @@
 <body>
 
 <canvas id="astroCanvas"></canvas>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+//  OpenAI Astra High-Fidelity 3D Starfield & Constellation Background
+// ══════════════════════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('astroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let W = 0, H = 0, dpr = window.devicePixelRatio || 1;
+    let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+    let t = 0;
+
+    function resize() {
+        dpr = window.devicePixelRatio || 1;
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        initStars();
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => {
+        targetMouseX = (e.clientX - W / 2) * 0.04;
+        targetMouseY = (e.clientY - H / 2) * 0.04;
+    });
+
+    // ── Starfield Data Structure ──
+    const STAR_COUNT = 320;
+    const stars = [];
+
+    function initStars() {
+        stars.length = 0;
+        for (let i = 0; i < STAR_COUNT; i++) {
+            const z = Math.random() * 1000 + 1;
+            stars.push({
+                x: (Math.random() - 0.5) * W * 2,
+                y: (Math.random() - 0.5) * H * 2,
+                z: z,
+                baseZ: z,
+                r: Math.random() * 1.5 + 0.3,
+                vx: (Math.random() - 0.5) * 0.15,
+                vy: (Math.random() - 0.5) * 0.15,
+                twinkleSpeed: Math.random() * 0.003 + 0.001,
+                twinklePhase: Math.random() * Math.PI * 2,
+                baseAlpha: Math.random() * 0.65 + 0.25,
+                isHero: Math.random() < 0.05, // 5% bright Astra stars with diffraction cross
+                color: Math.random() < 0.2 ? 'rgba(165, 180, 252,' : (Math.random() < 0.4 ? 'rgba(196, 181, 253,' : 'rgba(255, 255, 255,')
+            });
+        }
+    }
+
+    // ── Meteors / Shooting Stars ──
+    const meteors = [];
+    function spawnMeteor() {
+        if (meteors.length < 3 && Math.random() < 0.4) {
+            meteors.push({
+                x: Math.random() * W * 0.9,
+                y: Math.random() * H * 0.4,
+                len: Math.random() * 120 + 80,
+                speed: Math.random() * 6 + 7,
+                angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
+                alpha: 1,
+                decay: Math.random() * 0.015 + 0.012
+            });
+        }
+    }
+    setInterval(spawnMeteor, 2200);
+
+    // ── Astra Ambient Cosmic Nebula Glows ──
+    const nebulas = [
+        { xRatio: 0.25, yRatio: 0.30, rad: 0.45, color: [99, 102, 241], pulseSpd: 0.0006 },
+        { xRatio: 0.75, yRatio: 0.65, rad: 0.50, color: [168, 85, 247], pulseSpd: 0.0008 },
+        { xRatio: 0.50, yRatio: 0.85, rad: 0.40, color: [14, 165, 233], pulseSpd: 0.0005 },
+        { xRatio: 0.85, yRatio: 0.20, rad: 0.35, color: [249, 115, 22], pulseSpd: 0.0007 }
+    ];
+
+    function drawNebulas() {
+        for (const neb of nebulas) {
+            const cx = neb.xRatio * W + mouseX * 0.3;
+            const cy = neb.yRatio * H + mouseY * 0.3;
+            const radius = neb.rad * Math.max(W, H);
+            const pulse = 0.07 + Math.sin(t * neb.pulseSpd) * 0.025;
+
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            const [r, gr, b] = neb.color;
+            g.addColorStop(0, `rgba(${r},${gr},${b},${pulse})`);
+            g.addColorStop(0.5, `rgba(${r},${gr},${b},${pulse * 0.35})`);
+            g.addColorStop(1, `rgba(${r},${gr},${b},0)`);
+
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // ── Starfield & Constellation Links ──
+    function drawStars() {
+        const cx = W / 2 + mouseX;
+        const cy = H / 2 + mouseY;
+
+        // 1. Draw Subtle Constellation Links between nearby stars
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < stars.length; i += 2) {
+            const s1 = stars[i];
+            const sx1 = cx + s1.x;
+            const sy1 = cy + s1.y;
+
+            if (sx1 < -50 || sx1 > W + 50 || sy1 < -50 || sy1 > H + 50) continue;
+
+            for (let j = i + 1; j < Math.min(i + 8, stars.length); j++) {
+                const s2 = stars[j];
+                const sx2 = cx + s2.x;
+                const sy2 = cy + s2.y;
+                const dx = sx1 - sx2;
+                const dy = sy1 - sy2;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 90) {
+                    const linkAlpha = (1 - dist / 90) * 0.12;
+                    ctx.strokeStyle = `rgba(165, 180, 252, ${linkAlpha})`;
+                    ctx.beginPath();
+                    ctx.moveTo(sx1, sy1);
+                    ctx.lineTo(sx2, sy2);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // 2. Draw Stars with Twinkle & Cross Spikes
+        for (const s of stars) {
+            s.x += s.vx;
+            s.y += s.vy;
+
+            // Wrap around screen boundaries with margin
+            if (s.x < -W) s.x = W;
+            if (s.x > W) s.x = -W;
+            if (s.y < -H) s.y = H;
+            if (s.y > H) s.y = -H;
+
+            const sx = cx + s.x;
+            const sy = cy + s.y;
+
+            if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+
+            const twinkle = Math.sin(t * s.twinkleSpeed + s.twinklePhase);
+            const alpha = Math.max(0.1, Math.min(1, s.baseAlpha + twinkle * 0.35));
+
+            if (s.isHero) {
+                // Bright Astra Hero Star with 4-point diffraction spike
+                const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, s.r * 6);
+                haloGrad.addColorStop(0, `${s.color}${alpha})`);
+                haloGrad.addColorStop(0.3, `${s.color}${alpha * 0.4})`);
+                haloGrad.addColorStop(1, `${s.color}0)`);
+                ctx.fillStyle = haloGrad;
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r * 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Core pinpoint
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 4-point cross diffraction flare
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.75})`;
+                ctx.lineWidth = 0.75;
+                const flareLen = s.r * 8 + twinkle * 3;
+                ctx.beginPath();
+                ctx.moveTo(sx - flareLen, sy);
+                ctx.lineTo(sx + flareLen, sy);
+                ctx.moveTo(sx, sy - flareLen);
+                ctx.lineTo(sx, sy + flareLen);
+                ctx.stroke();
+                ctx.restore();
+            } else {
+                // Standard needle star
+                ctx.fillStyle = `${s.color}${alpha})`;
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    // ── Draw Meteors ──
+    function drawMeteors() {
+        for (let i = meteors.length - 1; i >= 0; i--) {
+            const m = meteors[i];
+            m.x += Math.cos(m.angle) * m.speed;
+            m.y += Math.sin(m.angle) * m.speed;
+            m.alpha -= m.decay;
+
+            if (m.alpha <= 0 || m.x > W + 100 || m.y > H + 100) {
+                meteors.splice(i, 1);
+                continue;
+            }
+
+            const tailX = m.x - Math.cos(m.angle) * m.len;
+            const tailY = m.y - Math.sin(m.angle) * m.len;
+
+            const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+            grad.addColorStop(0, `rgba(255, 255, 255, ${m.alpha * 0.95})`);
+            grad.addColorStop(0.2, `rgba(165, 180, 252, ${m.alpha * 0.6})`);
+            grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            ctx.save();
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(m.x, m.y);
+            ctx.lineTo(tailX, tailY);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // ── Main Render Loop ──
+    function render(time) {
+        t = time;
+
+        // Smooth mouse parallax interpolation
+        mouseX += (targetMouseX - mouseX) * 0.05;
+        mouseY += (targetMouseY - mouseY) * 0.05;
+
+        // Deep obsidian space base
+        ctx.fillStyle = '#020206';
+        ctx.fillRect(0, 0, W, H);
+
+        drawNebulas();
+        drawStars();
+        drawMeteors();
+
+        requestAnimationFrame(render);
+    }
+
+    resize();
+    requestAnimationFrame(render);
+})();
+</script>
 <div class="tricolor-stripe"></div>
 
 <!-- Topbar -->
@@ -3465,250 +3724,6 @@ setInterval(() => {
     loadBoothsMatrix();
     loadBlockchainLedger();
 }, 8000);
-
-// ══════════════════════════════════════════════════════════════════════
-//  OpenAI Astra High-Fidelity 3D Starfield & Constellation Background
-// ══════════════════════════════════════════════════════════════════════
-(function() {
-    const canvas = document.getElementById('astroCanvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    let W = 0, H = 0, dpr = window.devicePixelRatio || 1;
-    let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
-    let t = 0;
-
-    function resize() {
-        dpr = window.devicePixelRatio || 1;
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width = W * dpr;
-        canvas.height = H * dpr;
-        ctx.scale(dpr, dpr);
-        initStars();
-    }
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', (e) => {
-        targetMouseX = (e.clientX - W / 2) * 0.04;
-        targetMouseY = (e.clientY - H / 2) * 0.04;
-    });
-
-    // ── Starfield Data Structure ──
-    const STAR_COUNT = 320;
-    const stars = [];
-
-    function initStars() {
-        stars.length = 0;
-        for (let i = 0; i < STAR_COUNT; i++) {
-            const z = Math.random() * 1000 + 1;
-            stars.push({
-                x: (Math.random() - 0.5) * W * 2,
-                y: (Math.random() - 0.5) * H * 2,
-                z: z,
-                baseZ: z,
-                r: Math.random() * 1.5 + 0.3,
-                vx: (Math.random() - 0.5) * 0.15,
-                vy: (Math.random() - 0.5) * 0.15,
-                twinkleSpeed: Math.random() * 0.003 + 0.001,
-                twinklePhase: Math.random() * Math.PI * 2,
-                baseAlpha: Math.random() * 0.65 + 0.25,
-                isHero: Math.random() < 0.05, // 5% bright Astra stars with diffraction cross
-                color: Math.random() < 0.2 ? 'rgba(165, 180, 252,' : (Math.random() < 0.4 ? 'rgba(196, 181, 253,' : 'rgba(255, 255, 255,')
-            });
-        }
-    }
-
-    // ── Meteors / Shooting Stars ──
-    const meteors = [];
-    function spawnMeteor() {
-        if (meteors.length < 3 && Math.random() < 0.4) {
-            meteors.push({
-                x: Math.random() * W * 0.9,
-                y: Math.random() * H * 0.4,
-                len: Math.random() * 120 + 80,
-                speed: Math.random() * 6 + 7,
-                angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
-                alpha: 1,
-                decay: Math.random() * 0.015 + 0.012
-            });
-        }
-    }
-    setInterval(spawnMeteor, 2200);
-
-    // ── Astra Ambient Cosmic Nebula Glows ──
-    const nebulas = [
-        { xRatio: 0.25, yRatio: 0.30, rad: 0.45, color: [99, 102, 241], pulseSpd: 0.0006 },
-        { xRatio: 0.75, yRatio: 0.65, rad: 0.50, color: [168, 85, 247], pulseSpd: 0.0008 },
-        { xRatio: 0.50, yRatio: 0.85, rad: 0.40, color: [14, 165, 233], pulseSpd: 0.0005 },
-        { xRatio: 0.85, yRatio: 0.20, rad: 0.35, color: [249, 115, 22], pulseSpd: 0.0007 }
-    ];
-
-    function drawNebulas() {
-        for (const neb of nebulas) {
-            const cx = neb.xRatio * W + mouseX * 0.3;
-            const cy = neb.yRatio * H + mouseY * 0.3;
-            const radius = neb.rad * Math.max(W, H);
-            const pulse = 0.07 + Math.sin(t * neb.pulseSpd) * 0.025;
-
-            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-            const [r, gr, b] = neb.color;
-            g.addColorStop(0, `rgba(${r},${gr},${b},${pulse})`);
-            g.addColorStop(0.5, `rgba(${r},${gr},${b},${pulse * 0.35})`);
-            g.addColorStop(1, `rgba(${r},${gr},${b},0)`);
-
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    // ── Starfield & Constellation Links ──
-    function drawStars() {
-        const cx = W / 2 + mouseX;
-        const cy = H / 2 + mouseY;
-
-        // 1. Draw Subtle Constellation Links between nearby stars
-        ctx.lineWidth = 0.5;
-        for (let i = 0; i < stars.length; i += 2) {
-            const s1 = stars[i];
-            const sx1 = cx + s1.x;
-            const sy1 = cy + s1.y;
-
-            if (sx1 < -50 || sx1 > W + 50 || sy1 < -50 || sy1 > H + 50) continue;
-
-            for (let j = i + 1; j < Math.min(i + 8, stars.length); j++) {
-                const s2 = stars[j];
-                const sx2 = cx + s2.x;
-                const sy2 = cy + s2.y;
-                const dx = sx1 - sx2;
-                const dy = sy1 - sy2;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < 90) {
-                    const linkAlpha = (1 - dist / 90) * 0.12;
-                    ctx.strokeStyle = `rgba(165, 180, 252, ${linkAlpha})`;
-                    ctx.beginPath();
-                    ctx.moveTo(sx1, sy1);
-                    ctx.lineTo(sx2, sy2);
-                    ctx.stroke();
-                }
-            }
-        }
-
-        // 2. Draw Stars with Twinkle & Cross Spikes
-        for (const s of stars) {
-            s.x += s.vx;
-            s.y += s.vy;
-
-            // Wrap around screen boundaries with margin
-            if (s.x < -W) s.x = W;
-            if (s.x > W) s.x = -W;
-            if (s.y < -H) s.y = H;
-            if (s.y > H) s.y = -H;
-
-            const sx = cx + s.x;
-            const sy = cy + s.y;
-
-            if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-
-            const twinkle = Math.sin(t * s.twinkleSpeed + s.twinklePhase);
-            const alpha = Math.max(0.1, Math.min(1, s.baseAlpha + twinkle * 0.35));
-
-            if (s.isHero) {
-                // Bright Astra Hero Star with 4-point diffraction spike
-                const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, s.r * 6);
-                haloGrad.addColorStop(0, `${s.color}${alpha})`);
-                haloGrad.addColorStop(0.3, `${s.color}${alpha * 0.4})`);
-                haloGrad.addColorStop(1, `${s.color}0)`);
-                ctx.fillStyle = haloGrad;
-                ctx.beginPath();
-                ctx.arc(sx, sy, s.r * 6, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Core pinpoint
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(sx, sy, s.r * 1.2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // 4-point cross diffraction flare
-                ctx.save();
-                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.75})`;
-                ctx.lineWidth = 0.75;
-                const flareLen = s.r * 8 + twinkle * 3;
-                ctx.beginPath();
-                ctx.moveTo(sx - flareLen, sy);
-                ctx.lineTo(sx + flareLen, sy);
-                ctx.moveTo(sx, sy - flareLen);
-                ctx.lineTo(sx, sy + flareLen);
-                ctx.stroke();
-                ctx.restore();
-            } else {
-                // Standard needle star
-                ctx.fillStyle = `${s.color}${alpha})`;
-                ctx.beginPath();
-                ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-    }
-
-    // ── Draw Meteors ──
-    function drawMeteors() {
-        for (let i = meteors.length - 1; i >= 0; i--) {
-            const m = meteors[i];
-            m.x += Math.cos(m.angle) * m.speed;
-            m.y += Math.sin(m.angle) * m.speed;
-            m.alpha -= m.decay;
-
-            if (m.alpha <= 0 || m.x > W + 100 || m.y > H + 100) {
-                meteors.splice(i, 1);
-                continue;
-            }
-
-            const tailX = m.x - Math.cos(m.angle) * m.len;
-            const tailY = m.y - Math.sin(m.angle) * m.len;
-
-            const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
-            grad.addColorStop(0, `rgba(255, 255, 255, ${m.alpha * 0.95})`);
-            grad.addColorStop(0.2, `rgba(165, 180, 252, ${m.alpha * 0.6})`);
-            grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
-
-            ctx.save();
-            ctx.strokeStyle = grad;
-            ctx.lineWidth = 1.4;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(m.x, m.y);
-            ctx.lineTo(tailX, tailY);
-            ctx.stroke();
-            ctx.restore();
-        }
-    }
-
-    // ── Main Render Loop ──
-    function render(time) {
-        t = time;
-
-        // Smooth mouse parallax interpolation
-        mouseX += (targetMouseX - mouseX) * 0.05;
-        mouseY += (targetMouseY - mouseY) * 0.05;
-
-        // Deep obsidian space base
-        ctx.fillStyle = '#020206';
-        ctx.fillRect(0, 0, W, H);
-
-        drawNebulas();
-        drawStars();
-        drawMeteors();
-
-        requestAnimationFrame(render);
-    }
-
-    resize();
-    requestAnimationFrame(render);
-})();
 </script>
 
 </body>
