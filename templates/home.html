@@ -12,81 +12,44 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background: #f8fafc;
+            background: #050a18;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
         }
 
-        /* Tricolor Background Blobs */
-        .bg-blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.16;
-            z-index: 1;
-        }
-        #rainCanvas {
+        /* Astro Background Canvas */
+        #astroCanvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
             pointer-events: none;
-        }
-        .blob-orange {
-            top: -10%;
-            left: -10%;
-            width: 550px;
-            height: 550px;
-            background: #f97316; /* Saffron Orange */
-            animation: float-orange 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .blob-green {
-            bottom: -10%;
-            right: -10%;
-            width: 650px;
-            height: 650px;
-            background: #22c55e; /* Emerald Green */
-            animation: float-green 22s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        @keyframes float-orange {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(100px, 80px) scale(1.15) rotate(45deg); }
-            100% { transform: translate(-50px, 120px) scale(0.9) rotate(90deg); }
-        }
-        @keyframes float-green {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(-120px, -70px) scale(0.85) rotate(-60deg); }
-            100% { transform: translate(80px, -40px) scale(1.1) rotate(-120deg); }
         }
 
         .tricolor-stripe {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
+            top: 0; left: 0;
+            width: 100%; height: 5px;
             background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
             z-index: 100;
         }
 
         .main-card {
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: rgba(10, 18, 40, 0.62);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(120, 160, 255, 0.18);
             border-radius: 32px;
             padding: 55px 45px;
             width: 90%;
             max-width: 980px;
             text-align: center;
-            box-shadow: 
-                0 30px 60px -15px rgba(15, 23, 42, 0.1),
-                0 0 50px rgba(255, 255, 255, 0.4) inset;
+            box-shadow:
+                0 30px 80px -20px rgba(0, 0, 0, 0.7),
+                0 0 60px rgba(99, 140, 255, 0.08) inset,
+                0 0 0 1px rgba(255,255,255,0.04) inset;
             z-index: 10;
             position: relative;
             opacity: 0;
@@ -95,88 +58,80 @@
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(40px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* Language Bar */
         .language-bar {
             position: absolute;
-            top: 25px;
-            right: 30px;
+            top: 25px; right: 30px;
             display: flex;
-            background: rgba(15, 23, 42, 0.05);
+            background: rgba(255,255,255,0.04);
             padding: 4px;
             border-radius: 12px;
             gap: 2px;
+            border: 1px solid rgba(255,255,255,0.06);
         }
         .lang-btn {
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            color: #475569;
+            color: #94a3b8;
             padding: 6px 14px;
             border-radius: 8px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .lang-btn:hover {
-            color: #0f172a;
-            background: rgba(255, 255, 255, 0.4);
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.08);
             transform: translateY(-1px);
         }
         .active-lang {
-            background: #ffffff;
-            color: #0f172a !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.1);
+            color: #f1f5f9 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .logo-container {
-            width: 90px;
-            height: 90px;
-            background: #ffffff;
+            width: 90px; height: 90px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             opacity: 0;
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
         }
-        
         @keyframes popIn {
             from { opacity: 0; transform: scale(0.6) rotate(-10deg); }
-            to { opacity: 1; transform: scale(1) rotate(0); }
+            to   { opacity: 1; transform: scale(1) rotate(0); }
         }
-        
-        .logo-container:hover {
-            transform: rotate(10deg) scale(1.05);
-        }
-        .logo-img {
-            width: 60px;
-            height: auto;
-        }
+        .logo-container:hover { transform: rotate(10deg) scale(1.05); }
+        .logo-img { width: 60px; height: auto; }
 
         .heading-group {
             opacity: 0;
             animation: textSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
         }
-        
         @keyframes textSlideUp {
             from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             font-size: 38px;
             font-weight: 800;
-            color: #0f172a;
+            color: #f1f5f9;
             margin-bottom: 8px;
             letter-spacing: -1px;
         }
         h2 {
             font-size: 18px;
             font-weight: 500;
-            color: #64748b;
+            color: #7c9bc4;
             margin-bottom: 45px;
         }
 
@@ -187,10 +142,10 @@
             gap: 24px;
             margin-bottom: 20px;
         }
-        
+
         .portal-card {
-            background: #ffffff;
-            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 24px;
             padding: 35px 24px;
             text-decoration: none;
@@ -198,37 +153,31 @@
             flex-direction: column;
             align-items: center;
             opacity: 0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
             position: relative;
             overflow: hidden;
-            animation: 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation:
                 cardSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards,
                 cardFloat 6s infinite ease-in-out alternate;
         }
-        
-        .portal-card:nth-child(2) {
-            animation-delay: 0.6s, 1.5s;
-        }
-        .portal-card:nth-child(3) {
-            animation-delay: 0.7s, 3s;
-        }
-        
+        .portal-card:nth-child(2) { animation-delay: 0.6s, 1.5s; }
+        .portal-card:nth-child(3) { animation-delay: 0.7s, 3s; }
+
         @keyframes cardSlideIn {
             from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
         @keyframes cardFloat {
-            0% { transform: translateY(0); }
+            0%   { transform: translateY(0); }
             100% { transform: translateY(-8px); }
         }
-        
+
         /* Glass Shine Sweep */
         .portal-card::after {
             content: '';
             position: absolute;
             top: 0; left: -150%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
             transform: skewX(-25deg);
             pointer-events: none;
             transition: none;
@@ -241,46 +190,35 @@
         .portal-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
+            top: 0; left: 0; width: 100%; height: 3px;
             transition: opacity 0.3s ease;
             opacity: 0;
         }
-        .portal-card.card-register::before { background: #16a34a; }
-        .portal-card.card-scan::before     { background: #0f172a; }
-        .portal-card.card-admin::before    { background: #ea580c; }
+        .portal-card.card-register::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .portal-card.card-scan::before     { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .portal-card.card-admin::before    { background: linear-gradient(90deg, #f97316, #fb923c); }
 
         .portal-card:hover {
             animation-play-state: paused;
             transform: translateY(-12px) scale(1.03);
-            border-color: rgba(203, 213, 225, 0.8);
+            background: rgba(255,255,255,0.07);
         }
-        
         .portal-card.card-register:hover {
-            box-shadow: 
-                0 25px 40px -15px rgba(22, 163, 74, 0.18),
-                0 0 30px rgba(22, 163, 74, 0.1);
-            border-color: rgba(22, 163, 74, 0.4);
+            box-shadow: 0 25px 50px -15px rgba(34, 197, 94, 0.25), 0 0 40px rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.35);
         }
         .portal-card.card-scan:hover {
-            box-shadow: 
-                0 25px 40px -15px rgba(15, 23, 42, 0.18),
-                0 0 30px rgba(15, 23, 42, 0.1);
-            border-color: rgba(15, 23, 42, 0.4);
+            box-shadow: 0 25px 50px -15px rgba(99, 102, 241, 0.25), 0 0 40px rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.35);
         }
         .portal-card.card-admin:hover {
-            box-shadow: 
-                0 25px 40px -15px rgba(234, 88, 12, 0.18),
-                0 0 30px rgba(234, 88, 12, 0.1);
-            border-color: rgba(234, 88, 12, 0.4);
+            box-shadow: 0 25px 50px -15px rgba(249, 115, 22, 0.25), 0 0 40px rgba(249, 115, 22, 0.1);
+            border-color: rgba(249, 115, 22, 0.35);
         }
-        
-        .portal-card:hover::before {
-            opacity: 1;
-        }
+        .portal-card:hover::before { opacity: 1; }
 
         .icon-box {
-            width: 64px;
-            height: 64px;
+            width: 64px; height: 64px;
             border-radius: 18px;
             display: flex;
             align-items: center;
@@ -290,16 +228,16 @@
         }
         .portal-card:hover .icon-box {
             transform: translateY(-4px) scale(1.08);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        .card-register .icon-box { background: #f0fdf4; color: #16a34a; }
-        .card-scan .icon-box     { background: #f1f5f9; color: #0f172a; }
-        .card-admin .icon-box    { background: #fff7ed; color: #ea580c; }
+        .card-register .icon-box { background: rgba(34,197,94,0.12);  color: #4ade80; }
+        .card-scan .icon-box     { background: rgba(99,102,241,0.12); color: #818cf8; }
+        .card-admin .icon-box    { background: rgba(249,115,22,0.12); color: #fb923c; }
 
         .portal-title {
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
+            color: #e2e8f0;
             margin-bottom: 8px;
         }
         .portal-desc {
@@ -312,21 +250,17 @@
         .footer {
             margin-top: 35px;
             font-size: 13px;
-            color: #94a3b8;
+            color: #334155;
             font-weight: 500;
-            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            border-top: 1px solid rgba(255,255,255,0.06);
             padding-top: 20px;
         }
 
         @media (max-width: 768px) {
-            .btn-container {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .main-card {
-                padding: 40px 20px;
-            }
-            h1 { font-size: 30px; }
+            .btn-container { grid-template-columns: 1fr; gap: 16px; }
+            .main-card { padding: 40px 20px; }
+            h1 { font-size: 28px; }
+            h2 { font-size: 15px; }
             .language-bar { position: static; margin-bottom: 25px; display: inline-flex; }
         }
     </style>
@@ -334,9 +268,7 @@
 <body>
 
 <div class="tricolor-stripe"></div>
-<div class="bg-blob blob-orange"></div>
-<div class="bg-blob blob-green"></div>
-<canvas id="rainCanvas"></canvas>
+<canvas id="astroCanvas"></canvas>
 
 <div class="main-card">
     <div class="language-bar">
@@ -365,7 +297,7 @@
         </a>
 
         <!-- PORTAL 2 -->
-        <a href="/booth/login" class="portal-card card-scanner">
+        <a href="/booth/login" class="portal-card card-scan">
             <div class="icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
             </div>
@@ -405,58 +337,222 @@ function updateLanguage(lang) {
     document.getElementById("desc-3").innerText  = trans[lang].d3;
 }
 
-// ── Background Rain Particle Effect ──
+// ══════════════════════════════════════════════
+//  GPT-6 Astro Style Background Animation
+// ══════════════════════════════════════════════
 (function() {
-    const canvas = document.getElementById('rainCanvas');
+    const canvas = document.getElementById('astroCanvas');
     const ctx = canvas.getContext('2d');
-    
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-    
+    let W = canvas.width  = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+    let t = 0;
+
     window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        initStars();
     });
-    
-    const raindrops = [];
-    const maxDrops = 110;
-    
-    for (let i = 0; i < maxDrops; i++) {
-        raindrops.push({
-            x: Math.random() * width,
-            y: Math.random() * height - height,
-            vy: 6 + Math.random() * 8,
-            length: 12 + Math.random() * 15,
-            opacity: 0.08 + Math.random() * 0.12
+
+    // ── Stars ──
+    const STAR_COUNT = 220;
+    const stars = [];
+
+    function initStars() {
+        stars.length = 0;
+        for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 1.4 + 0.2,
+                alpha: Math.random() * 0.7 + 0.15,
+                speed: Math.random() * 0.003 + 0.001,
+                phase: Math.random() * Math.PI * 2,
+                // Occasional larger twinkle stars
+                big: Math.random() < 0.06
+            });
+        }
+    }
+    initStars();
+
+    // ── Nebula Aurora Orbs ──
+    const orbs = [
+        { cx: 0.18, cy: 0.25, rx: 0.38, ry: 0.30, color: [99, 102, 241],  speed: 0.00018, phase: 0 },
+        { cx: 0.80, cy: 0.72, rx: 0.42, ry: 0.34, color: [139, 92, 246],   speed: 0.00022, phase: 1.2 },
+        { cx: 0.50, cy: 0.50, rx: 0.50, ry: 0.40, color: [6,  182, 212],   speed: 0.00014, phase: 2.5 },
+        { cx: 0.10, cy: 0.80, rx: 0.30, ry: 0.25, color: [16, 185, 129],  speed: 0.00020, phase: 3.8 },
+        { cx: 0.88, cy: 0.15, rx: 0.28, ry: 0.22, color: [249, 115, 22],  speed: 0.00016, phase: 5.1 },
+    ];
+
+    // ── Shooting Stars ──
+    const shoots = [];
+    function spawnShoot() {
+        shoots.push({
+            x: Math.random() * W * 0.7,
+            y: Math.random() * H * 0.5,
+            len: 80 + Math.random() * 120,
+            vx: 4 + Math.random() * 5,
+            vy: 2 + Math.random() * 3,
+            alpha: 1,
+            life: 1
         });
     }
-    
-    function animateRain() {
-        ctx.clearRect(0, 0, width, height);
-        
-        ctx.lineWidth = 1.5;
-        ctx.lineCap = 'round';
-        
-        for (let i = 0; i < maxDrops; i++) {
-            const p = raindrops[i];
+    setInterval(spawnShoot, 3200 + Math.random() * 2000);
+
+    // ── Floating Dust Particles ──
+    const dust = [];
+    for (let i = 0; i < 55; i++) {
+        dust.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.8 + 0.4,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: (Math.random() - 0.5) * 0.12,
+            alpha: Math.random() * 0.25 + 0.05,
+            color: [[99,102,241],[139,92,246],[6,182,212],[255,255,255]][Math.floor(Math.random()*4)]
+        });
+    }
+
+    function drawOrbs() {
+        for (const o of orbs) {
+            const ox = (o.cx + Math.sin(t * o.speed * 1000 + o.phase) * 0.06) * W;
+            const oy = (o.cy + Math.cos(t * o.speed * 700  + o.phase) * 0.05) * H;
+            const rx = o.rx * W;
+            const ry = o.ry * H;
+
+            const grad = ctx.createRadialGradient(ox, oy, 0, ox, oy, Math.max(rx, ry));
+            const [r, g, b] = o.color;
+            grad.addColorStop(0,   `rgba(${r},${g},${b},0.13)`);
+            grad.addColorStop(0.4, `rgba(${r},${g},${b},0.07)`);
+            grad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+
+            ctx.save();
+            ctx.scale(1, ry / rx);
             ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p.x + (p.vy * 0.1), p.y + p.length);
-            ctx.strokeStyle = `rgba(186, 230, 253, ${p.opacity})`;
-            ctx.stroke();
-            
-            p.y += p.vy;
-            p.x += p.vy * 0.1;
-            
-            if (p.y > height) {
-                p.y = -p.length;
-                p.x = Math.random() * width;
-                p.vy = 6 + Math.random() * 8;
+            ctx.arc(ox, oy * (rx / ry), rx, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    function drawStars() {
+        for (const s of stars) {
+            const pulse = Math.sin(t * s.speed * 1000 + s.phase);
+            const alpha = s.alpha * (0.6 + 0.4 * pulse);
+
+            if (s.big) {
+                // Glowing big star with 4-point cross
+                const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
+                grd.addColorStop(0, `rgba(255,255,255,${alpha})`);
+                grd.addColorStop(0.4, `rgba(180,200,255,${alpha * 0.4})`);
+                grd.addColorStop(1, `rgba(100,150,255,0)`);
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
+                ctx.fillStyle = grd;
+                ctx.fill();
+
+                // Cross flare
+                ctx.save();
+                ctx.globalAlpha = alpha * 0.6;
+                ctx.strokeStyle = 'rgba(220,230,255,0.7)';
+                ctx.lineWidth = 0.6;
+                ctx.beginPath();
+                ctx.moveTo(s.x - s.r * 10, s.y);
+                ctx.lineTo(s.x + s.r * 10, s.y);
+                ctx.moveTo(s.x, s.y - s.r * 10);
+                ctx.lineTo(s.x, s.y + s.r * 10);
+                ctx.stroke();
+                ctx.restore();
+            } else {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200,220,255,${alpha})`;
+                ctx.fill();
             }
         }
-        requestAnimationFrame(animateRain);
     }
-    animateRain();
+
+    function drawDust() {
+        for (const d of dust) {
+            d.x += d.vx;
+            d.y += d.vy;
+            if (d.x < 0) d.x = W;
+            if (d.x > W) d.x = 0;
+            if (d.y < 0) d.y = H;
+            if (d.y > H) d.y = 0;
+            const [r, g, b] = d.color;
+            ctx.beginPath();
+            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${r},${g},${b},${d.alpha})`;
+            ctx.fill();
+        }
+    }
+
+    function drawShoots() {
+        for (let i = shoots.length - 1; i >= 0; i--) {
+            const s = shoots[i];
+            s.x += s.vx;
+            s.y += s.vy;
+            s.life -= 0.018;
+            s.alpha = s.life;
+
+            if (s.life <= 0) { shoots.splice(i, 1); continue; }
+
+            const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * s.len / 5, s.y - s.vy * s.len / 5);
+            grad.addColorStop(0,   `rgba(255,255,255,${s.alpha * 0.9})`);
+            grad.addColorStop(0.3, `rgba(180,200,255,${s.alpha * 0.4})`);
+            grad.addColorStop(1,   `rgba(99,102,241,0)`);
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(s.x - s.vx * (s.len / 5), s.y - s.vy * (s.len / 5));
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+    }
+
+    function drawAuroraBeams() {
+        // Subtle vertical light columns reminiscent of GPT-6 glows
+        const beams = [
+            { x: 0.15 * W, color: [99, 102, 241] },
+            { x: 0.50 * W, color: [6, 182, 212] },
+            { x: 0.82 * W, color: [139, 92, 246] },
+        ];
+        for (const b of beams) {
+            const pulse = 0.03 + 0.025 * Math.sin(t * 0.0006 + b.x);
+            const grad = ctx.createLinearGradient(b.x, 0, b.x, H);
+            const [r, g, v] = b.color;
+            grad.addColorStop(0,   `rgba(${r},${g},${v},0)`);
+            grad.addColorStop(0.3, `rgba(${r},${g},${v},${pulse})`);
+            grad.addColorStop(0.7, `rgba(${r},${g},${v},${pulse * 0.6})`);
+            grad.addColorStop(1,   `rgba(${r},${g},${v},0)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(b.x - 60, 0, 120, H);
+        }
+    }
+
+    function frame(timestamp) {
+        t = timestamp;
+        ctx.clearRect(0, 0, W, H);
+
+        // Deep space gradient base
+        const bg = ctx.createLinearGradient(0, 0, W * 0.6, H);
+        bg.addColorStop(0,   '#050a18');
+        bg.addColorStop(0.5, '#080d22');
+        bg.addColorStop(1,   '#030710');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        drawAuroraBeams();
+        drawOrbs();
+        drawStars();
+        drawDust();
+        drawShoots();
+
+        requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
 })();
 </script>
 </body>

@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        html { overflow-x: hidden; max-width: 100vw; }
+
         
         body {
             background: #f1f5f9;
@@ -14,6 +16,7 @@
             color: #0f172a;
             position: relative;
             overflow-x: hidden;
+            width: 100%;
         }
 
         .tricolor-stripe {
@@ -33,14 +36,18 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 16px 36px;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             z-index: 50;
             position: sticky;
             top: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
         .navbar-brand {
             display: flex;
@@ -93,9 +100,11 @@
         }
 
         .dashboard-container {
-            max-width: 1440px;
+            max-width: 100%;
+            width: 100%;
             margin: 25px auto 60px;
-            padding: 0 24px;
+            padding: 0 20px;
+            box-sizing: border-box;
         }
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -105,20 +114,26 @@
             background: #ffffff;
             border: 1.5px solid #cbd5e1;
             border-radius: 20px;
-            padding: 22px 28px;
-            margin-bottom: 25px;
+            padding: 20px 22px;
+            margin-bottom: 22px;
             box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+            max-width: 100%;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
         .hp-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
             border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
         .hp-title {
-            font-size: 15.5px;
+            font-size: 15px;
             font-weight: 800;
             color: #0f172a;
             display: flex;
@@ -126,46 +141,63 @@
             gap: 8px;
         }
         .hp-breadcrumbs {
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             color: #ea580c;
             background: #fff7ed;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 8px;
             border: 1px solid #ffedd5;
         }
         .hierarchy-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 14px;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
         }
-        @media (max-width: 1200px) {
-            .hierarchy-grid { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 1366px) {
+            .hierarchy-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
         @media (max-width: 768px) {
             .hierarchy-grid { grid-template-columns: 1fr; }
         }
+        .h-field {
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+        }
         .h-field label {
             display: block;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             color: #475569;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .h-field select {
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 12px;
+            max-width: 100%;
+            min-width: 0;
+            padding: 9px 10px;
+            border-radius: 10px;
             border: 1.5px solid #cbd5e1;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: #0f172a;
             background: #f8fafc;
             outline: none;
             cursor: pointer;
             transition: all 0.2s;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
         }
         .h-field select:focus {
             border-color: #ea580c;
@@ -178,39 +210,51 @@
            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
         }
-        @media (max-width: 1100px) {
-            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 1366px) {
+            .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
         @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 480px) {
             .kpi-grid { grid-template-columns: 1fr; }
         }
         .kpi-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 18px;
+            border-radius: 16px;
+            padding: 16px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
             transition: all 0.2s ease;
+            min-width: 0;
+            box-sizing: border-box;
         }
         .kpi-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 18px -4px rgba(0,0,0,0.06);
         }
-        .kpi-label { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; }
-        .kpi-value { font-size: 26px; font-weight: 800; color: #0f172a; }
-        .kpi-sub { font-size: 11.5px; font-weight: 600; margin-top: 4px; }
+        .kpi-label { font-size: 11.5px; font-weight: 700; color: #64748b; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-value { font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1.1; }
+        .kpi-sub { font-size: 11px; font-weight: 600; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Content Layout */
         .content-grid {
             display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 24px;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
-        @media (max-width: 1050px) {
+        @media (max-width: 1200px) {
             .content-grid { grid-template-columns: 1fr; }
         }
 
@@ -814,15 +858,17 @@
            COLUMN-WISE SIDEBAR TABS & DASHBOARD VIEWS
            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         .dashboard-wrapper {
-            max-width: 1560px;
+            max-width: 100%;
+            width: 100%;
             margin: 20px auto 60px;
-            padding: 0 20px;
+            padding: 0 16px;
             display: grid;
-            grid-template-columns: 290px 1fr;
-            gap: 24px;
+            grid-template-columns: 250px minmax(0, 1fr);
+            gap: 16px;
             align-items: start;
+            box-sizing: border-box;
         }
-        @media (max-width: 1080px) {
+        @media (max-width: 1100px) {
             .dashboard-wrapper {
                 grid-template-columns: 1fr;
             }
@@ -831,16 +877,29 @@
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 20px 16px;
+            padding: 18px 14px;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
             position: sticky;
             top: 85px;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
+            min-width: 0;
+            box-sizing: border-box;
         }
+        @media (max-width: 1100px) {
+            .sidebar-column {
+                position: static;
+                max-height: none;
+            }
+        }
+        .sidebar-column::-webkit-scrollbar { width: 4px; }
+        .sidebar-column::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
         .sidebar-header {
-            padding: 4px 8px 12px;
+            padding: 4px 8px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .sidebar-title {
@@ -852,7 +911,7 @@
             display: block;
         }
         .sidebar-sub {
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             color: #ffffff;
             display: block;
@@ -861,22 +920,23 @@
         .sidebar-nav {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .side-tab-btn {
             background: rgba(30, 41, 59, 0.6);
             border: 1.5px solid rgba(255, 255, 255, 0.06);
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             cursor: pointer;
             text-align: left;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             width: 100%;
+            box-sizing: border-box;
         }
         .side-tab-btn:hover {
             background: rgba(51, 65, 85, 0.8);
@@ -889,8 +949,8 @@
             box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);
         }
         .tab-icon-box {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.06);
             display: flex;
@@ -907,13 +967,17 @@
         }
         .tab-text-wrap {
             flex: 1;
+            min-width: 0;
         }
         .tab-title {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 800;
             color: #e2e8f0;
             letter-spacing: -0.2px;
             transition: color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .side-tab-btn.active .tab-title {
             color: #ffffff;
@@ -923,6 +987,9 @@
             color: #94a3b8;
             font-weight: 600;
             margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .side-tab-btn.active .tab-marathi {
             color: #7dd3fc;
@@ -945,13 +1012,76 @@
             background: rgba(30, 41, 59, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 14px;
-            padding: 14px;
+            padding: 12px;
             margin-top: auto;
+            box-sizing: border-box;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           CRITICAL: main content column must have min-width:0
+           for CSS grid to prevent overflow
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .main-content-column {
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
         }
 
+        /* All panels inside main content: min-width 0 for grid, no hidden overflow */
+        .hierarchy-panel,
+        .kpi-grid,
+        .panel,
+        .maha-map-panel,
+        .content-grid {
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        /* blockchain panel keeps overflow:hidden for its own cosmetic bg, 
+           but inner chain-track-wrapper already has overflow-x:auto */
+        .blockchain-panel {
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        /* tbl-wrap must be able to scroll horizontally */
+        .tbl-wrap {
+            overflow-x: auto !important;
+            max-width: 100%;
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tbl-wrap table {
+            width: 100%;
+            min-width: 580px;
+        }
+
+        /* Hierarchy panel selects must wrap properly */
+        .hierarchy-grid {
+            overflow: visible;
+        }
+
+        /* KPI cards should not have fixed min-width */
+        .kpi-card {
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           TAB CONTENT VIEWS
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         .tab-content-view {
             display: none;
             animation: fadeInView 0.35s ease;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
         .tab-content-view.active {
             display: block;
@@ -974,6 +1104,8 @@
             gap: 14px;
             margin-bottom: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            box-sizing: border-box;
         }
         .booth-search-input {
             width: 100%;
@@ -1027,9 +1159,13 @@
         }
         .bmap-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 20px;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 18px;
             align-items: start;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
         @media (max-width: 1100px) {
             .bmap-grid { grid-template-columns: 1fr; }
@@ -1044,11 +1180,26 @@
             justify-content: space-between;
             align-items: center;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
         .bmap-station-card:hover {
             border-color: #0284c7;
             box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
             transform: translateY(-2px);
+        }
+
+        .reg-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        @media (max-width: 1100px) {
+            .reg-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 600px) {
+            .reg-kpi-grid { grid-template-columns: 1fr; }
         }
 
         /* Toast Messages */
@@ -1706,21 +1857,16 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Voter ID</th>
+                                <th style="white-space:nowrap">Voter ID</th>
                                 <th>Name</th>
-                                <th>District / Constituency</th>
-                                <th>Assigned Booth</th>
-                                <th>ग्रामपंचायत</th>
-                                <th>पंचायत समिती</th>
-                                <th>जिल्हा परिषद</th>
-                                <th>महानगरपालिका</th>
-                                <th>नगरपरिषद</th>
-                                <th>नगरपंचायत</th>
-                                <th>Reg Date</th>
+                                <th style="white-space:nowrap">District / Constituency</th>
+                                <th style="white-space:nowrap">Assigned Booth</th>
+                                <th style="white-space:nowrap">Election Types</th>
+                                <th style="white-space:nowrap">Reg Date</th>
                             </tr>
                         </thead>
                         <tbody id="voters-body">
-                            <tr><td colspan="11" style="text-align:center; color:#94a3b8;">Loading voters…</td></tr>
+                            <tr><td colspan="6" style="text-align:center; color:#94a3b8;">Loading voters…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2130,7 +2276,7 @@
                 </div>
 
                 <!-- Registration Summary KPI Row -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                <div class="reg-kpi-grid">
                     <div style="background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
                         <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Total Registered Citizens</span>
                         <span style="font-size: 18px; font-weight: 800; color: #ffffff; display: block; margin-top: 2px;" id="reg_stat_total">0</span>
@@ -2163,21 +2309,16 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Voter ID</th>
+                                <th style="white-space:nowrap">Voter ID</th>
                                 <th>Citizen Name</th>
-                                <th>District / Const.</th>
-                                <th>Assigned Booth</th>
-                                <th>ग्रामपंचायत</th>
-                                <th>पंचायत समिती</th>
-                                <th>जिल्हा परिषद</th>
-                                <th>महानगरपालिका</th>
-                                <th>नगरपरिषद</th>
-                                <th>नगरपंचायत</th>
-                                <th>Voting Pass / ID</th>
+                                <th style="white-space:nowrap">District / Const.</th>
+                                <th style="white-space:nowrap">Assigned Booth</th>
+                                <th style="white-space:nowrap">Election Types</th>
+                                <th style="white-space:nowrap">Voting Pass / ID</th>
                             </tr>
                         </thead>
                         <tbody id="reg-voters-body">
-                            <tr><td colspan="11" style="text-align:center; color:#94a3b8;">Loading citizen voters list...</td></tr>
+                            <tr><td colspan="6" style="text-align:center; color:#94a3b8;">Loading citizen voters list...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2527,13 +2668,30 @@ async function loadVoters() {
             }
 
             if (data.length === 0) {
-                const emptyRow = '<tr><td colspan="11" style="text-align:center; color:#94a3b8;">No voters registered in this selection.</td></tr>';
+                const emptyRow = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No voters registered in this selection.</td></tr>';
                 if (tbody) tbody.innerHTML = emptyRow;
                 if (regTbody) regTbody.innerHTML = emptyRow;
                 return;
             }
 
-            // Main Control Center Table
+            // Helper: build compact election type badges cell
+            function electionBadges(v) {
+                const types = [
+                    ['ग्रामपंचायत', v.gram_panchayat],
+                    ['पं.समिती', v.panchayat_samiti],
+                    ['जि.परिषद', v.zilha_parishad],
+                    ['महानगर', v.mahanagarpalika],
+                    ['नगरपरिषद', v.nagar_parishad],
+                    ['नगरपंचायत', v.nagar_panchayat],
+                ];
+                return '<div style="display:flex;flex-wrap:wrap;gap:3px;">' +
+                    types.filter(([, val]) => val === 1)
+                        .map(([label]) => `<span class="badge badge-eligible" style="font-size:10px;padding:2px 5px;">${label}</span>`).join('') +
+                    (types.every(([, val]) => val !== 1) ? '<span style="color:#94a3b8;font-size:11px;">—</span>' : '') +
+                    '</div>';
+            }
+
+            // Main Control Center Table (6 cols)
             if (tbody) {
                 tbody.innerHTML = data.map(v => `
                     <tr>
@@ -2541,18 +2699,13 @@ async function loadVoters() {
                         <td><b>${v.name}</b><br><small style="color:#64748b;">DOB: ${v.dob || 'N/A'}</small></td>
                         <td>${v.district || 'Pune'} / ${v.constituency || 'Shivaji Nagar'}</td>
                         <td><span class="badge badge-booth">${v.booth_code || 'BOOTH-001'}</span></td>
-                        <td>${renderBadge(v.gram_panchayat)}</td>
-                        <td>${renderBadge(v.panchayat_samiti)}</td>
-                        <td>${renderBadge(v.zilha_parishad)}</td>
-                        <td>${renderBadge(v.mahanagarpalika)}</td>
-                        <td>${renderBadge(v.nagar_parishad)}</td>
-                        <td>${renderBadge(v.nagar_panchayat)}</td>
+                        <td>${electionBadges(v)}</td>
                         <td style="color:#64748b; font-size:11.5px;">${v.reg_date || '-'}</td>
                     </tr>
                 `).join('');
             }
 
-            // Registration Officer Console Table
+            // Registration Officer Console Table (same 6-col layout + action buttons)
             if (regTbody) {
                 regTbody.innerHTML = data.map(v => `
                     <tr>
@@ -2560,12 +2713,7 @@ async function loadVoters() {
                         <td><b>${v.name}</b><br><small style="color:#64748b;">DOB: ${v.dob || 'N/A'}</small></td>
                         <td>${v.district || 'Pune'} / ${v.constituency || 'Shivaji Nagar'}</td>
                         <td><span class="badge badge-booth">${v.booth_code || 'BOOTH-001'}</span></td>
-                        <td>${renderBadge(v.gram_panchayat)}</td>
-                        <td>${renderBadge(v.panchayat_samiti)}</td>
-                        <td>${renderBadge(v.zilha_parishad)}</td>
-                        <td>${renderBadge(v.mahanagarpalika)}</td>
-                        <td>${renderBadge(v.nagar_parishad)}</td>
-                        <td>${renderBadge(v.nagar_panchayat)}</td>
+                        <td>${electionBadges(v)}</td>
                         <td>
                             <div style="display:flex; gap:6px;">
                                 <a href="/download_card/${v.v_id}" target="_blank" class="btn btn-refresh" style="padding:3px 8px; font-size:11px; text-decoration:none;" title="Download Dual-Sided EPIC Card">
