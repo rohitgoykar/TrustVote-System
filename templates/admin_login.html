@@ -12,70 +12,48 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background: #f8fafc;
+            background: #02040a;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
         }
 
-        /* Background Gradient Blobs */
-        .bg-blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            z-index: 1;
-        }
-        .blob-orange {
-            top: -10%;
-            left: -10%;
-            width: 550px;
-            height: 550px;
-            background: #f97316;
-            animation: float-orange 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .blob-green {
-            bottom: -10%;
-            right: -10%;
-            width: 650px;
-            height: 650px;
-            background: #22c55e;
-            animation: float-green 22s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        @keyframes float-orange {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(100px, 80px) scale(1.15) rotate(45deg); }
-            100% { transform: translate(-50px, 120px) scale(0.9) rotate(90deg); }
-        }
-        @keyframes float-green {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(-120px, -70px) scale(0.85) rotate(-60deg); }
-            100% { transform: translate(80px, -40px) scale(1.1) rotate(-120deg); }
-        }
-
-        .tricolor-stripe {
-            position: absolute;
+        /* ── Fullscreen Live Solar Flame & Oceanic Azure Canvas ── */
+        #flameAzureCanvas {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 6px;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .tricolor-stripe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
             background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
             z-index: 100;
         }
 
+        /* ── Dark Frosted Aero-Glass Admin Login Box ── */
         .login-box {
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            padding: 50px 40px;
-            border-radius: 32px;
+            background: rgba(8, 14, 28, 0.76);
+            backdrop-filter: blur(34px);
+            -webkit-backdrop-filter: blur(34px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 48px 38px;
+            border-radius: 30px;
             box-shadow: 
-                0 30px 60px -15px rgba(15, 23, 42, 0.1),
-                0 0 50px rgba(255, 255, 255, 0.4) inset;
-            width: 400px;
+                0 30px 70px -15px rgba(0, 0, 0, 0.85),
+                0 0 45px rgba(249, 115, 22, 0.18),
+                0 0 45px rgba(6, 182, 212, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            width: 420px;
             text-align: center;
             z-index: 10;
             position: relative;
@@ -84,40 +62,44 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: translateY(35px) scale(0.97); filter: blur(8px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
         /* Official seal outline */
         .seal-icon {
-            width: 76px;
-            height: 76px;
-            background: #fff7ed;
-            color: #ea580c;
+            width: 74px;
+            height: 74px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #f59e0b;
+            border: 1.5px solid rgba(245, 158, 11, 0.4);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            box-shadow: 0 8px 16px rgba(234, 88, 12, 0.08);
+            margin: 0 auto 20px;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35), 0 8px 20px rgba(0, 0, 0, 0.5);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .login-box:hover .seal-icon {
-            transform: rotate(-10deg) scale(1.05);
+            transform: rotate(45deg) scale(1.06);
+            box-shadow: 0 0 35px rgba(6, 182, 212, 0.45);
+            border-color: rgba(6, 182, 212, 0.5);
+            color: #38bdf8;
         }
 
         h2 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 8px;
+            color: #ffffff;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
         p.sub-title {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 500;
-            color: #64748b;
-            margin-bottom: 35px;
+            color: #94a3b8;
+            margin-bottom: 28px;
         }
 
         /* Form Controls */
@@ -130,42 +112,42 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: #64748b;
             pointer-events: none;
             transition: all 0.3s ease;
         }
         input {
             width: 100%;
             padding: 14px 16px 14px 48px;
-            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
             border-radius: 14px;
             font-size: 15px;
             font-weight: 500;
-            color: #1e293b;
-            background: #ffffff;
+            color: #ffffff;
+            background: rgba(15, 23, 42, 0.65);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             outline: none;
         }
         input::placeholder {
-            color: #94a3b8;
+            color: #64748b;
         }
         input:focus {
-            border-color: #ea580c;
+            border-color: #f59e0b;
             box-shadow: 
-                0 0 0 4px rgba(234, 88, 12, 0.15),
-                0 10px 20px -5px rgba(234, 88, 12, 0.08);
-            background: #ffffff;
+                0 0 0 3px rgba(245, 158, 11, 0.25),
+                0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.88);
             transform: translateY(-2px);
         }
         input:focus + .input-icon {
-            color: #ea580c;
+            color: #f59e0b;
             transform: translateY(-50%) scale(1.05);
         }
 
         button {
             width: 100%;
             padding: 15px;
-            background: #ea580c;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #d97706 100%);
             color: white;
             border: none;
             border-radius: 14px;
@@ -173,12 +155,12 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 12px;
-            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.2);
+            margin-top: 10px;
+            box-shadow: 0 6px 22px rgba(249, 115, 22, 0.4);
         }
         button:hover {
-            background: #d97706;
-            box-shadow: 0 8px 20px rgba(234, 88, 12, 0.3);
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #b45309 100%);
+            box-shadow: 0 8px 28px rgba(249, 115, 22, 0.55);
             transform: translateY(-2px);
         }
         button:active {
@@ -186,14 +168,14 @@
         }
 
         .alert {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fee2e2;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
             font-size: 13.5px;
             font-weight: 600;
             padding: 12px 16px;
             border-radius: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
             text-align: left;
             display: flex;
             align-items: center;
@@ -212,14 +194,14 @@
             align-items: center;
             gap: 6px;
             margin-top: 25px;
-            color: #64748b;
+            color: #94a3b8;
             text-decoration: none;
             font-size: 13.5px;
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .back-btn:hover {
-            color: #0f172a;
+            color: #ffffff;
             transform: translateX(-3px);
         }
     </style>
@@ -227,8 +209,7 @@
 <body>
 
 <div class="tricolor-stripe"></div>
-<div class="bg-blob blob-orange"></div>
-<div class="bg-blob blob-green"></div>
+<canvas id="flameAzureCanvas"></canvas>
 
 <div class="login-box">
     <div class="seal-icon">
@@ -306,6 +287,369 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         errDiv.style.display = 'flex';
     }
 };
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+//  Solar Flame & Oceanic Azure Tendrils Canvas Simulation
+//  (Fiery Golden Flame Tendrils & Oceanic Aurora Waves with Bokeh Embers)
+// ══════════════════════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('flameAzureCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let W = 0, H = 0, dpr = 1;
+    let t = 0;
+    let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        initParticles();
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => {
+        targetMouseX = e.clientX;
+        targetMouseY = e.clientY;
+    });
+
+    // ── Click Burst Dual-Element Sparks (Flame + Azure) ──
+    const burstSparks = [];
+    window.addEventListener('click', (e) => {
+        const flameColors = ['rgba(249, 115, 22,', 'rgba(245, 158, 11,', 'rgba(253, 224, 71,', 'rgba(239, 68, 68,'];
+        const azureColors = ['rgba(6, 182, 212,', 'rgba(56, 189, 248,', 'rgba(45, 212, 191,', 'rgba(14, 165, 233,'];
+        
+        for (let i = 0; i < 28; i++) {
+            const angle = (Math.PI * 2 / 28) * i + (Math.random() - 0.5) * 0.25;
+            const spd = Math.random() * 4.5 + 2;
+            const isFlame = Math.random() < 0.5;
+            const colorList = isFlame ? flameColors : azureColors;
+            burstSparks.push({
+                x: e.clientX,
+                y: e.clientY,
+                vx: Math.cos(angle) * spd,
+                vy: Math.sin(angle) * spd,
+                alpha: 1,
+                decay: Math.random() * 0.02 + 0.015,
+                size: Math.random() * 2.4 + 1.2,
+                color: colorList[Math.floor(Math.random() * colorList.length)]
+            });
+        }
+    });
+
+    // ── Cubic Bezier Evaluator with Tangent/Normal ──
+    function evalBezier(p0, p1, p2, p3, u) {
+        const omt = 1 - u;
+        const omt2 = omt * omt;
+        const omt3 = omt2 * omt;
+        const u2 = u * u;
+        const u3 = u2 * u;
+
+        const x = omt3 * p0.x + 3 * omt2 * u * p1.x + 3 * omt * u2 * p2.x + u3 * p3.x;
+        const y = omt3 * p0.y + 3 * omt2 * u * p1.y + 3 * omt * u2 * p2.y + u3 * p3.y;
+
+        const dx = 3 * omt2 * (p1.x - p0.x) + 6 * omt * u * (p2.x - p1.x) + 3 * u2 * (p3.x - p2.x);
+        const dy = 3 * omt2 * (p1.y - p0.y) + 6 * omt * u * (p2.y - p1.y) + 3 * u2 * (p3.y - p2.y);
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        return { x, y, nx: -dy / len, ny: dx / len };
+    }
+
+    // ── Dynamic Curve Definitions ──
+    function getCurvePoint(curveType, u, time) {
+        let p0, p1, p2, p3;
+
+        if (curveType === 'flame-spine') {
+            // Main upward sweeping solar flame spine
+            p0 = { x: -W * 0.06, y: H * 1.05 };
+            p1 = { x: W * 0.14,  y: H * 0.52 };
+            p2 = { x: W * 0.20,  y: H * 0.20 };
+            p3 = { x: W * 0.38,  y: -H * 0.04 };
+        } else if (curveType === 'flame-swirl') {
+            // Central curling flame leaf swirl
+            p0 = { x: W * 0.06, y: H * 0.88 };
+            p1 = { x: W * 0.24, y: H * 0.58 };
+            p2 = { x: W * 0.32, y: H * 0.72 };
+            p3 = { x: W * 0.44, y: H * 0.82 };
+        } else if (curveType === 'azure-upper') {
+            // Upper oceanic azure aurora flow
+            p0 = { x: W * 0.36, y: H * 0.68 };
+            p1 = { x: W * 0.64, y: H * 0.52 };
+            p2 = { x: W * 0.84, y: H * 0.28 };
+            p3 = { x: W * 1.16, y: H * 0.14 };
+        } else {
+            // Lower oceanic cyan aurora flow
+            p0 = { x: W * 0.40, y: H * 0.82 };
+            p1 = { x: W * 0.68, y: H * 0.88 };
+            p2 = { x: W * 0.88, y: H * 0.75 };
+            p3 = { x: W * 1.18, y: H * 0.58 };
+        }
+
+        const pt = evalBezier(p0, p1, p2, p3, u);
+        const wave = Math.sin(u * 5 + time * 0.0016 + (curveType.includes('flame') ? 0 : 2.5)) * 14 * Math.sin(u * Math.PI);
+
+        // Mouse interactive soft deflection
+        const mDistX = pt.x - mouseX;
+        const mDistY = pt.y - mouseY;
+        const mDist = Math.sqrt(mDistX * mDistX + mDistY * mDistY) + 1;
+        const mPush = Math.max(0, 1 - mDist / 300) * 28;
+
+        return {
+            x: pt.x + pt.nx * (wave + mPush),
+            y: pt.y + pt.ny * (wave + mPush),
+            nx: pt.nx,
+            ny: pt.ny
+        };
+    }
+
+    // ── Translucent Flame Petals / Leaves Rendering ──
+    function drawFlamePetals(time) {
+        const petals = [
+            { baseU: 0.35, scale: 38, rot: 0.3 },
+            { baseU: 0.55, scale: 48, rot: -0.25 },
+            { baseU: 0.70, scale: 34, rot: 0.4 }
+        ];
+
+        for (const pet of petals) {
+            const pt = getCurvePoint('flame-spine', pet.baseU, time);
+            const flutter = Math.sin(time * 0.0018 + pet.baseU * 4) * 0.15;
+            const angle = Math.atan2(pt.ny, pt.nx) + pet.rot + flutter;
+
+            ctx.save();
+            ctx.translate(pt.x, pt.y);
+            ctx.rotate(angle);
+
+            // Draw floral petal leaf shape
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(pet.scale * 0.6, -pet.scale * 0.4, pet.scale * 1.1, -pet.scale * 0.2, pet.scale * 1.4, 0);
+            ctx.bezierCurveTo(pet.scale * 1.1, pet.scale * 0.2, pet.scale * 0.6, pet.scale * 0.4, 0, 0);
+
+            // Glowing translucent amber fill
+            const petalGrad = ctx.createLinearGradient(0, 0, pet.scale * 1.4, 0);
+            petalGrad.addColorStop(0, 'rgba(249, 115, 22, 0.18)');
+            petalGrad.addColorStop(0.6, 'rgba(245, 158, 11, 0.12)');
+            petalGrad.addColorStop(1, 'rgba(253, 224, 71, 0.03)');
+
+            ctx.fillStyle = petalGrad;
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
+            ctx.lineWidth = 1.2;
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = 'rgba(249, 115, 22, 0.6)';
+            ctx.stroke();
+
+            // Delicate internal vein
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(pet.scale * 1.1, 0);
+            ctx.strokeStyle = 'rgba(255, 251, 235, 0.3)';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+    }
+
+    // ── Render Layered Multi-Strand Waves ──
+    function drawWaves(time) {
+        const STRANDS = 22;
+        const SAMPLES = 60;
+
+        const curves = [
+            { type: 'flame-spine', isFlame: true },
+            { type: 'flame-swirl', isFlame: true },
+            { type: 'azure-upper', isFlame: false },
+            { type: 'azure-lower', isFlame: false }
+        ];
+
+        for (const curve of curves) {
+            for (let s = 0; s < STRANDS; s++) {
+                const strandFrac = (s / (STRANDS - 1)) - 0.5;
+                const strandOffset = strandFrac * (curve.isFlame ? 46 : 42);
+
+                ctx.beginPath();
+                for (let i = 0; i <= SAMPLES; i++) {
+                    const u = i / SAMPLES;
+                    const pt = getCurvePoint(curve.type, u, time);
+                    const envelope = Math.sin(u * Math.PI);
+                    const waveMod = Math.sin(u * 7 + s * 0.35 + time * 0.002) * 8 * envelope;
+                    const finalOffset = (strandOffset + waveMod) * envelope;
+
+                    const px = pt.x + pt.nx * finalOffset;
+                    const py = pt.y + pt.ny * finalOffset;
+
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+
+                const alpha = (0.24 - Math.abs(strandFrac) * 0.16);
+                let grad;
+
+                if (curve.isFlame) {
+                    grad = ctx.createLinearGradient(0, H * 0.8, W * 0.45, 0);
+                    grad.addColorStop(0.00, `rgba(220, 38, 38, ${alpha})`);   // Crimson
+                    grad.addColorStop(0.35, `rgba(249, 115, 22, ${alpha})`);  // Fire Orange
+                    grad.addColorStop(0.65, `rgba(245, 158, 11, ${alpha})`);  // Amber
+                    grad.addColorStop(0.88, `rgba(253, 224, 71, ${alpha})`);  // Bright Gold
+                    grad.addColorStop(1.00, `rgba(255, 251, 235, ${alpha * 0.9})`); // Radiant White
+                } else {
+                    grad = ctx.createLinearGradient(W * 0.35, H * 0.7, W, 0);
+                    grad.addColorStop(0.00, `rgba(45, 212, 191, ${alpha})`);  // Turquoise
+                    grad.addColorStop(0.38, `rgba(6, 182, 212, ${alpha})`);   // Electric Cyan
+                    grad.addColorStop(0.72, `rgba(56, 189, 248, ${alpha})`);  // Sky Blue
+                    grad.addColorStop(1.00, `rgba(30, 64, 175, ${alpha * 0.7})`); // Sapphire
+                }
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.6;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+        }
+    }
+
+    // ── Particles System: Warm Flame Embers + Cool Azure Bokeh ──
+    const particles = [];
+    const EMBER_COUNT = 130;
+    const AZURE_COUNT = 130;
+
+    function initParticles() {
+        particles.length = 0;
+
+        // 1. Warm Flame Embers (Left Side)
+        for (let i = 0; i < EMBER_COUNT; i++) {
+            particles.push({
+                isFlame: true,
+                x: Math.random() * W * 0.45,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.4) * 0.5,
+                vy: -Math.random() * 0.8 - 0.2, // Rising up like fire embers
+                size: Math.random() * 2.2 + 0.8,
+                alpha: Math.random() * 0.65 + 0.3,
+                twinkleSpeed: Math.random() * 0.003 + 0.001,
+                phase: Math.random() * Math.PI * 2,
+                color: Math.random() < 0.4 ? 'rgba(249, 115, 22,' : (Math.random() < 0.7 ? 'rgba(245, 158, 11,' : 'rgba(253, 224, 71,')
+            });
+        }
+
+        // 2. Cool Azure / Cyan Bokeh (Right Side)
+        for (let i = 0; i < AZURE_COUNT; i++) {
+            particles.push({
+                isFlame: false,
+                x: W * 0.45 + Math.random() * W * 0.55,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                size: Math.random() * 2.4 + 0.9,
+                alpha: Math.random() * 0.6 + 0.25,
+                twinkleSpeed: Math.random() * 0.003 + 0.001,
+                phase: Math.random() * Math.PI * 2,
+                color: Math.random() < 0.45 ? 'rgba(6, 182, 212,' : (Math.random() < 0.75 ? 'rgba(56, 189, 248,' : 'rgba(45, 212, 191,')
+            });
+        }
+    }
+
+    function drawParticles(time) {
+        for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Boundary wrapping
+            if (p.isFlame) {
+                if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W * 0.45; }
+                if (p.x < -20) p.x = W * 0.45;
+                if (p.x > W * 0.5) p.x = 0;
+            } else {
+                if (p.y < -20) p.y = H + 20;
+                if (p.y > H + 20) p.y = -20;
+                if (p.x < W * 0.4) p.x = W + 20;
+                if (p.x > W + 20) p.x = W * 0.4;
+            }
+
+            const twinkle = Math.sin(time * p.twinkleSpeed + p.phase);
+            const alpha = Math.max(0.12, Math.min(1, p.alpha + twinkle * 0.35));
+
+            ctx.fillStyle = `${p.color} ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Soft glowing halo
+            if (p.size > 1.6 && alpha > 0.45) {
+                ctx.fillStyle = `${p.color} ${alpha * 0.25})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 2.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Draw Click Burst Sparks
+        for (let i = burstSparks.length - 1; i >= 0; i--) {
+            const sp = burstSparks[i];
+            sp.x += sp.vx;
+            sp.y += sp.vy;
+            sp.vx *= 0.95;
+            sp.vy *= 0.95;
+            sp.alpha -= sp.decay;
+
+            if (sp.alpha <= 0) {
+                burstSparks.splice(i, 1);
+                continue;
+            }
+
+            ctx.fillStyle = `${sp.color} ${sp.alpha})`;
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // ── Main Render Loop ──
+    function render(time) {
+        t = time;
+
+        // Smooth mouse coords
+        mouseX += (targetMouseX - mouseX) * 0.05;
+        mouseY += (targetMouseY - mouseY) * 0.05;
+
+        // Deep obsidian-midnight base
+        ctx.fillStyle = '#02040a';
+        ctx.fillRect(0, 0, W, H);
+
+        // 1. Warm Solar Flame Ambient Corner (Left)
+        const gLeft = ctx.createRadialGradient(W * 0.12, H * 0.55, 0, W * 0.12, H * 0.55, W * 0.65);
+        gLeft.addColorStop(0, 'rgba(234, 88, 12, 0.22)');
+        gLeft.addColorStop(0.5, 'rgba(185, 28, 28, 0.12)');
+        gLeft.addColorStop(1, 'rgba(2, 4, 10, 0)');
+        ctx.fillStyle = gLeft;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Cool Oceanic Azure Ambient Corner (Right)
+        const gRight = ctx.createRadialGradient(W * 0.88, H * 0.45, 0, W * 0.88, H * 0.45, W * 0.65);
+        gRight.addColorStop(0, 'rgba(6, 182, 212, 0.20)');
+        gRight.addColorStop(0.5, 'rgba(14, 165, 233, 0.10)');
+        gRight.addColorStop(1, 'rgba(2, 4, 10, 0)');
+        ctx.fillStyle = gRight;
+        ctx.fillRect(0, 0, W, H);
+
+        drawWaves(time);
+        drawFlamePetals(time);
+        drawParticles(time);
+
+        requestAnimationFrame(render);
+    }
+
+    resize();
+    initParticles();
+    requestAnimationFrame(render);
+})();
 </script>
 
 </body>
