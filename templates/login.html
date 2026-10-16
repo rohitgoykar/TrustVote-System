@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorized Access & Sign Up | First-Time Voter e-EPIC Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.96);
+            --border-subtle: #e2e8f0;
+            --accent-primary: #0284c7;
+            --accent-saffron: #f97316;
+            --accent-green: #15803d;
+            --text-main: #0f172a;
+            --text-muted: #334155;
+            --text-subtle: #64748b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', 'Inter', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            background: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Animated Indian Flag Cinematic Background */
+        .flag-bg-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .flag-bg-image {
+            position: absolute;
+            top: -6%; left: -6%;
+            width: 112%; height: 112%;
+            background: url('/static/india_flag_bg.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.92) saturate(1.18) contrast(1.05);
+            animation: flagCinematicMotion 24s ease-in-out infinite alternate;
+            transform-origin: 60% 40%;
+        }
+
+        @keyframes flagCinematicMotion {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+            35% { transform: scale(1.04) translate(-1.5%, 1%) rotate(0.4deg); }
+            70% { transform: scale(1.02) translate(1.2%, -0.8%) rotate(-0.3deg); }
+            100% { transform: scale(1.06) translate(0.5%, 1.2%) rotate(0.3deg); }
+        }
+
+        .flag-bg-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(248, 250, 252, 0.88) 42%, rgba(241, 245, 249, 0.96) 100%),
+                        radial-gradient(circle at 82% 18%, rgba(255, 153, 51, 0.16) 0%, transparent 55%),
+                        radial-gradient(circle at 18% 82%, rgba(21, 128, 61, 0.12) 0%, transparent 60%);
+        }
+
+        .flag-glow-aura {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 78% 22%, rgba(255, 190, 60, 0.18) 0%, transparent 48%);
+            animation: pulseGoldenAura 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGoldenAura {
+            0% { opacity: 0.35; }
+            50% { opacity: 0.75; }
+            100% { opacity: 0.45; }
+        }
+
+        /* Tricolor Top Bar */
+        .tricolor-stripe {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        #astroCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Navbar */
+        .portal-nav {
+            position: relative;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
+        }
+
+        .brand-logo img { width: 32px; height: 32px; object-fit: contain; }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+
+        .brand-sub {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0284c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lang-switch {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .lang-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+        }
+
+        /* Container */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            max-width: 500px;
+            width: 92%;
+            margin: 32px auto;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(203, 213, 225, 0.95);
+            border-radius: 24px;
+            padding: 34px 34px 30px;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff9933 0%, #0284c7 50%, #15803d 100%);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .lock-icon-wrap {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            border: 1.5px solid #bae6fd;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.16);
+        }
+
+        .login-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .login-desc {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* ── ROLE & SIGN-UP SWITCHER TABS ── */
+        .sub-role-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 13px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 22px;
+        }
+
+        .sub-role-tab {
+            padding: 9px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #64748b;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .sub-role-tab.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+        }
+
+        .sub-role-tab.active.tab-signup {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.35);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 11px;
+            padding: 12px 16px 12px 42px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .input-field:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.14);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px;
+            font-size: 14.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.4);
+            transition: all 0.25s;
+            margin-top: 6px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.6);
+        }
+
+        .btn-submit.btn-signup {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            box-shadow: 0 8px 24px -4px rgba(22, 163, 74, 0.4);
+        }
+        .btn-submit.btn-signup:hover {
+            box-shadow: 0 12px 28px -4px rgba(22, 163, 74, 0.6);
+        }
+
+        .btn-submit:active { transform: translateY(0); }
+
+        .alert-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-box.success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12.5px;
+            color: #64748b;
+        }
+
+        .switch-link a {
+            color: #0284c7;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .switch-link a:hover { text-decoration: underline; }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.96);
+            border-top: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 12.5px;
+            color: #475569;
+            font-weight: 600;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ANIMATED INDIAN FLAG BACKGROUND -->
+<div class="flag-bg-container">
+    <div class="flag-bg-image"></div>
+    <div class="flag-bg-overlay"></div>
+    <div class="flag-glow-aura"></div>
+</div>
+
+<div class="tricolor-stripe"></div>
+<canvas id="astroCanvas"></canvas>
+
+<!-- TOP NAVBAR -->
+<header class="portal-nav">
+    <a href="/" class="brand-group">
+        <div class="brand-logo">
+            <img src="/static/logo.png" alt="SEC Logo" onerror="this.src='/static/india_flag_bg.png'">
+        </div>
+        <div>
+            <div class="brand-title" id="t-brand-title">महाराष्ट्र राज्य निवडणूक आयोग</div>
+            <div class="brand-sub" id="t-brand-sub">First-Time Voter e-EPIC & Enrolment Portal</div>
+        </div>
+    </a>
+
+    <div class="lang-switch">
+        <span class="lang-btn active" onclick="setLang('mr')">मराठी</span>
+        <span class="lang-btn" onclick="setLang('hi')">हिंदी</span>
+        <span class="lang-btn" onclick="setLang('en')">English</span>
+    </div>
+</header>
+
+<!-- MAIN AUTH CARD -->
+<main class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="lock-icon-wrap" id="headerIconWrap">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h1 class="login-title" id="t-login-title">अधिकृत प्रवेश लॉगिन</h1>
+            <p class="login-desc" id="t-login-desc">e-EPIC कार्ड डाउनलोड करण्यासाठी लॉगिन किंवा नवीन खाते तयार करा</p>
+        </div>
+
+        <div id="alertBox" class="alert-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="alertMsg">Invalid credentials.</span>
+        </div>
+
+        <!-- 3-TAB SWITCHER (CITIZEN LOGIN vs CREATE ACCOUNT / SIGN UP vs OFFICER) -->
+        <div class="sub-role-tabs">
+            <button type="button" class="sub-role-tab active" id="tab-login-cit" onclick="switchMainAuthTab('citizen')">
+                <span>🔑</span> <span id="t-sub-citizen">मतदार लॉगिन</span>
+            </button>
+            <button type="button" class="sub-role-tab tab-signup" id="tab-signup-cit" onclick="switchMainAuthTab('signup')">
+                <span>✨</span> <span id="t-sub-signup">नवीन खाते</span>
+            </button>
+            <button type="button" class="sub-role-tab" id="tab-login-off" onclick="switchMainAuthTab('officer')">
+                <span>🛡️</span> <span id="t-sub-officer">अधिकारी</span>
+            </button>
+        </div>
+
+        <!-- 1. CITIZEN LOGIN FORM -->
+        <form id="citizenLoginForm" onsubmit="handleCitizenLogin(event)">
+            <div class="form-group">
+                <label id="t-lbl-cit-id">नाव / अर्ज आयडी / मोबाईल / EPIC</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="7" y1="8" x2="17" y2="8"/></svg>
+                    <input type="text" id="citLoginId" class="input-field" placeholder="उदा. MHAPP... / नाव / मोबाईल" required autocomplete="username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="t-lbl-cit-dob">पासवर्ड किंवा जन्मतारीख (Password / DOB)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="citLoginDob" class="input-field" placeholder="तुमचा पासवर्ड किंवा YYYY-MM-DD" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btnCitLogin">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                <span id="t-btn-login-cit">पोर्टल लॉगिन करा (Sign In)</span>
+            </button>
+
+            <div class="switch-link">
+                नवीन अर्जदार आहात का? <a onclick="switchMainAuthTab('signup')">येथे नवीन खाते तयार करा (Create Account)</a>
+            </div>
+        </form>
+
+        <!-- 2. CREATE ACCOUNT / SIGN UP FORM (FOR FIRST-TIME APPLICANTS) -->
+        <form id="signupForm" style="display:none;" onsubmit="handleSignupSubmit(event)">
+            <div class="form-group">
+                <label>पूर्ण नाव (Full Name) <span style="color:#dc2626;">*</span></label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" id="signupFullname" class="input-field" placeholder="उदा. राहुल रमेश शिंदे / Rahul Shinde" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>मोबाईल क्रमांक किंवा युझरनेम (Mobile / Username) <span style="color:#dc2626;">*</span></label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <input type="text" id="signupMobile" class="input-field" placeholder="10-digit mobile number किंवा username" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>अर्ज आयडी / Application ID (ऐच्छिक / Optional)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="7" y1="8" x2="17" y2="8"/></svg>
+                    <input type="text" id="signupForm6Ref" class="input-field" placeholder="उदा. MHAPP2609278412">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>पासवर्ड तयार करा (Create Password) <span style="color:#dc2626;">*</span></label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="signupPassword" class="input-field" placeholder="किमान ४ अक्षरे (Min 4 chars)" required minlength="4">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>पासवर्ड कन्फर्म करा (Confirm Password) <span style="color:#dc2626;">*</span></label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="signupConfirmPassword" class="input-field" placeholder="पुन्हा पासवर्ड टाका" required minlength="4">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit btn-signup" id="btnSignupSubmit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>खाते तयार करा व लॉगिन करा (Create Account)</span>
+            </button>
+
+            <div class="switch-link">
+                आधीच खाते आहे का? <a onclick="switchMainAuthTab('citizen')">येथे लॉगिन करा (Sign In)</a>
+            </div>
+        </form>
+
+        <!-- 3. OFFICER LOGIN FORM -->
+        <form id="officerLoginForm" style="display:none;" onsubmit="handleOfficerLogin(event)">
+            <div class="form-group">
+                <label id="t-lbl-off-user">अधिकारी युझरनेम (Officer Username)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" id="offLoginUser" class="input-field" placeholder="e.g. admin किंवा ERO Username" required autocomplete="username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="t-lbl-off-pass">पासवर्ड (Password)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="offLoginPass" class="input-field" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btnOffLogin">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                <span id="t-btn-login-off">अधिकारी लॉगिन करा (Officer Login)</span>
+            </button>
+        </form>
+    </div>
+</main>
+
+<footer class="footer">
+    © 2026 State Election Commission, Maharashtra (महाराष्ट्र राज्य निवडणूक आयोग) • Citizen e-EPIC System
+</footer>
+
+<script>
+const TRANSLATIONS = {
+    mr: {
+        brandTitle: "महाराष्ट्र राज्य निवडणूक आयोग",
+        brandSub: "प्रथमच मतदार e-EPIC कार्ड डाउनलोड पोर्टल",
+        loginTitle: "अधिकृत प्रवेश लॉगिन",
+        loginDesc: "e-EPIC कार्ड डाउनलोड करण्यासाठी लॉगिन किंवा नवीन खाते तयार करा",
+        subCitizen: "मतदार लॉगिन",
+        subSignup: "नवीन खाते",
+        subOfficer: "अधिकारी",
+        lblCitId: "नाव / अर्ज आयडी / मोबाईल / EPIC",
+        lblCitDob: "पासवर्ड किंवा जन्मतारीख (DOB)",
+        btnCit: "पोर्टल लॉगिन करा (Sign In)",
+        lblOffUser: "अधिकारी युझरनेम (Username)",
+        lblOffPass: "पासवर्ड (Password)",
+        btnOff: "अधिकारी लॉगिन करा (Officer Login)"
+    },
+    hi: {
+        brandTitle: "महाराष्ट्र राज्य चुनाव आयोग",
+        brandSub: "प्रथम मतदाता e-EPIC कार्ड डाउनलोड पोर्टल",
+        loginTitle: "अधिकृत पहुंच लॉगिन",
+        loginDesc: "e-EPIC कार्ड डाउनलोड करने हेतु लॉगिन या नया खाता बनाएं",
+        subCitizen: "मतदाता लॉगिन",
+        subSignup: "नया खाता",
+        subOfficer: "अधिकारी",
+        lblCitId: "नाम / आवेदन आईडी / मोबाइल / EPIC",
+        lblCitDob: "पासवर्ड या जन्मतिथि (DOB)",
+        btnCit: "पोर्टल लॉगिन करें (Sign In)",
+        lblOffUser: "अधिकारी यूजरनेम (Username)",
+        lblOffPass: "पासवर्ड (Password)",
+        btnOff: "अधिकारी लॉगिन करें (Officer Login)"
+    },
+    en: {
+        brandTitle: "State Election Commission, Maharashtra",
+        brandSub: "First-Time Voter e-EPIC Download Portal",
+        loginTitle: "Authorized Portal Login",
+        loginDesc: "Sign in or create account to access & download e-EPIC cards",
+        subCitizen: "Voter Sign In",
+        subSignup: "Create Account",
+        subOfficer: "Officer Login",
+        lblCitId: "Name / Application ID / Mobile / EPIC",
+        lblCitDob: "Password or Date of Birth (DOB)",
+        btnCit: "Login to Portal",
+        lblOffUser: "Officer Username",
+        lblOffPass: "Password",
+        btnOff: "Officer Secure Login"
+    }
+};
+
+let currentLang = 'mr';
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    document.getElementById('t-brand-title').textContent = t.brandTitle;
+    document.getElementById('t-brand-sub').textContent = t.brandSub;
+    document.getElementById('t-login-title').textContent = t.loginTitle;
+    document.getElementById('t-login-desc').textContent = t.loginDesc;
+    document.getElementById('t-sub-citizen').textContent = t.subCitizen;
+    document.getElementById('t-sub-signup').textContent = t.subSignup;
+    document.getElementById('t-sub-officer').textContent = t.subOfficer;
+    document.getElementById('t-lbl-cit-id').textContent = t.lblCitId;
+    document.getElementById('t-lbl-cit-dob').textContent = t.lblCitDob;
+    document.getElementById('t-btn-login-cit').textContent = t.btnCit;
+    document.getElementById('t-lbl-off-user').textContent = t.lblOffUser;
+    document.getElementById('t-lbl-off-pass').textContent = t.lblOffPass;
+    document.getElementById('t-btn-login-off').textContent = t.btnOff;
+}
+
+function switchMainAuthTab(tab) {
+    document.getElementById('alertBox').style.display = 'none';
+
+    document.getElementById('tab-login-cit').classList.toggle('active', tab === 'citizen');
+    document.getElementById('tab-signup-cit').classList.toggle('active', tab === 'signup');
+    document.getElementById('tab-login-off').classList.toggle('active', tab === 'officer');
+
+    document.getElementById('citizenLoginForm').style.display = (tab === 'citizen') ? 'block' : 'none';
+    document.getElementById('signupForm').style.display = (tab === 'signup') ? 'block' : 'none';
+    document.getElementById('officerLoginForm').style.display = (tab === 'officer') ? 'block' : 'none';
+
+    const t = TRANSLATIONS[currentLang] || TRANSLATIONS.mr;
+    if (tab === 'signup') {
+        document.getElementById('t-login-title').textContent = "नवीन मतदार खाते तयार करा";
+        document.getElementById('t-login-desc').textContent = "नाव व पासवर्ड तयार करून थेट पोर्टलमध्ये प्रवेश करा";
+    } else if (tab === 'officer') {
+        document.getElementById('t-login-title').textContent = "अधिकारी सुरक्षित प्रवेश";
+        document.getElementById('t-login-desc').textContent = "SEC अधिकृत ऑपरेटर व ERO लॉगिन";
+    } else {
+        document.getElementById('t-login-title').textContent = t.loginTitle;
+        document.getElementById('t-login-desc').textContent = t.loginDesc;
+    }
+}
+
+function showAlert(msg, isSuccess = false) {
+    const box = document.getElementById('alertBox');
+    const txt = document.getElementById('alertMsg');
+    txt.textContent = msg;
+    box.className = isSuccess ? 'alert-box success' : 'alert-box';
+    box.style.display = 'flex';
+}
+
+async function handleCitizenLogin(e) {
+    e.preventDefault();
+    const identifier = document.getElementById('citLoginId').value.trim();
+    const dob = document.getElementById('citLoginDob').value.trim();
+
+    try {
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mode: 'citizen', identifier, dob })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            window.location.href = data.redirect || '/';
+        } else {
+            showAlert(data.message || "Invalid authentication details.");
+        }
+    } catch (err) {
+        showAlert("Connection error: " + err.message);
+    }
+}
+
+async function handleSignupSubmit(e) {
+    e.preventDefault();
+    const fullname = document.getElementById('signupFullname').value.trim();
+    const mobile = document.getElementById('signupMobile').value.trim();
+    const form6 = document.getElementById('signupForm6Ref').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+    const confirmPass = document.getElementById('signupConfirmPassword').value.trim();
+
+    if (!fullname) {
+        showAlert("Please enter your Full Name.");
+        return;
+    }
+
+    if (password.length < 4) {
+        showAlert("Password must be at least 4 characters long.");
+        return;
+    }
+
+    if (password !== confirmPass) {
+        showAlert("Password and Confirm Password do not match!");
+        return;
+    }
+
+    const btn = document.getElementById('btnSignupSubmit');
+    btn.disabled = true;
+    btn.innerHTML = "Creating Account...";
+
+    try {
+        const res = await fetch('/api/signup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fullname: fullname,
+                mobile: mobile,
+                form6: form6,
+                password: password
+            })
+        });
+        const data = await res.json();
+        btn.disabled = false;
+        btn.innerHTML = '<span>खाते तयार करा व लॉगिन करा (Create Account)</span>';
+
+        if (data.status === 'success') {
+            showAlert("Account created successfully! Redirecting to portal...", true);
+            setTimeout(() => {
+                window.location.href = data.redirect || '/portal';
+            }, 1000);
+        } else {
+            showAlert(data.message || "Could not create account. Please try again.");
+        }
+    } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>खाते तयार करा व लॉगिन करा (Create Account)</span>';
+        showAlert("Connection error: " + err.message);
+    }
+}
+
+async function handleOfficerLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('offLoginUser').value.trim();
+    const password = document.getElementById('offLoginPass').value.trim();
+
+    try {
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mode: 'officer', username, password })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            window.location.href = data.redirect || '/';
+        } else {
+            showAlert(data.message || "Invalid officer username or password.");
+        }
+    } catch (err) {
+        showAlert("Connection error: " + err.message);
+    }
+}
+
+// Particle Canvas Animation
+(function() {
+    const canvas = document.getElementById('astroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const COLOR_PALETTE = [
+        { r: 234, g: 88,  b: 12 },
+        { r: 217, g: 119, b: 6 },
+        { r: 2,   g: 132, b: 199 },
+        { r: 21,  g: 128, b: 61 }
+    ];
+
+    class SparkParticle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 2 + 0.6;
+            this.speedY = -(Math.random() * 0.45 + 0.2);
+            this.speedX = (Math.random() - 0.45) * 0.35;
+            this.color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+            this.alpha = Math.random() * 0.6 + 0.2;
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.y < -20) this.y = height + 10;
+            if (this.x < -20) this.x = width + 10;
+            if (this.x > width + 20) this.x = -10;
+        }
+
+        draw() {
+            ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.alpha})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    const particles = [];
+    for (let i = 0; i < 50; i++) particles.push(new SparkParticle());
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+</script>
+
+</body>
+</html>

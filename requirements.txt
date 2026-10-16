@@ -6,4 +6,4 @@ numpy>=1.26.0
 Pillow>=10.3.0
 qrcode>=7.4.2
 Werkzeug>=3.0.0
-
+pyzbar>=0.1.9

@@ -116,3 +116,40 @@ def decrypt_voter_data(encrypted_str):
     except Exception as e:
         print(f"[Security] Decryption failed: {e}")
         return None
+
+def encrypt_offline_package(package_dict: dict) -> dict:
+    """
+    Encrypts a structured offline voter database dictionary into an authenticated,
+    tamper-proof encrypted bundle for booth offline operation.
+    """
+    try:
+        raw_json = json.dumps(package_dict, ensure_ascii=False).encode('utf-8')
+        signature = hashlib.sha256(SECRET_KEY + raw_json).hexdigest()
+        ciphertext = xor_crypt(raw_json, SECRET_KEY)
+        encrypted_b64 = base64.b64encode(ciphertext).decode('utf-8')
+        return {
+            "encrypted_data": encrypted_b64,
+            "signature": signature,
+            "checksum": hashlib.md5(raw_json).hexdigest(),
+            "voter_count": len(package_dict.get("voters", []))
+        }
+    except Exception as e:
+        print(f"[Security] Offline package encryption error: {e}")
+        return {}
+
+def decrypt_offline_package(encrypted_b64: str, signature: str) -> dict:
+    """
+    Decrypts and validates the signature of an offline voter database package.
+    """
+    try:
+        ciphertext = base64.b64decode(encrypted_b64)
+        decrypted = xor_crypt(ciphertext, SECRET_KEY)
+        expected_sig = hashlib.sha256(SECRET_KEY + decrypted).hexdigest()
+        if signature != expected_sig:
+            print("[Security] Offline package signature mismatch!")
+            return None
+        return json.loads(decrypted.decode('utf-8'))
+    except Exception as e:
+        print(f"[Security] Offline package decryption error: {e}")
+        return None
+

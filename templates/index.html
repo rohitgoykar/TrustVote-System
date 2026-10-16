@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First-Time Voter e-EPIC Download Portal | State Election Commission Maharashtra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.94);
+            --border-subtle: #e2e8f0;
+            --accent-primary: #0284c7;  /* Indian Ashoka Blue / Cyan */
+            --accent-saffron: #f97316;  /* Saffron */
+            --accent-green: #15803d;    /* Emerald Green */
+            --text-main: #0f172a;       /* Dark Slate / Navy */
+            --text-muted: #334155;      /* Slate */
+            --text-subtle: #64748b;     /* Muted Slate */
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            background: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated Indian Flag Cinematic Background (Light Mode) */
+        .flag-bg-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .flag-bg-image {
+            position: absolute;
+            top: -6%; left: -6%;
+            width: 112%; height: 112%;
+            background: url('/static/india_flag_bg.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.92) saturate(1.18) contrast(1.05);
+            animation: flagCinematicMotion 24s ease-in-out infinite alternate;
+            transform-origin: 60% 40%;
+        }
+
+        @keyframes flagCinematicMotion {
+            0% {
+                transform: scale(1) translate(0, 0) rotate(0deg);
+                filter: brightness(0.90) saturate(1.15) contrast(1.05);
+            }
+            35% {
+                transform: scale(1.05) translate(-1.8%, 1%) rotate(0.5deg);
+                filter: brightness(0.96) saturate(1.22) contrast(1.08);
+            }
+            70% {
+                transform: scale(1.02) translate(1.5%, -0.8%) rotate(-0.3deg);
+                filter: brightness(0.92) saturate(1.16) contrast(1.06);
+            }
+            100% {
+                transform: scale(1.07) translate(0.6%, 1.5%) rotate(0.3deg);
+                filter: brightness(0.98) saturate(1.25) contrast(1.10);
+            }
+        }
+
+        .flag-bg-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.60) 0%, rgba(248, 250, 252, 0.82) 42%, rgba(241, 245, 249, 0.95) 100%),
+                        radial-gradient(circle at 82% 18%, rgba(255, 153, 51, 0.18) 0%, transparent 55%),
+                        radial-gradient(circle at 18% 82%, rgba(21, 128, 61, 0.14) 0%, transparent 60%);
+        }
+
+        .flag-glow-aura {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 78% 22%, rgba(255, 190, 60, 0.22) 0%, transparent 48%);
+            animation: pulseGoldenAura 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGoldenAura {
+            0% { opacity: 0.35; }
+            50% { opacity: 0.75; }
+            100% { opacity: 0.45; }
+        }
+
+        /* Tricolor Top Bar */
+        .tricolor-stripe {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        /* Astro Canvas */
+        #astroCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Top Navigation Header */
+        .portal-nav {
+            position: relative;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
+        }
+
+        .brand-logo img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+
+        .brand-sub {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0284c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Language Switcher */
+        .lang-switch {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+        }
+
+        .user-pill {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-logout-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .nav-home-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
+        }
+
+        .nav-home-btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #0284c7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            max-width: 1050px;
+            width: 94%;
+            margin: 32px auto 60px;
+            flex: 1;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0369a1;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.12);
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            line-height: 1.25;
+            margin-bottom: 12px;
+        }
+
+        .hero-sub {
+            font-size: 14.5px;
+            color: #334155;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Search Card */
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(203, 213, 225, 0.9);
+            border-radius: 24px;
+            padding: 32px 36px;
+            box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff9933 0%, #0284c7 50%, #15803d 100%);
+        }
+
+        /* Search Input Tabs */
+        .search-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 14px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border-color: #0284c7;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field-wrap {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 13px 18px 13px 44px;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .input-field:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.14);
+            background: #ffffff;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 30px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.4);
+            transition: all 0.25s;
+            height: 48px;
+            white-space: nowrap;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.6);
+        }
+
+        .btn-search:active {
+            transform: translateY(0);
+        }
+
+        /* Additional Search Fields (DOB row) */
+        #extra-fields {
+            margin-top: 14px;
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Result Container */
+        #result-container {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Status Cards */
+        .status-card {
+            border-radius: 20px;
+            padding: 26px 30px;
+            margin-bottom: 24px;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        /* PENDING STATUS */
+        .status-card.pending {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            box-shadow: 0 15px 40px -10px rgba(245, 158, 11, 0.15);
+        }
+
+        /* REJECTED STATUS */
+        .status-card.rejected {
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            box-shadow: 0 15px 40px -10px rgba(239, 68, 68, 0.15);
+        }
+
+        /* APPROVED STATUS */
+        .status-card.approved {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            box-shadow: 0 20px 45px -12px rgba(21, 128, 61, 0.15);
+        }
+
+        /* Status Header */
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .pill-pending  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .pill-rejected { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .pill-approved { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+        /* Stepper Component */
+        .stepper-wrap {
+            margin: 22px 0;
+            background: #ffffff;
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .stepper {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            position: relative;
+        }
+
+        .step-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 2px solid #cbd5e1;
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .step-item.completed .step-icon {
+            background: #15803d;
+            border-color: #15803d;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(21, 128, 61, 0.4);
+        }
+
+        .step-item.active .step-icon {
+            background: #d97706;
+            border-color: #d97706;
+            color: #ffffff;
+            box-shadow: 0 0 14px rgba(217, 119, 6, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        .step-item.locked .step-icon {
+            opacity: 0.5;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .step-sub {
+            font-size: 10.5px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Applicant Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .vid-badge {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: #0284c7;
+            background: #e0f2fe;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid #bae6fd;
+            display: inline-block;
+        }
+
+        /* Card Visualizer for Approved */
+        .card-preview-section {
+            background: #ffffff;
+            border: 1px solid #bbf7d0;
+            border-radius: 20px;
+            padding: 26px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
+        }
+
+        .card-img-wrap {
+            max-width: 680px;
+            margin: 0 auto 22px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.12);
+            background: #f8fafc;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .download-actions-grid {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #15803d, #166534);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 24px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px -4px rgba(21, 128, 61, 0.4);
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(21, 128, 61, 0.6);
+        }
+
+        .btn-download-pass {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-download-pass:hover {
+            box-shadow: 0 12px 28px -4px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-cert {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-cert:hover {
+            background: #f8fafc;
+            border-color: #0284c7;
+            color: #0284c7;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-top: 35px;
+            box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-item {
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 16px;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .faq-q {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0284c7;
+            margin-bottom: 5px;
+        }
+
+        .faq-a {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.96);
+            border-top: 1px solid #e2e8f0;
+            padding: 20px 24px;
+            text-align: center;
+            font-size: 12.5px;
+            color: #475569;
+            font-weight: 600;
+            position: relative;
+            z-index: 20;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #ffffff;
+            border: 1.5px solid #0284c7;
+            color: #0f172a;
+            padding: 13px 22px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px -5px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 13.5px;
+            font-weight: 700;
+        }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .input-row { grid-template-columns: 1fr; }
+            .btn-search { width: 100%; justify-content: center; }
+            .stepper { grid-template-columns: 1fr 1fr; gap: 16px; }
+            .hero-title { font-size: 24px; }
+            .search-card { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ANIMATED CINEMATIC INDIAN FLAG BACKGROUND (LIGHT MODE) -->
+<div class="flag-bg-container">
+    <div class="flag-bg-image"></div>
+    <div class="flag-bg-overlay"></div>
+    <div class="flag-glow-aura"></div>
+</div>
+
+<div class="tricolor-stripe"></div>
+<canvas id="astroCanvas"></canvas>
+
+<!-- TOP NAVBAR -->
+<header class="portal-nav">
+    <a href="/" class="brand-group">
+        <div class="brand-logo">
+            <img src="/static/logo.png" alt="SEC Logo" onerror="this.src='/static/default_avatar.png'">
+        </div>
+        <div>
+            <div class="brand-title" id="t-brand-title">State Election Commission, Maharashtra</div>
+            <div class="brand-sub" id="t-brand-sub">First-Time Voter e-EPIC Download Portal</div>
+        </div>
+    </a>
+
+    <div class="nav-actions">
+        <div class="lang-switch">
+            <span class="lang-btn active" onclick="setLang('mr')">मराठी</span>
+            <span class="lang-btn" onclick="setLang('hi')">हिंदी</span>
+            <span class="lang-btn" onclick="setLang('en')">English</span>
+        </div>
+        
+        {% if user %}
+        <div class="user-pill">
+            <span>{% if user.user_type == 'officer' %}🛡️{% else %}👤{% endif %}</span>
+            <span>{{ user.user_name }}</span>
+        </div>
+        <a href="/logout" class="nav-logout-btn" title="Logout">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span id="t-btn-logout">लॉगआउट (Logout)</span>
+        </a>
+        {% endif %}
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main-container">
+    <!-- HERO HEADER -->
+    <div class="hero-banner">
+        <div class="hero-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span id="t-badge">Official Certified e-EPIC Portal • Election Commission</span>
+        </div>
+        <h1 class="hero-title" id="t-hero-title">Download First-Time Voter Identity Card (e-EPIC)</h1>
+        <p class="hero-sub" id="t-hero-sub">
+            Search your Form 6 Application status. Your official Digital Voter ID Card & QR Voting Pass are generated securely upon verification & approval by your Constituency Electoral Registration Officer (ERO).
+        </p>
+    </div>
+
+    <!-- SEARCH APPLICATION CARD -->
+    <div class="search-card">
+        <!-- TABS -->
+        <div class="search-tabs">
+            <button class="tab-btn active" onclick="switchSearchTab('ref', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/><line x1="7" y1="16" x2="11" y2="16"/></svg>
+                <span id="t-tab-ref">Application Ref / EPIC No.</span>
+            </button>
+            <button class="tab-btn" onclick="switchSearchTab('mobile', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <span id="t-tab-mobile">Mobile Number & DOB</span>
+            </button>
+            <button class="tab-btn" onclick="switchSearchTab('aadhaar', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="13" y1="10" x2="17" y2="10"/><line x1="13" y1="14" x2="17" y2="14"/></svg>
+                <span id="t-tab-aadhaar">Aadhaar Number</span>
+            </button>
+        </div>
+
+        <!-- SEARCH INPUT FORM -->
+        <div class="input-row">
+            <div class="form-group">
+                <label id="input-label">Enter Application Reference ID or Voter ID (EPIC)</label>
+                <div class="input-field-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" class="input-field" placeholder="e.g. F6MH2609250001 or KLM1234567" autocomplete="off">
+                </div>
+            </div>
+            <button class="btn-search" id="btnSearch" onclick="handleSearch()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span id="t-btn-search">Search & Verify</span>
+            </button>
+        </div>
+
+        <!-- ADDITIONAL FIELDS FOR MOBILE SEARCH -->
+        <div id="extra-fields">
+            <div class="form-group">
+                <label id="t-lbl-dob">Date of Birth (DOB)</label>
+                <div class="input-field-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <input type="date" id="dobInput" class="input-field">
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="t-lbl-name">Applicant Full Name (Optional)</label>
+                <div class="input-field-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <input type="text" id="nameInput" class="input-field" placeholder="e.g. Rohit Goykar">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DYNAMIC STATUS & CARD RESULTS SECTION -->
+    <div id="result-container">
+        <!-- PENDING STATE CARD -->
+        <div id="card-pending" class="status-card pending" style="display:none;">
+            <div class="status-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px; height:42px; border-radius:12px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; border:1px solid #fde68a;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:18px; font-weight:900; color:#92400e;" id="t-pending-head">Application Under ERO Review</div>
+                        <div style="font-size:12.5px; color:#78350f;" id="p-ero-jurisdiction">Constituency Jurisdiction: ERO Office</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-pending">⏳ Pending ERO Decision</span>
+            </div>
+
+            <!-- ERO Security Explanation Alert -->
+            <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:12px; padding:14px 18px; color:#92400e; font-size:13px; line-height:1.5; font-weight:600;" id="t-pending-desc">
+                In accordance with State Election Commission security protocols, official Voter ID Cards (e-EPIC) are generated and issued <strong>ONLY after formal verification & approval by your Constituency Electoral Registration Officer (ERO)</strong>.
+            </div>
+
+            <!-- 4-Step Application Tracker -->
+            <div class="stepper-wrap">
+                <div class="stepper">
+                    <div class="step-item completed">
+                        <div class="step-icon">✓</div>
+                        <div class="step-title">Form 6 Submitted</div>
+                        <div class="step-sub">Online Record Created</div>
+                    </div>
+                    <div class="step-item active">
+                        <div class="step-icon">2</div>
+                        <div class="step-title">ERO Scrutiny</div>
+                        <div class="step-sub">In Progress</div>
+                    </div>
+                    <div class="step-item locked">
+                        <div class="step-icon">3</div>
+                        <div class="step-title">Electoral Approval</div>
+                        <div class="step-sub">Pending ERO</div>
+                    </div>
+                    <div class="step-item locked">
+                        <div class="step-icon">🔒</div>
+                        <div class="step-title">Card Generation</div>
+                        <div class="step-sub">Locked until Approval</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-grid" id="pending-info-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- REJECTED STATE CARD -->
+        <div id="card-rejected" class="status-card rejected" style="display:none;">
+            <div class="status-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px; height:42px; border-radius:12px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; border:1px solid #fca5a5;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:18px; font-weight:900; color:#991b1b;">Application Disqualified / Rejected</div>
+                        <div style="font-size:12.5px; color:#7f1d1d;" id="r-ero-info">Decided by Constituency ERO</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-rejected">✕ Rejected on Electoral Roll</span>
+            </div>
+
+            <div style="background:#fee2e2; border:1px solid #fca5a5; border-radius:12px; padding:14px 18px; margin-top:14px;">
+                <div style="font-size:13px; font-weight:800; color:#991b1b; margin-bottom:4px;">Official ERO Reason / शेरा:</div>
+                <div style="font-size:13.5px; color:#7f1d1d; font-weight:700;" id="r-reason">Discrepancy in documentation or age proof.</div>
+            </div>
+
+            <div class="info-grid" id="rejected-info-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- APPROVED STATE CARD -->
+        <div id="card-approved" class="status-card approved" style="display:none;">
+            <div class="status-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:44px; height:44px; border-radius:12px; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; border:1.5px solid #86efac;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:20px; font-weight:900; color:#166534;" id="t-approved-head">Electoral Roll Approval Verified!</div>
+                        <div style="font-size:12.5px; color:#14532d; font-weight:600;" id="a-ero-info">Approved by Constituency ERO • Ready for Download</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-approved">✓ Certified on Electoral Roll</span>
+            </div>
+
+            <!-- ERO Seal Banner -->
+            <div style="background:#dcfce7; border:1px solid #86efac; border-radius:12px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <div style="font-size:11.5px; font-weight:800; color:#166534; text-transform:uppercase;">Official ERO Decision Order</div>
+                    <div style="font-size:13.5px; font-weight:800; color:#0f172a; margin-top:2px;" id="a-ero-remarks">Identity verified & approved for local body elections.</div>
+                </div>
+                <div style="font-size:12px; font-weight:700; color:#15803d; text-align:right;" id="a-ero-meta">
+                    Decided by ERO Shivaji Nagar
+                </div>
+            </div>
+
+            <!-- Applicant Info Grid -->
+            <div class="info-grid" id="approved-info-grid">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Dual Sided Voter Card Preview -->
+            <div class="card-preview-section">
+                <div style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px;">
+                    Digital Voter Identity Card (e-EPIC) & QR Voting Pass
+                </div>
+                <div style="font-size:13px; color:#64748b; margin-bottom:20px; font-weight:500;">
+                    High-resolution biometric authenticated dual-sided card generated strictly via official ERO decision.
+                </div>
+
+                <div class="card-img-wrap">
+                    <img id="a-card-img" src="" alt="Voter ID Card Preview" onerror="this.src='/static/default_avatar.png'">
+                </div>
+
+                <!-- Action Download Buttons -->
+                <div class="download-actions-grid">
+                    <a id="btn-dl-card" href="#" class="btn-download" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span id="t-btn-dl-card">Download Voter ID Card (PNG)</span>
+                    </a>
+
+                    <a id="btn-dl-pass" href="#" class="btn-download btn-download-pass" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+                        <span id="t-btn-dl-pass">Download QR Voting Pass</span>
+                    </a>
+
+                    <a id="btn-view-cert" href="#" class="btn-download btn-cert" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        <span id="t-btn-cert">Print Official Certificate</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ & CITIZEN GUIDE -->
+    <div class="faq-section">
+        <div class="faq-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.3"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span id="t-faq-head">Frequently Asked Questions (प्रथमच मतदार माहिती)</span>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" id="t-q1">Why does a first-time voter card require Constituency ERO approval?</div>
+            <div class="faq-a" id="t-a1">Under Election Commission statutory guidelines, all first-time voter applications (Form No. 6) must be reviewed and certified by the designated Electoral Registration Officer (ERO) to prevent duplicate voter registrations and ensure residency verification before issuing an official EPIC card.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" id="t-q2">How soon after ERO approval can I download my Voter Card?</div>
+            <div class="faq-a" id="t-a2">Immediately! As soon as the ERO approves your application on their dashboard, the cryptographic e-EPIC card and QR Voting Pass are generated on the server and become instantly downloadable on this portal.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" id="t-q3">How do I use this card on voting day?</div>
+            <div class="faq-a" id="t-a3">You can carry the printed Voter ID Card or your Digital QR Voting Pass to your designated polling booth. The booth officer will scan your QR pass and verify your identity via facial biometrics in under 3 seconds.</div>
+        </div>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    © 2026 State Election Commission, Maharashtra (महाराष्ट्र राज्य निवडणूक आयोग) • TrustVote Multi-Booth Electoral Architecture
+</footer>
+
+<!-- TOAST -->
+<div id="toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <span id="toast-msg">Notification</span>
+</div>
+
+<script>
+// Multilingual Translations
+const TRANSLATIONS = {
+    mr: {
+        brandTitle: "महाराष्ट्र राज्य निवडणूक आयोग",
+        brandSub: "प्रथमच मतदार e-EPIC कार्ड डाउनलोड पोर्टल",
+        btnHome: "मुख्यपृष्ठ",
+        badge: "अधिकृत प्रमाणित e-EPIC पोर्टल • निवडणूक आयोग",
+        heroTitle: "प्रथमच मतदार ओळखपत्र (e-EPIC) डाउनलोड करा",
+        heroSub: "तुमच्या नमुना ६ अर्जाची स्थिती तपासा. मतदारसंघाच्या मतदार नोंदणी अधिकाऱ्यांनी (ERO) मंजुरी दिल्यानंतरच तुमचे अधिकृत मतदार ओळखपत्र व QR पास डाउनलोडसाठी तयार होते.",
+        tabRef: "अर्ज संदर्भ क्र. / EPIC क्र.",
+        tabMobile: "नोंदणीकृत मोबाईल व जन्मतारीख",
+        tabAadhaar: "आधार क्रमांक",
+        lblRef: "अर्ज संदर्भ क्रमांक किंवा मतदार ओळखपत्र (EPIC) टाका",
+        lblMobile: "१० अंकी नोंदणीकृत मोबाईल क्रमांक टाका",
+        lblAadhaar: "१२ अंकी आधार क्रमांक टाका",
+        btnSearch: "शोधा व पडताळा",
+        lblDob: "जन्मतारीख (DOB)",
+        lblName: "अर्जदाराचे पूर्ण नाव (ऐच्छिक)",
+        pendingHead: "अर्ज ERO कडे पुनरावलोकनाधीन आहे",
+        pendingDesc: "निवडणूक आयोगाच्या नियमानुसार, मतदारसंघाच्या मतदार नोंदणी अधिकाऱ्यांनी (ERO) नमुना ६ अर्जाची छाननी करून मंजुरी दिल्यानंतरच तुमचे अधिकृत मतदार ओळखपत्र (e-EPIC) व QR पास या पोर्टलवर त्वरित तयार होईल.",
+        approvedHead: "मतदार यादी मंजुरी पडताळली!",
+        btnDlCard: "मतदार ओळखपत्र डाउनलोड (PNG)",
+        btnDlPass: "QR मतदान पास डाउनलोड करा",
+        btnCert: "प्रमाणपत्र / स्लिप प्रिंट करा",
+        faqHead: "वारंवार विचारले जाणारे प्रश्न (FAQ)"
+    },
+    hi: {
+        brandTitle: "महाराष्ट्र राज्य चुनाव आयोग",
+        brandSub: "प्रथम मतदाता e-EPIC कार्ड डाउनलोड पोर्टल",
+        btnHome: "होम",
+        badge: "आधिकारिक प्रमाणित e-EPIC पोर्टल • चुनाव आयोग",
+        heroTitle: "प्रथम मतदाता पहचान पत्र (e-EPIC) डाउनलोड करें",
+        heroSub: "अपने फॉर्म ६ आवेदन की स्थिति देखें। निर्वाचन पंजीकरण अधिकारी (ERO) द्वारा अनुमोदन के बाद ही आपका डिजिटल वोटर कार्ड और QR पास डाउनलोड हेतु उपलब्ध होता है।",
+        tabRef: "आवेदन संदर्भ / EPIC सं.",
+        tabMobile: "मोबाइल नंबर व जन्मतिथि",
+        tabAadhaar: "आधार संख्या",
+        lblRef: "आवेदन संदर्भ संख्या या मतदाता पहचान पत्र (EPIC) दर्ज करें",
+        lblMobile: "१० अंकों का पंजीकृत मोबाइल नंबर दर्ज करें",
+        lblAadhaar: "१२ अंकों का आधार नंबर दर्ज करें",
+        btnSearch: "खोजें और सत्यापित करें",
+        lblDob: "जन्मतिथि (DOB)",
+        lblName: "आवेदक का नाम (वैकल्पिक)",
+        pendingHead: "आवेदन ERO समीक्षाधीन है",
+        pendingDesc: "चुनाव आयोग के नियमों के तहत, निर्वाचन पंजीकरण अधिकारी (ERO) द्वारा फॉर्म ६ सत्यापन व अनुमोदन के पश्चात ही आपका मतदाता कार्ड इस पोर्टल पर डाउनलोड हेतु उपलब्ध होगा।",
+        approvedHead: "मतदाता सूची अनुमोदन सत्यापित!",
+        btnDlCard: "वोटर आईडी कार्ड डाउनलोड (PNG)",
+        btnDlPass: "QR वोटिंग पास डाउनलोड करें",
+        btnCert: "प्रमाणपत्र प्रिंट करें",
+        faqHead: "अक्सर पूछे जाने वाले प्रश्न (FAQ)"
+    },
+    en: {
+        brandTitle: "State Election Commission, Maharashtra",
+        brandSub: "First-Time Voter e-EPIC Download Portal",
+        btnHome: "Home",
+        badge: "Official Certified e-EPIC Portal • Election Commission",
+        heroTitle: "Download First-Time Voter Identity Card (e-EPIC)",
+        heroSub: "Search your Form 6 Application status. Your official Digital Voter ID Card & QR Voting Pass are generated securely upon verification & approval by your Constituency Electoral Registration Officer (ERO).",
+        tabRef: "Application Ref / EPIC No.",
+        tabMobile: "Mobile Number & DOB",
+        tabAadhaar: "Aadhaar Number",
+        lblRef: "Enter Application Reference ID or Voter ID (EPIC)",
+        lblMobile: "Enter 10-Digit Registered Mobile Number",
+        lblAadhaar: "Enter 12-Digit Aadhaar Number",
+        btnSearch: "Search & Verify",
+        lblDob: "Date of Birth (DOB)",
+        lblName: "Applicant Full Name (Optional)",
+        pendingHead: "Application Under ERO Review",
+        pendingDesc: "In accordance with Election Commission rules, your official Voter ID Card (e-EPIC) and QR Voting Pass are generated strictly once the Constituency Electoral Registration Officer (ERO) approves your application.",
+        approvedHead: "Electoral Roll Approval Verified!",
+        btnDlCard: "Download Voter ID Card (PNG)",
+        btnDlPass: "Download QR Voting Pass",
+        btnCert: "Print Official Certificate",
+        faqHead: "Frequently Asked Questions"
+    }
+};
+
+let currentLang = 'mr';
+let currentTab = 'ref';
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    document.getElementById('t-brand-title').textContent = t.brandTitle;
+    document.getElementById('t-brand-sub').textContent = t.brandSub;
+    document.getElementById('t-btn-home').textContent = t.btnHome;
+    document.getElementById('t-badge').textContent = t.badge;
+    document.getElementById('t-hero-title').textContent = t.heroTitle;
+    document.getElementById('t-hero-sub').textContent = t.heroSub;
+    document.getElementById('t-tab-ref').textContent = t.tabRef;
+    document.getElementById('t-tab-mobile').textContent = t.tabMobile;
+    document.getElementById('t-tab-aadhaar').textContent = t.tabAadhaar;
+    document.getElementById('t-btn-search').textContent = t.btnSearch;
+    document.getElementById('t-lbl-dob').textContent = t.lblDob;
+    document.getElementById('t-lbl-name').textContent = t.lblName;
+    document.getElementById('t-pending-head').textContent = t.pendingHead;
+    document.getElementById('t-pending-desc').textContent = t.pendingDesc;
+    document.getElementById('t-approved-head').textContent = t.approvedHead;
+    document.getElementById('t-btn-dl-card').textContent = t.btnDlCard;
+    document.getElementById('t-btn-dl-pass').textContent = t.btnDlPass;
+    document.getElementById('t-btn-cert').textContent = t.btnCert;
+    document.getElementById('t-faq-head').textContent = t.faqHead;
+
+    updateInputLabel();
+}
+
+function switchSearchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+
+    const extraFields = document.getElementById('extra-fields');
+    const input = document.getElementById('searchInput');
+
+    if (tab === 'ref') {
+        extraFields.style.display = 'none';
+        input.type = 'text';
+        input.placeholder = 'e.g. F6MH2609250001 or KLM1234567';
+        input.maxLength = 24;
+    } else if (tab === 'mobile') {
+        extraFields.style.display = 'grid';
+        input.type = 'tel';
+        input.placeholder = 'e.g. 9876543210 (10 digits)';
+        input.maxLength = 10;
+    } else if (tab === 'aadhaar') {
+        extraFields.style.display = 'none';
+        input.type = 'text';
+        input.placeholder = 'e.g. 123456789012 (12 digits)';
+        input.maxLength = 12;
+    }
+
+    updateInputLabel();
+    input.focus();
+}
+
+function updateInputLabel() {
+    const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+    const lbl = document.getElementById('input-label');
+    if (currentTab === 'ref') lbl.textContent = t.lblRef;
+    else if (currentTab === 'mobile') lbl.textContent = t.lblMobile;
+    else if (currentTab === 'aadhaar') lbl.textContent = t.lblAadhaar;
+}
+
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    const tm = document.getElementById('toast-msg');
+    tm.textContent = msg;
+    t.style.borderColor = isError ? '#ef4444' : '#0284c7';
+    t.style.color = isError ? '#dc2626' : '#0f172a';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+async function handleSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const dob = document.getElementById('dobInput').value.trim();
+    const btn = document.getElementById('btnSearch');
+
+    if (!query) {
+        showToast("Please enter an identifier to search.", true);
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+        <span>Verifying…</span>
+    `;
+
+    try {
+        const res = await fetch('/api/check_first_time_voter', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ query, dob })
+        });
+        const data = await res.json();
+
+        const container = document.getElementById('result-container');
+        const cardPending = document.getElementById('card-pending');
+        const cardRejected = document.getElementById('card-rejected');
+        const cardApproved = document.getElementById('card-approved');
+
+        cardPending.style.display = 'none';
+        cardRejected.style.display = 'none';
+        cardApproved.style.display = 'none';
+
+        if (data.status === 'NOT_FOUND' || data.status === 'error') {
+            container.style.display = 'none';
+            showToast(data.message || "No voter application found.", true);
+            alert(data.message || "No application record found. Please verify your reference number.");
+            return;
+        }
+
+        container.style.display = 'block';
+
+        if (data.status === 'PENDING') {
+            cardPending.style.display = 'block';
+            document.getElementById('p-ero-jurisdiction').textContent = `Constituency Jurisdiction: ${data.voter.constituency || 'Shivaji Nagar'} • District: ${data.voter.district || 'Pune'}`;
+            
+            const pGrid = document.getElementById('pending-info-grid');
+            pGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-lbl">Application Ref ID</div>
+                    <div class="info-val vid-badge">${data.voter.v_id}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Applicant Name</div>
+                    <div class="info-val">${data.voter.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Relative Name</div>
+                    <div class="info-val">${data.voter.relative_type || 'Father'}: ${data.voter.relative_name || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">District / Constituency</div>
+                    <div class="info-val">${data.voter.district || 'Pune'} / ${data.voter.constituency || 'Shivaji Nagar'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Application Date</div>
+                    <div class="info-val">${data.voter.reg_date || 'Recent'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Status</div>
+                    <div class="info-val" style="color:#b45309;">Pending ERO Approval</div>
+                </div>
+            `;
+            showToast("Application found: Under Review by Constituency ERO.");
+            cardPending.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        else if (data.status === 'REJECTED') {
+            cardRejected.style.display = 'block';
+            document.getElementById('r-ero-info').textContent = `Decided by ${data.voter.ero_decided_by || 'Constituency ERO'} on ${data.voter.ero_decided_at || 'N/A'}`;
+            document.getElementById('r-reason').textContent = data.voter.ero_remarks || "Discrepancy in documentation or age proof.";
+
+            const rGrid = document.getElementById('rejected-info-grid');
+            rGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-lbl">Application ID</div>
+                    <div class="info-val vid-badge" style="color:#b91c1c; background:#fee2e2; border-color:#fca5a5;">${data.voter.v_id}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Applicant Name</div>
+                    <div class="info-val">${data.voter.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Constituency</div>
+                    <div class="info-val">${data.voter.constituency} (${data.voter.district})</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Decided Date</div>
+                    <div class="info-val">${data.voter.ero_decided_at || '—'}</div>
+                </div>
+            `;
+            showToast("Application was Rejected by ERO.", true);
+            cardRejected.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        else if (data.status === 'APPROVED') {
+            cardApproved.style.display = 'block';
+            document.getElementById('a-ero-info').textContent = `Approved by ERO (${data.voter.constituency}, ${data.voter.district}) • Official Certified Entry`;
+            document.getElementById('a-ero-remarks').textContent = data.voter.ero_remarks || "Identity verified and certified on official Electoral Roll.";
+            document.getElementById('a-ero-meta').textContent = `Decided by ERO: ${data.voter.ero_decided_by || 'ERO'} (${data.voter.ero_decided_at || ''})`;
+
+            const aGrid = document.getElementById('approved-info-grid');
+            aGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-lbl">Certified EPIC (Voter ID)</div>
+                    <div class="info-val vid-badge" style="font-size:15px;">${data.voter.v_id}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Elector Name</div>
+                    <div class="info-val" style="font-size:15px;">${data.voter.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Relative Name</div>
+                    <div class="info-val">${data.voter.relative_type || 'Father'}: ${data.voter.relative_name || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">DOB / Gender</div>
+                    <div class="info-val">${data.voter.dob || '—'} / ${data.voter.gender || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">District / Constituency</div>
+                    <div class="info-val">${data.voter.district} / ${data.voter.constituency}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-lbl">Assigned Polling Booth</div>
+                    <div class="info-val" style="color:#0284c7;">${data.voter.booth_code} - ${data.voter.booth_name}</div>
+                </div>
+            `;
+
+            // Card Image
+            document.getElementById('a-card-img').src = data.card_preview_url + '?t=' + new Date().getTime();
+            document.getElementById('btn-dl-card').href = data.download_card_url;
+            document.getElementById('btn-dl-pass').href = data.download_pass_url;
+            document.getElementById('btn-view-cert').href = data.certificate_url;
+
+            showToast("Success! Voter ID Card generated & ready for download.");
+            cardApproved.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+    } catch (e) {
+        showToast("Error checking application: " + e.message, true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>${(TRANSLATIONS[currentLang] || TRANSLATIONS.en).btnSearch}</span>
+        `;
+    }
+}
+
+// Auto-load citizen profile if citizen session is active
+window.addEventListener('DOMContentLoaded', () => {
+    {% if user and user.user_type == 'citizen' and user.user_id %}
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = "{{ user.user_id }}";
+        handleSearch();
+    }
+    {% endif %}
+});
+
+// Light-Mode Warm Golden & Tricolor Particle Sparks
+(function() {
+    const canvas = document.getElementById('astroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    let mouse = { x: width / 2, y: height / 2, active: false };
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.active = true;
+    });
+    window.addEventListener('mouseleave', () => { mouse.active = false; });
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const COLOR_PALETTE = [
+        { r: 234, g: 88,  b: 12 },  // Warm Saffron Spark
+        { r: 217, g: 119, b: 6 },   // Golden Amber
+        { r: 2,   g: 132, b: 199 }, // Ashoka Blue
+        { r: 21,  g: 128, b: 61 },  // Emerald Green
+        { r: 245, g: 158, b: 11 }   // Luminous Gold
+    ];
+
+    class SparkParticle {
+        constructor(init = false) {
+            this.reset(init);
+        }
+
+        reset(init = false) {
+            this.x = Math.random() * width;
+            this.y = init ? Math.random() * height : height + Math.random() * 20;
+            this.size = Math.random() * 2.2 + 0.6;
+            this.baseSize = this.size;
+            this.speedY = -(Math.random() * 0.55 + 0.2);
+            this.speedX = (Math.random() - 0.45) * 0.4;
+            this.color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+            this.alpha = Math.random() * 0.65 + 0.25;
+            this.pulseSpeed = Math.random() * 0.03 + 0.01;
+            this.pulsePhase = Math.random() * Math.PI * 2;
+            this.life = 0;
+            this.maxLife = Math.random() * 600 + 400;
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life++;
+            this.pulsePhase += this.pulseSpeed;
+
+            if (mouse.active) {
+                const dx = this.x - mouse.x;
+                const dy = this.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    const force = (120 - dist) / 120;
+                    this.x += (dx / dist) * force * 1.2;
+                    this.y += (dy / dist) * force * 1.2;
+                }
+            }
+
+            if (this.y < -20 || this.x < -20 || this.x > width + 20 || this.life > this.maxLife) {
+                this.reset(false);
+            }
+        }
+
+        draw() {
+            const currentAlpha = Math.max(0, Math.min(1, this.alpha * (0.6 + 0.4 * Math.sin(this.pulsePhase))));
+            const currentSize = this.baseSize * (0.8 + 0.3 * Math.sin(this.pulsePhase));
+
+            ctx.save();
+            ctx.shadowBlur = currentSize * 5;
+            ctx.shadowColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${currentAlpha * 0.8})`;
+            ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${currentAlpha})`;
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, currentSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    const particlesCount = Math.min(90, Math.floor(width / 15));
+    const particles = [];
+    for (let i = 0; i < particlesCount; i++) {
+        particles.push(new SparkParticle(true));
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+</script>
+
+</body>
+</html>

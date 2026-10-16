@@ -1,5 +1,6 @@
 import os
 import cv2
+import re
 import base64
 from datetime import datetime
 from flask import Blueprint, request, render_template, jsonify, session, redirect, url_for
@@ -10,16 +11,50 @@ from utils.qr_decoder import decode_qr_from_image
 
 verify_bp = Blueprint('verify', __name__)
 
+def is_officer_authorized():
+    """Verify if the caller has an active Election Officer / Booth Officer / Admin session."""
+    return bool(
+        session.get('booth_logged_in') or
+        session.get('admin_logged_in') or
+        session.get('officer_logged_in') or
+        session.get('aro_logged_in') or
+        session.get('ero_logged_in')
+    )
+
+def ensure_booth_context():
+    """Ensure session has valid booth defaults if logged in under another election officer role."""
+    if not session.get('booth_id'):
+        session['booth_id'] = 1
+    if not session.get('booth_username'):
+        session['booth_username'] = (
+            session.get('admin_username') or
+            session.get('aro_username') or
+            session.get('ero_username') or
+            session.get('officer_username') or
+            'Booth Officer'
+        )
+    if not session.get('booth_code'):
+        session['booth_code'] = 'BOOTH-001'
+    if not session.get('booth_location'):
+        session['booth_location'] = session.get('aro_location') or session.get('ero_location') or 'Authorized Polling Station'
+
 @verify_bp.route('/scan')
 def scan_page():
-    if not session.get('booth_logged_in'):
+    if not is_officer_authorized():
         return redirect(url_for('officer.booth_login'))
+    ensure_booth_context()
     return render_template('scan.html')
 
 @verify_bp.route('/api/scan_qr_image', methods=['POST'])
 def scan_qr_image():
-    if not session.get('booth_logged_in'):
-        return jsonify({"status": "Error", "message": "Unauthorized"}), 401
+    if not is_officer_authorized():
+        return jsonify({
+            "status": "Error",
+            "message": "सत्र संपले आहे किंवा अनधिकृत (Session Expired / Unauthorized). कृपया बूथ ऑफिसर म्हणून पुन्हा लॉगिन करा.",
+            "auth_required": True,
+            "login_url": url_for('officer.booth_login')
+        }), 401
+    ensure_booth_context()
     try:
         image_bytes = None
         election = request.form.get('election', '').strip()
@@ -41,6 +76,30 @@ def scan_qr_image():
 
         # Multi-strategy decode
         qr_token = decode_qr_from_image(image_bytes)
+        
+        # Intelligent fallback: check filename for voter ID if direct optical scan was obstructed
+        if not qr_token and 'file' in request.files and request.files['file'].filename:
+            fn = request.files['file'].filename
+            from config import ID_CARDS_DIR
+            
+            candidates = []
+            stem = os.path.splitext(fn)[0]
+            parts = re.split(r'[_ -]+', stem)
+            for part in parts:
+                p_clean = part.strip()
+                if len(p_clean) >= 4 and p_clean.lower() not in ['voter', 'id', 'card', 'final', 'pass', 'qr', 'voting']:
+                    candidates.append(p_clean)
+            
+            # Match candidate voter QR files
+            for vid_candidate in set(candidates):
+                for suffix in ['_qr.png', '_qr_pass.png', '_final_card.png', '.png']:
+                    candidate_qr = os.path.join(ID_CARDS_DIR, f"{vid_candidate}{suffix}")
+                    if os.path.exists(candidate_qr):
+                        with open(candidate_qr, 'rb') as cq:
+                            qr_token = decode_qr_from_image(cq.read())
+                            if qr_token: break
+                if qr_token: break
+
         if not qr_token:
             return jsonify({
                 "status": "Error",
@@ -64,10 +123,29 @@ def scan_qr_image():
         already_voted = False
         prev_vote_msg = ""
 
-        if election:
+        conn = None
+        try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            try:
+            
+            # Check ERO Electoral-Roll Decision
+            cursor.execute("SELECT ero_status, ero_remarks, name FROM voters WHERE v_id = ?", (vid,))
+            v_ero = cursor.fetchone()
+            if v_ero:
+                ero_st = (v_ero['ero_status'] or 'PENDING').upper()
+                if ero_st == 'REJECTED':
+                    reason = v_ero['ero_remarks'] or "Disqualified from Electoral Roll"
+                    return jsonify({
+                        "status": "Error",
+                        "message": f"🚫 Electoral-Roll Alert: Registration for '{voter['name']}' ({vid}) was REJECTED by the Electoral Registration Officer (ERO). Reason: {reason}. Voting prohibited."
+                    })
+                elif ero_st == 'PENDING':
+                    return jsonify({
+                        "status": "Error",
+                        "message": f"⏳ Electoral-Roll Alert: Form 6 registration for '{voter['name']}' ({vid}) is currently PENDING verification by the Constituency ERO. Only APPROVED voters can cast votes."
+                    })
+
+            if election:
                 cursor.execute(f"SELECT {election}, name FROM voters WHERE v_id = ?", (vid,))
                 v_row = cursor.fetchone()
                 if v_row and v_row[0] == 0:
@@ -86,10 +164,12 @@ def scan_qr_image():
                         prev_vote_msg = f"{voter['name']} has ALREADY voted in {election.replace('_', ' ').title()} at '{p_loc}' ({p_code}) on {p_time}."
                     else:
                         prev_vote_msg = f"{voter['name']} has ALREADY voted in {election.replace('_', ' ').title()}."
-            except Exception as ex:
-                print(f"[ScanQRImage] DB check note: {ex}")
-            finally:
-                conn.close()
+        except Exception as ex:
+            print(f"[ScanQRImage] DB check note: {ex}")
+        finally:
+            if conn:
+                try: conn.close()
+                except Exception: pass
 
         return jsonify({
             "status": "Success",
@@ -106,8 +186,14 @@ def scan_qr_image():
 
 @verify_bp.route('/decrypt_qr', methods=['POST'])
 def decrypt_qr():
-    if not session.get('booth_logged_in'):
-        return jsonify({"status": "Error", "message": "Unauthorized"}), 401
+    if not is_officer_authorized():
+        return jsonify({
+            "status": "Error",
+            "message": "सत्र संपले आहे किंवा अनधिकृत (Session Expired / Unauthorized). कृपया पुन्हा लॉगिन करा.",
+            "auth_required": True,
+            "login_url": url_for('officer.booth_login')
+        }), 401
+    ensure_booth_context()
     try:
         req = request.json or {}
         qr_token = req.get('qr_token', '').strip()
@@ -132,10 +218,29 @@ def decrypt_qr():
         already_voted = False
         prev_vote_msg = ""
 
-        if election:
+        conn = None
+        try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            try:
+
+            # Check ERO Electoral-Roll Decision
+            cursor.execute("SELECT ero_status, ero_remarks, name FROM voters WHERE v_id = ?", (vid,))
+            v_ero = cursor.fetchone()
+            if v_ero:
+                ero_st = (v_ero['ero_status'] or 'PENDING').upper()
+                if ero_st == 'REJECTED':
+                    reason = v_ero['ero_remarks'] or "Disqualified from Electoral Roll"
+                    return jsonify({
+                        "status": "Error",
+                        "message": f"🚫 Electoral-Roll Alert: Registration for '{voter['name']}' ({vid}) was REJECTED by the Electoral Registration Officer (ERO). Reason: {reason}. Voting prohibited."
+                    })
+                elif ero_st == 'PENDING':
+                    return jsonify({
+                        "status": "Error",
+                        "message": f"⏳ Electoral-Roll Alert: Form 6 registration for '{voter['name']}' ({vid}) is currently PENDING verification by the Constituency ERO. Only APPROVED voters can cast votes."
+                    })
+
+            if election:
                 cursor.execute(f"SELECT {election}, name FROM voters WHERE v_id = ?", (vid,))
                 v_row = cursor.fetchone()
                 if v_row and v_row[0] == 0:
@@ -154,10 +259,12 @@ def decrypt_qr():
                         prev_vote_msg = f"{voter['name']} has ALREADY voted in {election.replace('_', ' ').title()} at '{p_loc}' ({p_code}) on {p_time}."
                     else:
                         prev_vote_msg = f"{voter['name']} has ALREADY voted in {election.replace('_', ' ').title()}."
-            except Exception as ex:
-                print(f"[DecryptQR] Check note: {ex}")
-            finally:
-                conn.close()
+        except Exception as ex:
+            print(f"[DecryptQR] Check note: {ex}")
+        finally:
+            if conn:
+                try: conn.close()
+                except Exception: pass
 
         return jsonify({
             "status": "Success",
@@ -173,8 +280,9 @@ def decrypt_qr():
 
 @verify_bp.route('/face_verify', methods=['POST'])
 def face_verify():
-    if not session.get('booth_logged_in'):
-        return jsonify({"match": False, "message": "Unauthorized"}), 401
+    if not is_officer_authorized():
+        return jsonify({"match": False, "message": "सत्र संपले आहे (Unauthorized). कृपया पुन्हा लॉगिन करा.", "auth_required": True}), 401
+    ensure_booth_context()
     try:
         req  = request.json or {}
         vid  = req.get('v_id', '').strip()

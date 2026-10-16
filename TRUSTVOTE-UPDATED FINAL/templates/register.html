@@ -33,12 +33,12 @@
 
         /* Full-Screen Container */
         .container {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1.5px solid rgba(226, 232, 240, 0.95);
             width: 100%;
-            max-width: 1620px;
+            max-width: 1640px;
             padding: 28px 36px 36px;
             border-radius: 28px;
             box-shadow: 
@@ -47,11 +47,11 @@
             position: relative;
             z-index: 10;
             margin-top: 10px;
-            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -60,8 +60,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 20px;
-            margin-bottom: 24px;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
             border-bottom: 2px solid #e2e8f0;
             flex-wrap: wrap;
             gap: 15px;
@@ -73,7 +73,7 @@
             gap: 16px;
         }
         .emblem-icon {
-            font-size: 38px;
+            font-size: 34px;
             line-height: 1;
             background: #ffffff;
             padding: 10px;
@@ -82,13 +82,14 @@
             border: 1px solid #e2e8f0;
         }
         .brand-title {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 900;
             color: #0f172a;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .brand-subtitle {
             font-size: 13px;
@@ -144,19 +145,137 @@
             transform: translateY(-1px);
         }
 
+        /* ── Dual Mode Tab Navigation ── */
+        .mode-tab-bar {
+            display: flex;
+            gap: 8px;
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 24px;
+            border: 1.5px solid #e2e8f0;
+        }
+        .mode-tab-btn {
+            flex: 1;
+            padding: 13px 20px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 800;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.2px;
+        }
+        .mode-tab-btn:hover { background: #e2e8f0; color: #1e293b; }
+        .mode-tab-btn.active {
+            background: #ffffff;
+            color: #16a34a;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            border: 1.5px solid #dcfce7;
+        }
+        .mode-tab-btn.active.tab-form6 {
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+        .mode-tab-btn.active.tab-form6 svg { stroke: #2563eb; }
+
+        .tab-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .badge-green { background: #dcfce7; color: #15803d; }
+        .badge-blue  { background: #dbeafe; color: #1e40af; }
+
+        /* Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* Form 6 Notice Banner */
+        .form6-banner {
+            background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(22,163,74,0.06) 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .form6-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .form6-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            border: 1px solid #93c5fd;
+            flex-shrink: 0;
+        }
+        .form6-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form6-desc {
+            font-size: 12.5px;
+            color: #475569;
+            margin-top: 2px;
+        }
+        .form6-eci-link {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2563eb;
+            background: #ffffff;
+            border: 1px solid #bfdbfe;
+            padding: 6px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .form6-eci-link:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
         /* 3-Column Executive Grid */
         .form-grid-layout {
             display: grid;
-            grid-template-columns: 1.05fr 1.35fr 1.05fr;
-            gap: 24px;
+            grid-template-columns: 1.05fr 1.15fr 0.95fr;
+            gap: 22px;
             align-items: stretch;
         }
 
-        @media (max-width: 1280px) {
+        @media (max-width: 1320px) {
             .form-grid-layout {
                 grid-template-columns: 1fr 1fr;
             }
-            .form-col:nth-child(3) {
+            .form-col-right {
                 grid-column: 1 / -1;
             }
         }
@@ -170,19 +289,19 @@
         .panel-card {
             background: #ffffff;
             border: 1.5px solid #e2e8f0;
-            border-radius: 22px;
-            padding: 24px;
-            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.04);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.04);
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
         }
 
         .panel-title {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             color: #0f172a;
             display: flex;
             align-items: center;
@@ -194,32 +313,32 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
         }
         .form-row.full { grid-template-columns: 1fr; }
 
         label {
             font-weight: 700;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: #334155;
-            font-size: 13px;
+            font-size: 12.5px;
         }
         label span.req { color: #ef4444; }
 
-        input[type=text], input[type=date], select {
+        input[type=text], input[type=date], input[type=email], input[type=tel], select, textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 9px 13px;
             border: 1.5px solid #cbd5e1;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 11px;
+            font-size: 13.5px;
             font-weight: 500;
             color: #1e293b;
             background: #f8fafc;
             transition: all 0.2s ease;
             outline: none;
         }
-        input[type=text]:focus, input[type=date]:focus, select:focus {
+        input[type=text]:focus, input[type=date]:focus, input[type=email]:focus, input[type=tel]:focus, select:focus, textarea:focus {
             border-color: #16a34a;
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
@@ -228,7 +347,7 @@
         .search-box {
             width: 100%;
             padding: 7px 12px !important;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             border: 1px solid #cbd5e1 !important;
             border-radius: 9px !important;
             font-size: 12px !important;
@@ -239,24 +358,24 @@
         .checkbox-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             background: #f8fafc;
-            padding: 14px;
-            border-radius: 14px;
+            padding: 12px;
+            border-radius: 12px;
             border: 1px solid #e2e8f0;
         }
         .checkbox-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             color: #1e293b;
             cursor: pointer;
         }
         .checkbox-item input[type=checkbox] {
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
             accent-color: #16a34a;
             cursor: pointer;
         }
@@ -265,17 +384,67 @@
         .local-bodies-wrap {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            max-height: 480px;
+            gap: 12px;
+            max-height: 380px;
             overflow-y: auto;
             padding-right: 4px;
         }
-        .local-bodies-wrap::-webkit-scrollbar {
-            width: 6px;
+        .local-bodies-wrap::-webkit-scrollbar { width: 5px; }
+        .local-bodies-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Form 6 Dedicated File Upload Box */
+        .form6-upload-box {
+            background: #f8fafc;
+            border: 2px dashed #94a3b8;
+            border-radius: 16px;
+            padding: 18px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
-        .local-bodies-wrap::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+        .form6-upload-box:hover, .form6-upload-box.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .form6-upload-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .form6-upload-box:hover .form6-upload-icon {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .form6-upload-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .form6-upload-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 3px;
+        }
+        .form6-file-preview {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            padding: 8px 12px;
             border-radius: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e40af;
         }
 
         /* Camera Box */
@@ -284,91 +453,103 @@
             width: 100%;
             max-width: 380px;
             margin: 0 auto;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             background: #000;
-            border: 3px solid #cbd5e1;
+            border: 2.5px solid #cbd5e1;
         }
-        #video {
+        .video-feed {
             width: 100%;
             display: block;
-            height: 250px;
+            height: 210px;
             object-fit: cover;
         }
-        #preview-img {
+        .preview-img {
             width: 100%;
-            height: 250px;
-            object-fit: cover;
             display: none;
-            border: 4px solid #16a34a;
+            height: 210px;
+            object-fit: cover;
         }
         .cam-hint {
             font-size: 11.5px;
             color: #64748b;
             text-align: center;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .btn-capture, .btn-retake {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 11px;
             font-weight: 700;
-            font-size: 13.5px;
+            font-size: 13px;
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
-            margin-top: 10px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn-capture {
             background: #1e293b;
             color: #ffffff;
         }
-        .btn-capture:hover {
-            background: #0f172a;
-        }
+        .btn-capture:hover { background: #0f172a; }
         .btn-retake {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1.5px solid #bfdbfe;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
             display: none;
         }
+        .btn-retake:hover { background: #fee2e2; }
 
         .btn-submit {
             width: 100%;
-            padding: 16px;
-            background: #16a34a;
-            color: #ffffff;
+            padding: 14px 20px;
+            color: white;
             border: none;
-            border-radius: 14px;
-            font-size: 15px;
+            border-radius: 13px;
+            font-size: 14.5px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.4);
             transition: all 0.2s ease;
-            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .btn-submit:hover {
-            background: #15803d;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(22, 163, 74, 0.5);
+        .btn-submit-existing {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 8px 20px -4px rgba(22, 163, 74, 0.4);
+        }
+        .btn-submit-existing:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px -4px rgba(22, 163, 74, 0.5);
+        }
+        .btn-submit-form6 {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.4);
+        }
+        .btn-submit-form6:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px -4px rgba(37, 99, 235, 0.5);
         }
         .btn-submit:disabled {
-            background: #94a3b8;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
         .status-badge {
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: center;
             display: none;
-            margin-top: 10px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            margin-top: 5px;
         }
         .status-ok { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
         .status-wait { background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; display: block; }
@@ -383,7 +564,7 @@
         <!-- Header Bar -->
         <div class="header-bar">
             <div class="brand-box">
-                <div class="emblem-icon"></div>
+                <div class="emblem-icon">🏛️</div>
                 <div>
                     <div class="brand-title">
                         महाराष्ट्र राज्य निवडणूक आयोग
@@ -395,314 +576,630 @@
             
             <div class="header-actions">
                 <div class="officer-badge">
-                    <span></span> Registration Officer Active
+                    <span>🟢</span> Registration Officer Active
                 </div>
-                <a href="/admin/login" class="logout-link" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
+                <button type="button" onclick="openChangePasswordModal()" class="logout-link" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; cursor:pointer;">
+                    🔒 Change Password
+                </button>
+                <a href="/admin/login" class="logout-link" style="background:#f8fafc; color:#475569; border-color:#cbd5e1;">
                     Admin Control
                 </a>
-                <a href="/logout" class="logout-link">
+                <a href="/officer/logout" class="logout-link">
                     Logout
                 </a>
             </div>
         </div>
 
-        <form id="regForm" onsubmit="return false;">
-            <div class="form-grid-layout">
-                
-                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                     COLUMN 1: CITIZEN PROFILE & JURISDICTION
-                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-                <div class="panel-card">
-                    <div class="panel-title">
-                        १. मतदाराची वैयक्तिक माहिती व मतदारसंघ
-                    </div>
+        <!-- ── DUAL TAB BAR: EXISTING VOTER VS FIRST-TIME FORM 6 ── -->
+        <div class="mode-tab-bar">
+            <button class="mode-tab-btn active" id="tabBtn-existing" onclick="switchRegistrationMode('existing')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+                <span>Existing Voter Enrolment (विद्यमान मतदार नोंदणी)</span>
+                <span class="tab-badge badge-green">Has Voter ID</span>
+            </button>
+            <button class="mode-tab-btn tab-form6" id="tabBtn-form6" onclick="switchRegistrationMode('form6')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                <span>First-Time Applicant (Form No. 6 - नवीन मतदार)</span>
+                <span class="tab-badge badge-blue">No Voter ID • Forward to ERO</span>
+            </button>
+        </div>
 
-                    <div>
-                        <label>Voter ID (EPIC Number) <span class="req">*</span></label>
-                        <input type="text" name="v_id" id="v_id" placeholder="उदा. MH14ABC1234" required oninput="this.value=this.value.toUpperCase()">
-                        <div id="vid-status" class="status-badge"></div>
-                    </div>
-
-                    <div class="form-row">
-                        <div>
-                            <label>First Name <span class="req">*</span></label>
-                            <input type="text" id="first_name" placeholder="First Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
-                        </div>
-                        <div>
-                            <label>Last Name <span class="req">*</span></label>
-                            <input type="text" id="last_name" placeholder="Last Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label>Father's / Husband's Name <span class="req">*</span></label>
-                        <input type="text" id="father_name" placeholder="Father's / Husband's Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
-                    </div>
-                    <input type="hidden" name="name" id="full_name_hidden">
-
-                    <div class="form-row">
-                        <div>
-                            <label>Gender / लिंग <span class="req">*</span></label>
-                            <select name="gender">
-                                <option value="Male">Male / पुरुष</option>
-                                <option value="Female">Female / महिला</option>
-                                <option value="Other">Other / इतर</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Date of Birth / जन्म तारीख <span class="req">*</span></label>
-                            <input type="date" name="dob" id="dob" required>
-                        </div>
-                    </div>
-                    <div id="dob-error" style="color:#ef4444;font-size:12px;display:none;font-weight:700;">️ You must be 18 years of age or older to register.</div>
-
-                    <div style="border-top: 1px dashed #cbd5e1; padding-top: 14px;">
-                        <label>Voter's Home District / जिल्हा (३६ जिल्हे) <span class="req">*</span></label>
-                        <input type="text" class="search-box" placeholder="जिल्हा शोधा (Search 36 Districts)..." oninput="filterDropdown('reg_district', this.value); onDistrictSelect();">
-                        <select name="district" id="reg_district" onchange="onDistrictSelect()" required>
-                            <option value="">-- जिल्हा निवडा / Select District --</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Voter's Constituency / मतदारसंघ / प्रभाग <span class="req">*</span></label>
-                        <input type="text" class="search-box" placeholder="मतदारसंघ शोधा (Search Constituency)..." oninput="filterDropdown('reg_constituency', this.value);">
-                        <select name="constituency" id="reg_constituency" required>
-                            <option value="">-- मतदारसंघ निवडा / Select Constituency --</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                     COLUMN 2: LOCAL SELF-GOVERNMENT ELECTIONS
-                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-                <div class="panel-card">
-                    <div class="panel-title">
-                        २. स्थानिक स्वराज्य संस्था निवडणूक निवड
-                    </div>
-
-                    <div>
-                        <label style="margin-bottom: 8px;">लागू असलेल्या निवडणुका निवडा (Select Applicable Tiers):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-item"><input type="checkbox" id="chk_mnc" name="mnc" onchange="toggleLocalBodyFields()" checked> महानगरपालिका (29)</label>
-                            <label class="checkbox-item"><input type="checkbox" id="chk_zp" name="zp" onchange="toggleLocalBodyFields()" checked> जिल्हा परिषद (36)</label>
-                            <label class="checkbox-item"><input type="checkbox" id="chk_ps" name="ps" onchange="toggleLocalBodyFields()" checked> पंचायत समिती (351)</label>
-                            <label class="checkbox-item"><input type="checkbox" id="chk_np" name="np" onchange="toggleLocalBodyFields()"> नगरपालिका परिषद</label>
-                            <label class="checkbox-item"><input type="checkbox" id="chk_npt" name="npt" onchange="toggleLocalBodyFields()"> नगरपंचायत</label>
-                            <label class="checkbox-item"><input type="checkbox" id="chk_gp" name="gp" onchange="toggleLocalBodyFields()"> ग्रामपंचायत</label>
-                        </div>
-                    </div>
-
-                    <div class="local-bodies-wrap">
-                        
-                        <!-- 1. Mahanagarpalika -->
-                        <div id="grp_mnc">
-                            <label>महानगरपालिका निवडा / Select Mahanagarpalika</label>
-                            <input type="text" class="search-box" placeholder="महानगरपालिका शोधा (Search Corporation)..." oninput="filterDropdown('sel_mnc', this.value)">
-                            <select name="mahanagarpalika_name" id="sel_mnc">
-                                <option value="">-- महानगरपालिका निवडा --</option>
-                            </select>
-                        </div>
-
-                        <!-- 2. Zilha Parishad -->
-                        <div id="grp_zp">
-                            <label>जिल्हा परिषद निवडा / Select Zilha Parishad</label>
-                            <input type="text" class="search-box" placeholder="जिल्हा परिषद शोधा (Search ZP)..." oninput="filterDropdown('sel_zp', this.value)">
-                            <select name="zilha_parishad_name" id="sel_zp">
-                                <option value="">-- जिल्हा परिषद निवडा --</option>
-                            </select>
-                        </div>
-
-                        <!-- 3. Panchayat Samiti -->
-                        <div id="grp_ps">
-                            <label>तालुका पंचायत समिती निवडा (जिल्ह्यानुसार)</label>
-                            <input type="text" class="search-box" placeholder="पंचायत समिती शोधा (Search Samiti)..." oninput="filterDropdown('sel_ps', this.value)">
-                            <select name="panchayat_samiti_name" id="sel_ps">
-                                <option value="">-- तालुका पंचायत समिती निवडा --</option>
-                            </select>
-                        </div>
-
-                        <!-- 4. Nagar Parishad -->
-                        <div id="grp_np" style="display: none;">
-                            <label>नगरपालिका / नगरपरिषद निवडा (जिल्ह्यानुसार)</label>
-                            <input type="text" class="search-box" placeholder="नगरपालिका शोधा (Search Parishad)..." oninput="filterDropdown('sel_np', this.value)">
-                            <select name="nagar_parishad_name" id="sel_np">
-                                <option value="">-- नगरपालिका / नगरपरिषद निवडा --</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. Nagar Panchayat -->
-                        <div id="grp_npt" style="display: none;">
-                            <label>नगरपंचायत निवडा (जिल्ह्यानुसार)</label>
-                            <input type="text" class="search-box" placeholder="नगरपंचायत शोधा (Search Panchayat)..." oninput="filterDropdown('sel_npt', this.value)">
-                            <select name="nagar_panchayat_name" id="sel_npt">
-                                <option value="">-- नगरपंचायत निवडा --</option>
-                            </select>
-                        </div>
-
-                        <!-- 6. Gram Panchayat -->
-                        <div id="grp_gp" style="display: none;">
-                            <label>ग्रामपंचायत गाव व प्रभाग (Searchable & Open Entry)</label>
-                            <input list="gp_list" name="gram_panchayat_name" id="txt_gp" placeholder="गाव निवडा किंवा टाईप करा (उदा. मौजे शिर्डी / प्रभाग १)">
-                            <datalist id="gp_list"></datalist>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                     COLUMN 3: BIOMETRICS & SUBMISSION
-                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-                <div class="panel-card" style="justify-content: space-between;">
-                    <div>
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             TAB 1: EXISTING VOTER REGISTRATION (DIRECT ENROLMENT)
+             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="tab-panel active" id="panel-existing">
+            <form id="form-existing" onsubmit="return handleExistingSubmit(event)">
+                <input type="hidden" name="reg_type" value="existing">
+                <div class="form-grid-layout">
+                    
+                    <!-- Column 1: Citizen Profile -->
+                    <div class="panel-card">
                         <div class="panel-title">
-                            ३. बायोमेट्रिक छायाचित्र व पडताळणी
+                            १. विद्यमान मतदाराचा तपशील (Existing Voter Details)
                         </div>
 
-                        <div class="video-wrap" style="margin-top: 10px;">
-                            <video id="video" autoplay playsinline muted></video>
-                            <img id="preview-img" alt="Captured Photo">
+                        <div>
+                            <label>Existing Voter ID (EPIC Number) <span class="req">*</span></label>
+                            <input type="text" name="v_id" id="exist_vid" placeholder="उदा. MH14ABC1234" required oninput="this.value=this.value.toUpperCase()">
+                            <div style="font-size:11px; color:#64748b; margin-top:3px;">Enter citizen's official 10/12-character EPIC number</div>
+                            <div id="exist_vid_status" class="status-badge"></div>
                         </div>
-                        <p class="cam-hint">कॅमेऱ्याकडे थेट पहा. व्यवस्थित प्रकाश असल्याची खात्री करा.</p>
-                        
-                        <div id="photo-status" class="status-badge status-wait">️ कृपया छायाचित्र कॅप्चर करा</div>
 
-                        <button type="button" class="btn-capture" id="btn-capture" onclick="capturePhoto()">
-                            Capture Live Photo
-                        </button>
-                        <button type="button" class="btn-retake" id="btn-retake" onclick="retakePhoto()">
-                            Retake Photo
-                        </button>
+                        <div class="form-row">
+                            <div>
+                                <label>First Name / नाव <span class="req">*</span></label>
+                                <input type="text" id="exist_first_name" placeholder="First Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                            <div>
+                                <label>Last Name / आडनाव <span class="req">*</span></label>
+                                <input type="text" id="exist_last_name" placeholder="Surname" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>Father's / Husband's Full Name <span class="req">*</span></label>
+                            <input type="text" id="exist_father_name" placeholder="Father's / Husband's Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                        </div>
+                        <input type="hidden" name="name" id="exist_full_name_hidden">
+
+                        <div class="form-row">
+                            <div>
+                                <label>Gender / लिंग <span class="req">*</span></label>
+                                <select name="gender" id="exist_gender">
+                                    <option value="Male">Male / पुरुष</option>
+                                    <option value="Female">Female / महिला</option>
+                                    <option value="Other">Other / इतर</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Date of Birth / जन्म तारीख <span class="req">*</span></label>
+                                <input type="date" name="dob" id="exist_dob" required>
+                            </div>
+                        </div>
+                        <div id="exist_dob_error" style="color:#ef4444;font-size:11.5px;display:none;font-weight:700;">⚠️ Citizen must be 18 years of age or older.</div>
                     </div>
 
-                    <div style="margin-top: 15px;">
-                        <input type="hidden" name="photo" id="photo_input">
-                        <button type="submit" class="btn-submit" id="btn-submit">
-                            Complete Voter Registration
-                        </button>
+                    <!-- Column 2: Jurisdiction & Local Body -->
+                    <div class="panel-card">
+                        <div class="panel-title">
+                            २. मतदारसंघ व स्थानिक संस्था (Jurisdiction)
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>District / जिल्हा (३६) <span class="req">*</span></label>
+                                <input type="text" class="search-box" placeholder="जिल्हा शोधा..." oninput="filterDropdown('exist_district', this.value); onExistDistrictSelect();">
+                                <select name="district" id="exist_district" onchange="onExistDistrictSelect()" required>
+                                    <option value="">-- जिल्हा निवडा --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Constituency / मतदारसंघ <span class="req">*</span></label>
+                                <input type="text" class="search-box" placeholder="मतदारसंघ शोधा..." oninput="filterDropdown('exist_constituency', this.value);">
+                                <select name="constituency" id="exist_constituency" required>
+                                    <option value="">-- मतदारसंघ निवडा --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="margin-bottom: 6px;">स्थानिक स्वराज्य संस्था (Local Body Entitlements):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_mnc" name="mnc" onchange="toggleExistLocalBodyFields()" checked> महानगरपालिका</label>
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_zp" name="zp" onchange="toggleExistLocalBodyFields()" checked> जिल्हा परिषद</label>
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_ps" name="ps" onchange="toggleExistLocalBodyFields()" checked> पंचायत समिती</label>
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_np" name="np" onchange="toggleExistLocalBodyFields()"> नगरपालिका परिषद</label>
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_npt" name="npt" onchange="toggleExistLocalBodyFields()"> नगरपंचायत</label>
+                                <label class="checkbox-item"><input type="checkbox" id="exist_chk_gp" name="gp" onchange="toggleExistLocalBodyFields()"> ग्रामपंचायत</label>
+                            </div>
+                        </div>
+
+                        <div class="local-bodies-wrap">
+                            <div id="exist_grp_mnc">
+                                <label>महानगरपालिका निवडा</label>
+                                <select name="mahanagarpalika_name" id="exist_sel_mnc"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="exist_grp_zp">
+                                <label>जिल्हा परिषद निवडा</label>
+                                <select name="zilha_parishad_name" id="exist_sel_zp"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="exist_grp_ps">
+                                <label>तालुका पंचायत समिती निवडा</label>
+                                <select name="panchayat_samiti_name" id="exist_sel_ps"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="exist_grp_np" style="display:none;">
+                                <label>नगरपालिका निवडा</label>
+                                <select name="nagar_parishad_name" id="exist_sel_np"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="exist_grp_npt" style="display:none;">
+                                <label>नगरपंचायत निवडा</label>
+                                <select name="nagar_panchayat_name" id="exist_sel_npt"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="exist_grp_gp" style="display:none;">
+                                <label>ग्रामपंचायत गाव व प्रभाग</label>
+                                <input list="gp_list" name="gram_panchayat_name" placeholder="गाव किंवा प्रभाग टाईप करा">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Biometrics & Enrolment -->
+                    <div class="panel-card form-col-right" style="justify-content: space-between;">
+                        <div>
+                            <div class="panel-title">
+                                ३. बायोमेट्रिक छायाचित्र व पडताळणी
+                            </div>
+                            <div class="video-wrap">
+                                <video class="video-feed" id="exist_video" autoplay playsinline muted></video>
+                                <img class="preview-img" id="exist_preview_img" alt="Captured Photo">
+                            </div>
+                            <p class="cam-hint">कॅमेऱ्याकडे थेट पहा. व्यवस्थित प्रकाश असल्याची खात्री करा.</p>
+                            <div id="exist_photo_status" class="status-badge status-wait">⚠️ कृपया थेट छायाचित्र कॅप्चर करा</div>
+
+                            <button type="button" class="btn-capture" id="exist_btn_capture" onclick="captureExistPhoto()">
+                                📷 Capture Live Photo
+                            </button>
+                            <button type="button" class="btn-retake" id="exist_btn_retake" onclick="retakeExistPhoto()">
+                                ↺ Retake Photo
+                            </button>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <input type="hidden" name="photo" id="exist_photo_input">
+                            <button type="submit" class="btn-submit btn-submit-existing" id="exist_btn_submit">
+                                ✓ Complete Existing Voter Enrolment & Issue Card
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             TAB 2: FIRST-TIME APPLICANTS (FORM 6 + UPLOAD + ERO APPROVAL)
+             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="tab-panel" id="panel-form6">
+            
+            <!-- ECI Form 6 Banner -->
+            <div class="form6-banner">
+                <div class="form6-banner-left">
+                    <div class="form6-icon-box">६</div>
+                    <div>
+                        <div class="form6-title">
+                            <span>FORM 6 — Application Form for First-Time New Voter Registration</span>
+                            <span style="font-size:11px; background:#dbeafe; color:#1e40af; border:1px solid #93c5fd; padding:2px 8px; border-radius:9999px; font-weight:800;">Forwarded to ERO</span>
+                        </div>
+                        <div class="form6-desc">
+                            नवीन मतदारांसाठी अर्ज (नमुना क्र. ६) • Exclusively for citizens with NO existing Voter ID. Forwarded to Constituency ERO for approval.
+                        </div>
                     </div>
                 </div>
-
+                <a href="https://voters.eci.gov.in/" target="_blank" rel="noopener noreferrer" class="form6-eci-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Official ECI Portal (voters.eci.gov.in)
+                </a>
             </div>
-        </form>
+
+            <form id="form-form6" onsubmit="return handleForm6Submit(event)" enctype="multipart/form-data">
+                <input type="hidden" name="reg_type" value="first_time">
+                <div class="form-grid-layout">
+                    
+                    <!-- Column 1: Personal & Relative Details -->
+                    <div class="panel-card">
+                        <div class="panel-title">
+                            १. नवीन मतदाराचा तपशील (Form 6 Details)
+                        </div>
+
+                        <div style="background:rgba(37,99,235,0.06); border:1px solid #bfdbfe; border-radius:12px; padding:10px 14px; font-size:12px; color:#1e40af; display:flex; align-items:center; gap:8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <span>Official EPIC / Voter ID Number will be assigned by the Constituency ERO upon statutory verification.</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>First Name / नाव <span class="req">*</span></label>
+                                <input type="text" id="f6_first_name" placeholder="First Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                            <div>
+                                <label>Surname / आडनाव <span class="req">*</span></label>
+                                <input type="text" id="f6_last_name" placeholder="Surname" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>Relative Type / नाते <span class="req">*</span></label>
+                                <select name="relative_type" id="f6_relative_type">
+                                    <option value="Father">Father / वडील</option>
+                                    <option value="Mother">Mother / आई</option>
+                                    <option value="Husband">Husband / पती</option>
+                                    <option value="Legal Guardian">Legal Guardian / पालक</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Relative's Name / नाव <span class="req">*</span></label>
+                                <input type="text" name="relative_name" id="f6_father_name" placeholder="Relative's Full Name" required oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                        </div>
+                        <input type="hidden" name="name" id="f6_full_name_hidden">
+
+                        <div class="form-row">
+                            <div>
+                                <label>Gender / लिंग <span class="req">*</span></label>
+                                <select name="gender" id="f6_gender">
+                                    <option value="Male">Male / पुरुष</option>
+                                    <option value="Female">Female / महिला</option>
+                                    <option value="Other">Third Gender / इतर</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Date of Birth / जन्म तारीख <span class="req">*</span></label>
+                                <input type="date" name="dob" id="f6_dob" required>
+                            </div>
+                        </div>
+                        <div id="f6_dob_error" style="color:#ef4444;font-size:11.5px;display:none;font-weight:700;">⚠️ You must be 18 years of age or older to register.</div>
+
+                        <div>
+                            <label>Self-Attested Proof of Date of Birth (वयाचा पुरावा)</label>
+                            <select name="dob_proof_type" id="f6_dob_proof_type">
+                                <option value="Aadhaar Card">Aadhaar Card (आधार कार्ड)</option>
+                                <option value="Birth Certificate">Birth Certificate (जन्म दाखला)</option>
+                                <option value="PAN Card">PAN Card (पॅन कार्ड)</option>
+                                <option value="Driving License">Driving License (वाहन चालक परवाना)</option>
+                                <option value="Indian Passport">Indian Passport (पासपोर्ट)</option>
+                                <option value="Class 10th / 12th Certificate">Class 10th / 12th Certificate (१० वी प्रमाणपत्र)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>Mobile No. / भ्रमणध्वनी <span class="req">*</span></label>
+                                <input type="tel" name="mobile" id="f6_mobile" placeholder="10-digit Mobile" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+                            </div>
+                            <div>
+                                <label>Email ID / ईमेल (Optional)</label>
+                                <input type="email" name="email" id="f6_email" placeholder="example@gmail.com">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>Aadhaar Number / आधार क्रमांक</label>
+                            <input type="text" name="aadhaar_no" id="f6_aadhaar_no" placeholder="12-digit Aadhaar (उदा. 1234 5678 9012)" maxlength="14" oninput="formatAadhaar(this)">
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Constituency, Address & Local Body -->
+                    <div class="panel-card">
+                        <div class="panel-title">
+                            २. मतदारसंघ, पत्ता व स्थानिक संस्था (Jurisdiction)
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>Home District / जिल्हा (३६) <span class="req">*</span></label>
+                                <input type="text" class="search-box" placeholder="जिल्हा शोधा..." oninput="filterDropdown('f6_district', this.value); onF6DistrictSelect();">
+                                <select name="district" id="f6_district" onchange="onF6DistrictSelect()" required>
+                                    <option value="">-- जिल्हा निवडा --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Assembly Constituency <span class="req">*</span></label>
+                                <input type="text" class="search-box" placeholder="मतदारसंघ शोधा..." oninput="filterDropdown('f6_constituency', this.value);">
+                                <select name="constituency" id="f6_constituency" required>
+                                    <option value="">-- मतदारसंघ निवडा --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>House / Building No & Street (घर क्र. व रस्ता) <span class="req">*</span></label>
+                            <input type="text" name="address_line" id="f6_address_line" placeholder="House/Flat No, Apartment, Street / Locality" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label>Town / Village / गाव / शहर <span class="req">*</span></label>
+                                <input type="text" name="taluka" id="f6_taluka" placeholder="Town / Village" required>
+                            </div>
+                            <div>
+                                <label>PIN Code / पिन कोड <span class="req">*</span></label>
+                                <input type="text" name="pincode" id="f6_pincode" placeholder="6-digit PIN" maxlength="6" required oninput="this.value=this.value.replace(/\D/g,'')">
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+                            <label style="margin-bottom: 6px;">स्थानिक स्वराज्य संस्था (Local Self-Government):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_mnc" name="mnc" onchange="toggleF6LocalBodyFields()" checked> महानगरपालिका</label>
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_zp" name="zp" onchange="toggleF6LocalBodyFields()" checked> जिल्हा परिषद</label>
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_ps" name="ps" onchange="toggleF6LocalBodyFields()" checked> पंचायत समिती</label>
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_np" name="np" onchange="toggleF6LocalBodyFields()"> नगरपालिका</label>
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_npt" name="npt" onchange="toggleF6LocalBodyFields()"> नगरपंचायत</label>
+                                <label class="checkbox-item"><input type="checkbox" id="f6_chk_gp" name="gp" onchange="toggleF6LocalBodyFields()"> ग्रामपंचायत</label>
+                            </div>
+                        </div>
+
+                        <div class="local-bodies-wrap">
+                            <div id="f6_grp_mnc">
+                                <label>महानगरपालिका निवडा</label>
+                                <select name="mahanagarpalika_name" id="f6_sel_mnc"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="f6_grp_zp">
+                                <label>जिल्हा परिषद निवडा</label>
+                                <select name="zilha_parishad_name" id="f6_sel_zp"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="f6_grp_ps">
+                                <label>तालुका पंचायत समिती निवडा</label>
+                                <select name="panchayat_samiti_name" id="f6_sel_ps"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="f6_grp_np" style="display:none;">
+                                <label>नगरपालिका निवडा</label>
+                                <select name="nagar_parishad_name" id="f6_sel_np"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="f6_grp_npt" style="display:none;">
+                                <label>नगरपंचायत निवडा</label>
+                                <select name="nagar_panchayat_name" id="f6_sel_npt"><option value="">-- निवडा --</option></select>
+                            </div>
+                            <div id="f6_grp_gp" style="display:none;">
+                                <label>ग्रामपंचायत गाव व प्रभाग</label>
+                                <input list="gp_list" name="gram_panchayat_name" placeholder="गाव किंवा प्रभाग निवडा">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Form 6 Upload, Biometrics & ERO Routing -->
+                    <div class="panel-card form-col-right" style="justify-content: space-between;">
+                        <div style="display:flex; flex-direction:column; gap:14px;">
+                            <div class="panel-title">
+                                ३. नमुना ६ फाईल व छायाचित्र (Upload & Photo)
+                            </div>
+
+                            <!-- Form No. 6 Dedicated Upload Box -->
+                            <div>
+                                <label style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Upload Form No. 6 File (नमुना ६ फाईल)</span>
+                                    <span style="font-size:11px; color:#2563eb; font-weight:700;">PDF / JPG / PNG</span>
+                                </label>
+                                
+                                <div class="form6-upload-box" id="form6DropArea" onclick="document.getElementById('form6FileInput').click()">
+                                    <input type="file" id="form6FileInput" name="form6_upload" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleForm6FileSelect(this)">
+                                    <div class="form6-upload-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    </div>
+                                    <div class="form6-upload-title" id="form6UploadTitle">Click or Drag & Drop Form No. 6</div>
+                                    <div class="form6-upload-hint">Upload signed physical Form 6 / ECI acknowledgement (Max 15MB)</div>
+                                </div>
+
+                                <div class="form6-file-preview" id="form6FilePreview">
+                                    <span style="display:flex; align-items:center; gap:6px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                        <span id="form6FileName">form6.pdf</span>
+                                    </span>
+                                    <button type="button" onclick="clearForm6File(event)" style="background:none; border:none; color:#dc2626; font-weight:800; cursor:pointer; font-size:14px;">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Live Photo Capture -->
+                            <div>
+                                <label>Biometric Live Photo / छायाचित्र <span class="req">*</span></label>
+                                <div class="video-wrap">
+                                    <video class="video-feed" id="f6_video" autoplay playsinline muted></video>
+                                    <img class="preview-img" id="f6_preview_img" alt="Captured Photo">
+                                </div>
+                                <p class="cam-hint">कॅमेऱ्याकडे थेट पहा. व्यवस्थित प्रकाश असल्याची खात्री करा.</p>
+                                <div id="f6_photo_status" class="status-badge status-wait">⚠️ कृपया थेट छायाचित्र कॅप्चर करा</div>
+
+                                <button type="button" class="btn-capture" id="f6_btn_capture" onclick="captureF6Photo()">
+                                    📷 Capture Live Photo
+                                </button>
+                                <button type="button" class="btn-retake" id="f6_btn_retake" onclick="retakeF6Photo()">
+                                    ↺ Retake Photo
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <label style="font-size:11px; font-weight:600; color:#475569; display:flex; align-items:flex-start; gap:8px; cursor:pointer; margin-bottom:10px;">
+                                <input type="checkbox" required checked style="margin-top:2px; accent-color:#2563eb;">
+                                <span>I declare that I am a first-time applicant and have not applied for inclusion in any other constituency.</span>
+                            </label>
+
+                            <input type="hidden" name="photo" id="f6_photo_input">
+                            <button type="submit" class="btn-submit btn-submit-form6" id="f6_btn_submit">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                Submit Form 6 to Constituency ERO
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
     </div>
 
+    <!-- Datalist for Gram Panchayats -->
+    <datalist id="gp_list"></datalist>
+
 <script>
-    // ── DOB Age >= 18 check ──
-    const dobInput = document.getElementById('dob');
-    const dobError = document.getElementById('dob-error');
-    dobInput.addEventListener('change', function() {
-        if (!this.value) return;
-        const dob = new Date(this.value);
-        const today = new Date();
-        let age = today.getFullYear() - dob.getFullYear();
-        const m = today.getMonth() - dob.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-        if (age < 18) {
-            dobError.style.display = 'block';
-            this.setCustomValidity('Must be 18+');
-        } else {
-            dobError.style.display = 'none';
-            this.setCustomValidity('');
+    // ── Tab Mode Switcher ──
+    function switchRegistrationMode(mode) {
+        document.querySelectorAll('.mode-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+        document.getElementById('tabBtn-' + mode).classList.add('active');
+        document.getElementById('panel-' + mode).classList.add('active');
+
+        // Initialize camera for the active tab
+        initCameraForMode(mode);
+    }
+
+    // ── Aadhaar Formatting (XXXX XXXX XXXX) ──
+    function formatAadhaar(el) {
+        let val = el.value.replace(/\D/g, '').substring(0, 12);
+        let formatted = '';
+        for (let i = 0; i < val.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += val[i];
         }
-    });
+        el.value = formatted;
+    }
 
-    // ── Voter ID Duplicate Real-time Check ──
-    let vidTimer = null;
-    document.getElementById('v_id').addEventListener('input', function() {
-        clearTimeout(vidTimer);
-        const val = this.value.trim();
-        const statusDiv = document.getElementById('vid-status');
-        if (val.length < 4) {
-            statusDiv.style.display = 'none';
-            return;
-        }
-        vidTimer = setTimeout(() => {
-            fetch('/check_voter_id?v_id=' + encodeURIComponent(val))
-                .then(r => r.json())
-                .then(d => {
-                    if (d.exists) {
-                        statusDiv.className = 'status-badge status-err';
-                        statusDiv.style.display = 'block';
-                        statusDiv.innerText = d.message || '️ Voter ID already registered!';
-                    } else {
-                        statusDiv.className = 'status-badge status-ok';
-                        statusDiv.style.display = 'block';
-                        statusDiv.innerText = 'Voter ID is available';
-                    }
-                })
-                .catch(() => {});
-        }, 400);
-    });
+    // ── Form 6 File Upload Drag/Drop & Browse ──
+    const dropArea = document.getElementById('form6DropArea');
+    const fileInput = document.getElementById('form6FileInput');
+    const filePreview = document.getElementById('form6FilePreview');
+    const fileNameSpan = document.getElementById('form6FileName');
+    const uploadTitle = document.getElementById('form6UploadTitle');
 
-    // ── WebCam Photo Capture ──
-    const video = document.getElementById('video');
-    const previewImg = document.getElementById('preview-img');
-    const photoInput = document.getElementById('photo_input');
-    const photoStatus = document.getElementById('photo-status');
-    const btnCapture = document.getElementById('btn-capture');
-    const btnRetake = document.getElementById('btn-retake');
-
-    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
-        .then(stream => { video.srcObject = stream; })
-        .catch(err => {
-            photoStatus.className = 'status-badge status-err';
-            photoStatus.innerText = 'Camera access error: ' + err.message;
+    if (dropArea) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropArea.classList.add('dragover');
+            }, false);
         });
 
-    function capturePhoto() {
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropArea.classList.remove('dragover');
+            }, false);
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                fileInput.files = files;
+                handleForm6FileSelect(fileInput);
+            }
+        });
+    }
+
+    function handleForm6FileSelect(input) {
+        if (input.files && input.files[0]) {
+            const f = input.files[0];
+            const sizeMb = (f.size / (1024 * 1024)).toFixed(2);
+            fileNameSpan.textContent = `${f.name} (${sizeMb} MB)`;
+            filePreview.style.display = 'flex';
+            uploadTitle.textContent = 'Form No. 6 File Attached';
+        }
+    }
+
+    function clearForm6File(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        uploadTitle.textContent = 'Click or Drag & Drop Form No. 6';
+    }
+
+    // ── WebCam Video Stream Management ──
+    let activeStream = null;
+
+    function initCameraForMode(mode) {
+        const videoEl = mode === 'existing' ? document.getElementById('exist_video') : document.getElementById('f6_video');
+        if (!videoEl) return;
+
+        if (activeStream) {
+            videoEl.srcObject = activeStream;
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+            .then(stream => {
+                activeStream = stream;
+                document.getElementById('exist_video').srcObject = stream;
+                document.getElementById('f6_video').srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Camera access error:", err);
+            });
+    }
+
+    // ── Existing Voter Photo Capture ──
+    function captureExistPhoto() {
+        const video = document.getElementById('exist_video');
+        const preview = document.getElementById('exist_preview_img');
+        const photoInput = document.getElementById('exist_photo_input');
+        const status = document.getElementById('exist_photo_status');
+
         const canvas = document.createElement('canvas');
-        canvas.width = 640;
-        canvas.height = 480;
+        canvas.width = 640; canvas.height = 480;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, 640, 480);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
 
         photoInput.value = dataUrl;
-        previewImg.src = dataUrl;
+        preview.src = dataUrl;
         video.style.display = 'none';
-        previewImg.style.display = 'block';
+        preview.style.display = 'block';
 
-        btnCapture.style.display = 'none';
-        btnRetake.style.display = 'block';
+        document.getElementById('exist_btn_capture').style.display = 'none';
+        document.getElementById('exist_btn_retake').style.display = 'block';
 
-        photoStatus.className = 'status-badge status-ok';
-        photoStatus.innerText = 'Photo captured successfully';
+        status.className = 'status-badge status-ok';
+        status.innerText = '✓ Photo captured successfully';
     }
 
-    function retakePhoto() {
-        photoInput.value = '';
-        previewImg.style.display = 'none';
-        video.style.display = 'block';
+    function retakeExistPhoto() {
+        document.getElementById('exist_photo_input').value = '';
+        document.getElementById('exist_preview_img').style.display = 'none';
+        document.getElementById('exist_video').style.display = 'block';
+        document.getElementById('exist_btn_capture').style.display = 'block';
+        document.getElementById('exist_btn_retake').style.display = 'none';
+        const status = document.getElementById('exist_photo_status');
+        status.className = 'status-badge status-wait';
+        status.innerText = '⚠️ Please capture a photo before submitting';
+    }
 
-        btnCapture.style.display = 'block';
-        btnRetake.style.display = 'none';
+    // ── Form 6 Photo Capture ──
+    function captureF6Photo() {
+        const video = document.getElementById('f6_video');
+        const preview = document.getElementById('f6_preview_img');
+        const photoInput = document.getElementById('f6_photo_input');
+        const status = document.getElementById('f6_photo_status');
 
-        photoStatus.className = 'status-badge status-wait';
-        photoStatus.innerText = '️ Please capture a photo before submitting';
+        const canvas = document.createElement('canvas');
+        canvas.width = 640; canvas.height = 480;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 640, 480);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+        photoInput.value = dataUrl;
+        preview.src = dataUrl;
+        video.style.display = 'none';
+        preview.style.display = 'block';
+
+        document.getElementById('f6_btn_capture').style.display = 'none';
+        document.getElementById('f6_btn_retake').style.display = 'block';
+
+        status.className = 'status-badge status-ok';
+        status.innerText = '✓ Photo captured successfully';
+    }
+
+    function retakeF6Photo() {
+        document.getElementById('f6_photo_input').value = '';
+        document.getElementById('f6_preview_img').style.display = 'none';
+        document.getElementById('f6_video').style.display = 'block';
+        document.getElementById('f6_btn_capture').style.display = 'block';
+        document.getElementById('f6_btn_retake').style.display = 'none';
+        const status = document.getElementById('f6_photo_status');
+        status.className = 'status-badge status-wait';
+        status.innerText = '⚠️ Please capture a photo before submitting';
     }
 
     // ── Load 36 Districts of Maharashtra & Full Local Bodies Data ──
     let mahaDistricts = {};
     let districtLocalBodies = {};
 
-    function toggleLocalBodyFields() {
-        document.getElementById('grp_mnc').style.display = document.getElementById('chk_mnc').checked ? 'block' : 'none';
-        document.getElementById('grp_zp').style.display = document.getElementById('chk_zp').checked ? 'block' : 'none';
-        document.getElementById('grp_ps').style.display = document.getElementById('chk_ps').checked ? 'block' : 'none';
-        document.getElementById('grp_np').style.display = document.getElementById('chk_np').checked ? 'block' : 'none';
-        document.getElementById('grp_npt').style.display = document.getElementById('chk_npt').checked ? 'block' : 'none';
-        document.getElementById('grp_gp').style.display = document.getElementById('chk_gp').checked ? 'block' : 'none';
-    }
-
     function setDropdownOptions(selectId, items, placeholder) {
         const sel = document.getElementById(selectId);
         if (!sel) return;
-        
         const opts = [{ value: '', text: placeholder }];
-        (items || []).forEach(item => {
-            opts.push({ value: item, text: item });
-        });
+        (items || []).forEach(item => opts.push({ value: item, text: item }));
         sel._allOptions = opts;
         filterDropdown(selectId, '');
     }
@@ -711,18 +1208,15 @@
         const sel = document.getElementById(selectId);
         if (!sel || !sel._allOptions) return;
         const q = (query || '').toLowerCase().trim();
-        
         const currentVal = sel.value;
         sel.innerHTML = '';
-        
         const filtered = sel._allOptions.filter(opt => 
             !q || opt.text.toLowerCase().includes(q) || (opt.value && opt.value.toLowerCase().includes(q))
         );
-        
         if (filtered.length === 0) {
             const opt = document.createElement('option');
             opt.value = "";
-            opt.innerText = "-- Result Not Found / सापडले नाही --";
+            opt.innerText = "-- Result Not Found --";
             sel.appendChild(opt);
         } else {
             filtered.forEach(opt => {
@@ -735,140 +1229,328 @@
         }
     }
 
-    // Load Local Bodies & Districts
     Promise.all([
         fetch('/get_district_local_bodies').then(r => r.json()),
         fetch('/get_maharashtra_districts').then(r => r.json())
-    ]).then(([lbRes, distRes]) => {
-        if (lbRes.status === 'success' && lbRes.data) {
-            districtLocalBodies = lbRes.data;
-        }
-        if (distRes.status === 'success' && distRes.data) {
-            mahaDistricts = distRes.data;
-            const districtList = Object.keys(mahaDistricts);
-            setDropdownOptions('reg_district', districtList, '-- जिल्हा निवडा / Select District (36 Districts) --');
-            
-            // Default select Pune
-            const puneKey = districtList.find(k => k.toLowerCase().includes('pune')) || districtList[0];
-            if (puneKey) {
-                document.getElementById('reg_district').value = puneKey;
-                onDistrictSelect();
+    ]).then(([lbData, distData]) => {
+        if (lbData.status === 'success') districtLocalBodies = lbData.data || {};
+        if (distData.status === 'success') {
+            mahaDistricts = distData.data || {};
+            const distNames = Object.keys(mahaDistricts).sort();
+
+            // Populate both Existing and Form 6 district selects
+            ['exist_district', 'f6_district'].forEach(selId => {
+                const sel = document.getElementById(selId);
+                const opts = [{ value: '', text: '-- जिल्हा निवडा (36) --' }];
+                distNames.forEach(d => opts.push({ value: d, text: d }));
+                sel._allOptions = opts;
+                filterDropdown(selId, '');
+            });
+
+            // Default to Pune
+            if (mahaDistricts['Pune']) {
+                document.getElementById('exist_district').value = 'Pune';
+                document.getElementById('f6_district').value = 'Pune';
+                onExistDistrictSelect();
+                onF6DistrictSelect();
             }
         }
-    }).catch(err => console.log("Data load error:", err));
+    }).catch(err => console.error("Regional data load note:", err));
 
-    function onDistrictSelect() {
-        const selectedDistrict = document.getElementById('reg_district').value;
-        const distData = districtLocalBodies[selectedDistrict] || {};
-        const distNameShort = selectedDistrict ? selectedDistrict.split('(')[0].trim() : '';
-
-        // 1. Update Constituencies for Selected District
-        const consts = mahaDistricts[selectedDistrict] || [];
-        setDropdownOptions('reg_constituency', consts, '-- मतदारसंघ निवडा / Select Constituency --');
-        if (consts.length > 0) {
-            document.getElementById('reg_constituency').value = consts[0];
-        }
-
-        // 2. District-wise Panchayat Samitis (351 Total)
-        const psList = distData.panchayat_samiti || [];
-        const psPlaceholder = psList.length 
-            ? `-- ${distNameShort} पंचायत समित्या (${psList.length} उपलब्ध) --`
-            : '-- तालुका पंचायत समिती निवडा --';
-        setDropdownOptions('sel_ps', psList, psPlaceholder);
-        if (psList.length > 0) document.getElementById('sel_ps').value = psList[0];
-
-        // 3. District-wise Nagar Parishads (Municipal Councils)
-        const npList = distData.nagar_parishad || [];
-        const npPlaceholder = npList.length
-            ? `-- ${distNameShort} नगरपालिका / नगरपरिषद (${npList.length} उपलब्ध) --`
-            : '-- नगरपालिका / नगरपरिषद निवडा --';
-        setDropdownOptions('sel_np', npList, npPlaceholder);
-        if (npList.length > 0) document.getElementById('sel_np').value = npList[0];
-
-        // 4. District-wise Nagar Panchayats
-        const nptList = distData.nagar_panchayat || [];
-        const nptPlaceholder = nptList.length
-            ? `-- ${distNameShort} नगरपंचायती (${nptList.length} उपलब्ध) --`
-            : '-- नगरपंचायत निवडा --';
-        setDropdownOptions('sel_npt', nptList, nptPlaceholder);
-        if (nptList.length > 0) document.getElementById('sel_npt').value = nptList[0];
-
-        // 5. District-wise Mahanagarpalika (Municipal Corporations)
-        const mncList = distData.mahanagarpalika || [];
-        const allMnc = [];
-        Object.values(districtLocalBodies).forEach(d => {
-            (d.mahanagarpalika || []).forEach(m => { if (!allMnc.includes(m)) allMnc.push(m); });
-        });
-        const mncToDisplay = mncList.length ? mncList : allMnc;
-        const mncPlaceholder = mncList.length
-            ? `-- ${distNameShort} महानगरपालिका (${mncList.length}) --`
-            : '-- महानगरपालिका निवडा (२९ शहरे) --';
-        setDropdownOptions('sel_mnc', mncToDisplay, mncPlaceholder);
-        if (mncList.length > 0) document.getElementById('sel_mnc').value = mncList[0];
-
-        // 6. District-wise Zilha Parishad
-        const zpList = distData.zilha_parishad || [];
-        const allZp = [];
-        Object.values(districtLocalBodies).forEach(d => {
-            (d.zilha_parishad || []).forEach(z => { if (!allZp.includes(z)) allZp.push(z); });
-        });
-        setDropdownOptions('sel_zp', zpList.length ? zpList : allZp, '-- जिल्हा परिषद निवडा (36 Zilha Parishads) --');
-        if (zpList.length > 0) document.getElementById('sel_zp').value = zpList[0];
-
-        // 7. District-wise Gram Panchayats Datalist & Search
-        const gpList = distData.gram_panchayat || [];
-        const datalist = document.getElementById('gp_list');
-        if (datalist) {
-            datalist.innerHTML = gpList.map(g => `<option value="${g}">`).join('');
-        }
+    // ── Existing Tab Local Bodies & Constituency Handler ──
+    function toggleExistLocalBodyFields() {
+        document.getElementById('exist_grp_mnc').style.display = document.getElementById('exist_chk_mnc').checked ? 'block' : 'none';
+        document.getElementById('exist_grp_zp').style.display = document.getElementById('exist_chk_zp').checked ? 'block' : 'none';
+        document.getElementById('exist_grp_ps').style.display = document.getElementById('exist_chk_ps').checked ? 'block' : 'none';
+        document.getElementById('exist_grp_np').style.display = document.getElementById('exist_chk_np').checked ? 'block' : 'none';
+        document.getElementById('exist_grp_npt').style.display = document.getElementById('exist_chk_npt').checked ? 'block' : 'none';
+        document.getElementById('exist_grp_gp').style.display = document.getElementById('exist_chk_gp').checked ? 'block' : 'none';
     }
 
-    // ── Submit Form Handler ──
-    document.getElementById('regForm').onsubmit = async function(e) {
+    function onExistDistrictSelect() {
+        const distName = document.getElementById('exist_district').value;
+        const constSelect = document.getElementById('exist_constituency');
+        if (!distName || !mahaDistricts[distName]) {
+            constSelect._allOptions = [{ value: '', text: '-- प्रथम जिल्हा निवडा --' }];
+            filterDropdown('exist_constituency', '');
+            return;
+        }
+        const constituencies = mahaDistricts[distName] || [];
+        const constOpts = [{ value: '', text: `-- ${distName} मतदारसंघ (${constituencies.length}) --` }];
+        constituencies.forEach(c => constOpts.push({ value: c, text: c }));
+        constSelect._allOptions = constOpts;
+        filterDropdown('exist_constituency', '');
+        if (constituencies.length > 0) constSelect.value = constituencies[0];
+
+        const distData = districtLocalBodies[distName] || {};
+        const distShort = distName.replace(' District', '');
+        setDropdownOptions('exist_sel_ps', distData.panchayat_samiti || [], `-- ${distShort} पंचायत समिती --`);
+        setDropdownOptions('exist_sel_np', distData.nagar_parishad || [], `-- ${distShort} नगरपालिका --`);
+        setDropdownOptions('exist_sel_npt', distData.nagar_panchayat || [], `-- ${distShort} नगरपंचायत --`);
+        
+        const mncList = distData.mahanagarpalika || [];
+        setDropdownOptions('exist_sel_mnc', mncList, mncList.length ? `-- ${distShort} महानगरपालिका --` : '-- महानगरपालिका निवडा --');
+        setDropdownOptions('exist_sel_zp', distData.zilha_parishad || [], '-- जिल्हा परिषद --');
+    }
+
+    // ── Form 6 Tab Local Bodies & Constituency Handler ──
+    function toggleF6LocalBodyFields() {
+        document.getElementById('f6_grp_mnc').style.display = document.getElementById('f6_chk_mnc').checked ? 'block' : 'none';
+        document.getElementById('f6_grp_zp').style.display = document.getElementById('f6_chk_zp').checked ? 'block' : 'none';
+        document.getElementById('f6_grp_ps').style.display = document.getElementById('f6_chk_ps').checked ? 'block' : 'none';
+        document.getElementById('f6_grp_np').style.display = document.getElementById('f6_chk_np').checked ? 'block' : 'none';
+        document.getElementById('f6_grp_npt').style.display = document.getElementById('f6_chk_npt').checked ? 'block' : 'none';
+        document.getElementById('f6_grp_gp').style.display = document.getElementById('f6_chk_gp').checked ? 'block' : 'none';
+    }
+
+    function onF6DistrictSelect() {
+        const distName = document.getElementById('f6_district').value;
+        const constSelect = document.getElementById('f6_constituency');
+        if (!distName || !mahaDistricts[distName]) {
+            constSelect._allOptions = [{ value: '', text: '-- प्रथम जिल्हा निवडा --' }];
+            filterDropdown('f6_constituency', '');
+            return;
+        }
+        const constituencies = mahaDistricts[distName] || [];
+        const constOpts = [{ value: '', text: `-- ${distName} मतदारसंघ (${constituencies.length}) --` }];
+        constituencies.forEach(c => constOpts.push({ value: c, text: c }));
+        constSelect._allOptions = constOpts;
+        filterDropdown('f6_constituency', '');
+        if (constituencies.length > 0) constSelect.value = constituencies[0];
+
+        const distData = districtLocalBodies[distName] || {};
+        const distShort = distName.replace(' District', '');
+        setDropdownOptions('f6_sel_ps', distData.panchayat_samiti || [], `-- ${distShort} पंचायत समिती --`);
+        setDropdownOptions('f6_sel_np', distData.nagar_parishad || [], `-- ${distShort} नगरपालिका --`);
+        setDropdownOptions('f6_sel_npt', distData.nagar_panchayat || [], `-- ${distShort} नगरपंचायत --`);
+        
+        const mncList = distData.mahanagarpalika || [];
+        setDropdownOptions('f6_sel_mnc', mncList, mncList.length ? `-- ${distShort} महानगरपालिका --` : '-- महानगरपालिका निवडा --');
+        setDropdownOptions('f6_sel_zp', distData.zilha_parishad || [], '-- जिल्हा परिषद --');
+
+        const gpList = distData.gram_panchayat_sample || [];
+        const datalist = document.getElementById('gp_list');
+        if (datalist) datalist.innerHTML = gpList.map(g => `<option value="${g}">`).join('');
+    }
+
+    // ── Voter ID Real-Time Checks ──
+    let existVidTimer = null;
+    document.getElementById('exist_vid').addEventListener('input', function() {
+        clearTimeout(existVidTimer);
+        const val = this.value.trim();
+        const statusDiv = document.getElementById('exist_vid_status');
+        if (val.length < 4) { statusDiv.style.display = 'none'; return; }
+        existVidTimer = setTimeout(() => {
+            fetch('/check_voter_id?v_id=' + encodeURIComponent(val))
+                .then(r => r.json())
+                .then(d => {
+                    if (d.exists) {
+                        statusDiv.className = 'status-badge status-err';
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerText = d.message || '⚠️ Voter ID already registered!';
+                    } else {
+                        statusDiv.className = 'status-badge status-ok';
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerText = '✓ Voter ID available for enrolment';
+                    }
+                });
+        }, 400);
+    });
+
+    // ── Submit Existing Voter Form ──
+    async function handleExistingSubmit(e) {
         e.preventDefault();
-
-        // Validate Full Name
-        const fn = document.getElementById('first_name').value.trim();
-        const ln = document.getElementById('last_name').value.trim();
-        const fa = document.getElementById('father_name').value.trim();
+        const fn = document.getElementById('exist_first_name').value.trim();
+        const ln = document.getElementById('exist_last_name').value.trim();
+        const fa = document.getElementById('exist_father_name').value.trim();
         if (!fn || !ln || !fa) {
-            alert('Please fill out all First Name, Last Name and Father/Husband Name fields.');
-            return;
+            alert('Please fill out First Name, Surname and Father/Husband Name.');
+            return false;
         }
-        document.getElementById('full_name_hidden').value = `${fn} ${fa} ${ln}`;
+        document.getElementById('exist_full_name_hidden').value = `${fn} ${fa} ${ln}`;
 
-        // Validate Photo Captured
-        if (!photoInput.value) {
-            alert('Please capture a biometric photo before submitting.');
-            return;
+        if (!document.getElementById('exist_photo_input').value) {
+            alert('Please capture a live biometric photo before submitting.');
+            return false;
         }
 
-        const btnSubmit = document.getElementById('btn-submit');
-        btnSubmit.disabled = true;
-        btnSubmit.innerText = 'Processing Registration & Encrypting QR...';
+        const btn = document.getElementById('exist_btn_submit');
+        btn.disabled = true;
+        btn.innerHTML = 'Enrolling Existing Voter & Generating Certified Pass...';
 
-        const formData = new FormData(this);
-
+        const formData = new FormData(document.getElementById('form-existing'));
         try {
-            const resp = await fetch('/register', {
-                method: 'POST',
-                body: formData
-            });
+            const resp = await fetch('/register', { method: 'POST', body: formData });
             const data = await resp.json();
-
             if (data.status === 'Success') {
                 window.location.href = '/success/' + data.v_id;
             } else {
-                alert('Registration Blocked: ' + (data.message || 'Registration failed'));
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Complete Voter Registration';
+                alert('Enrolment Blocked: ' + (data.message || 'Failed'));
+                btn.disabled = false;
+                btn.innerHTML = '✓ Complete Existing Voter Enrolment & Issue Card';
             }
         } catch (err) {
-            alert('Server error. Please check server connection.');
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = 'Complete Voter Registration';
+            alert('Server error: ' + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '✓ Complete Existing Voter Enrolment & Issue Card';
         }
-    };
+        return false;
+    }
+
+    // ── Submit Form 6 First-Time Voter Form ──
+    async function handleForm6Submit(e) {
+        e.preventDefault();
+        const fn = document.getElementById('f6_first_name').value.trim();
+        const ln = document.getElementById('f6_last_name').value.trim();
+        const fa = document.getElementById('f6_father_name').value.trim();
+        if (!fn || !ln || !fa) {
+            alert('Please fill out First Name, Surname and Relative Name.');
+            return false;
+        }
+        document.getElementById('f6_full_name_hidden').value = `${fn} ${fa} ${ln}`;
+
+        if (!document.getElementById('f6_photo_input').value) {
+            alert('Please capture a live biometric photo before submitting.');
+            return false;
+        }
+
+        const btn = document.getElementById('f6_btn_submit');
+        btn.disabled = true;
+        btn.innerHTML = 'Submitting Form 6 & Routing to Constituency ERO...';
+
+        const formData = new FormData(document.getElementById('form-form6'));
+        try {
+            const resp = await fetch('/register', { method: 'POST', body: formData });
+            const data = await resp.json();
+            if (data.status === 'Success') {
+                window.location.href = '/success/' + data.v_id;
+            } else {
+                alert('Form 6 Submission Blocked: ' + (data.message || 'Failed'));
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit Form 6 to Constituency ERO';
+            }
+        } catch (err) {
+            alert('Server error: ' + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit Form 6 to Constituency ERO';
+        }
+        return false;
+    }
+
+    // ── Init on page load ──
+    window.addEventListener('DOMContentLoaded', () => {
+        initCameraForMode('existing');
+    });
+
+    /* Universal Change Password Logic */
+    function openChangePasswordModal() {
+        document.getElementById('changePasswordModal').style.display = 'flex';
+        document.getElementById('pwdAlertBox').style.display = 'none';
+        document.getElementById('formChangePassword').reset();
+    }
+
+    function closeChangePasswordModal() {
+        document.getElementById('changePasswordModal').style.display = 'none';
+    }
+
+    async function submitChangePassword(e) {
+        e.preventDefault();
+        const cur = document.getElementById('cp_current_pwd').value;
+        const nxt = document.getElementById('cp_new_pwd').value;
+        const conf = document.getElementById('cp_confirm_pwd').value;
+        const alertBox = document.getElementById('pwdAlertBox');
+        const btn = document.getElementById('btnSubmitChangePwd');
+
+        if (nxt !== conf) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#fef2f2';
+            alertBox.style.color = '#dc2626';
+            alertBox.style.border = '1px solid #fecaca';
+            alertBox.innerText = '⚠️ New password and confirm password do not match.';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = 'Saving...';
+
+        try {
+            const resp = await fetch('/api/change_password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    current_password: cur,
+                    new_password: nxt,
+                    confirm_password: conf
+                })
+            });
+            const res = await resp.json();
+
+            alertBox.style.display = 'block';
+            if (res.status === 'success') {
+                alertBox.style.background = '#f0fdf4';
+                alertBox.style.color = '#15803d';
+                alertBox.style.border = '1px solid #bbf7d0';
+                alertBox.innerText = '✅ ' + (res.message || 'Password changed successfully!');
+                setTimeout(() => { closeChangePasswordModal(); }, 1600);
+            } else {
+                alertBox.style.background = '#fef2f2';
+                alertBox.style.color = '#dc2626';
+                alertBox.style.border = '1px solid #fecaca';
+                alertBox.innerText = '❌ ' + (res.message || 'Failed to update password.');
+            }
+        } catch (err) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#fef2f2';
+            alertBox.style.color = '#dc2626';
+            alertBox.style.border = '1px solid #fecaca';
+            alertBox.innerText = '❌ Network error: ' + err.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Save Password';
+        }
+    }
 </script>
+
+<!-- UNIVERSAL CHANGE PASSWORD MODAL -->
+<div id="changePasswordModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.7); backdrop-filter:blur(10px); z-index:99999; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;">
+    <div style="background:#ffffff; color:#0f172a; width:100%; max-width:440px; border-radius:24px; padding:32px 28px; box-shadow:0 25px 60px -15px rgba(0,0,0,0.3); border:1.5px solid #e2e8f0; position:relative;">
+        <button type="button" onclick="closeChangePasswordModal()" style="position:absolute; top:18px; right:18px; background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; font-size:16px; font-weight:800; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">✕</button>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="width:46px; height:46px; border-radius:14px; background:#eff6ff; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid #bfdbfe;">
+                🔒
+            </div>
+            <div>
+                <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin-bottom:2px;">Change Password</h3>
+                <p style="font-size:12px; color:#64748b;">Update your Registration Officer password</p>
+            </div>
+        </div>
+
+        <div id="pwdAlertBox" style="display:none; padding:10px 14px; border-radius:10px; font-size:12.5px; font-weight:600; margin-bottom:16px;"></div>
+
+        <form id="formChangePassword" onsubmit="submitChangePassword(event)">
+            <div style="margin-bottom:14px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Current Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_current_pwd" required placeholder="Enter current password" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:14px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">New Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_new_pwd" minlength="6" required placeholder="At least 6 characters" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:20px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Confirm New Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_confirm_pwd" minlength="6" required placeholder="Re-enter new password" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" onclick="closeChangePasswordModal()" style="padding:10px 18px; border-radius:10px; border:1.5px solid #cbd5e1; background:#f8fafc; color:#475569; font-weight:700; font-size:13px; cursor:pointer;">Cancel</button>
+                <button type="submit" id="btnSubmitChangePwd" style="padding:10px 20px; border-radius:10px; border:none; background:linear-gradient(135deg, #1d4ed8, #1e40af); color:#ffffff; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 14px rgba(29,78,216,0.3);">Save Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>

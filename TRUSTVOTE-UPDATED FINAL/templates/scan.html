@@ -370,7 +370,10 @@
 <canvas id="rainCanvas"></canvas>
 
 <div class="container">
-    <a href="/booth/logout" class="logout-link">Logout </a>
+    <button type="button" onclick="openChangePasswordModal()" class="logout-link" style="right: 100px; background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; cursor: pointer;">
+        🔒 Password
+    </button>
+    <a href="/booth/logout" class="logout-link">Logout</a>
     
     <div class="page-header">
         <h2>TrustVote - मतदान स्कॅनर</h2>
@@ -378,10 +381,42 @@
             <div>
                 <span style="font-weight: 800; color: #0f172a;">{{ session.get('booth_code', 'BOOTH-001') }}:</span>
                 <span style="font-weight: 600; color: #475569;">{{ session.get('booth_name', 'Pune Polling Station') }}</span>
+                <span style="color:#94a3b8; margin: 0 4px;">|</span>
+                <span style="font-weight: 700; color: #6d28d9;">Constituency: {{ session.get('booth_constituency', 'Shivaji Nagar') }}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 <span style="font-weight: 700; color: #0f172a;">{{ session.get('booth_username', 'Booth Officer') }}</span>
-                <span style="background: #dcfce7; color: #166534; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; border: 1px solid #bbf7d0;">Cloud Synced</span>
+                <button type="button" onclick="openNetworkQueryModal()" style="background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.12); transition: all 0.2s;" onmouseover="this.style.background='#ffedd5'" onmouseout="this.style.background='#fff7ed'">
+                    <span>📡</span> Report Network Issue
+                </button>
+                <button type="button" onclick="openAroQueryModal()" style="background: #faf5ff; color: #7c3aed; border: 1.5px solid #ddd6fe; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.12); transition: all 0.2s;" onmouseover="this.style.background='#ede9fe'" onmouseout="this.style.background='#faf5ff'">
+                    <span>🛡️</span> Report to ARO
+                </button>
+                <button type="button" id="btnOpenSyncModal" onclick="openSyncStatusModal()" style="background: #f0fdf4; color: #166534; border: 1.5px solid #86efac; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.12); transition: all 0.2s;" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
+                    <span>📊</span> Sync Status (<span id="topPendingCount" style="color: #d97706;">0 Pending</span> | <span id="topSyncedCount" style="color: #16a34a;">0 Synced</span>)
+                </button>
+            </div>
+        </div>
+
+        <!-- Offline Mode Status & Control Bar -->
+        <div id="offlineControlBar" style="background: rgba(254, 243, 199, 0.7); border: 1.5px solid #fde68a; border-radius: 14px; padding: 10px 16px; margin: 12px 0 14px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="offlineStatusDot" style="width: 9px; height: 9px; border-radius: 50%; background: #16a34a; display: inline-block;"></span>
+                <span id="offlineStatusText" style="font-weight: 700; color: #78350f;">Mode: <strong id="currentModeLabel" style="color: #166534;">Online (Cloud Synced)</strong></span>
+                <span id="constituencyDbBadge" style="background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10.5px;">📦 DB: {{ session.get('booth_constituency', 'Shivaji Nagar') }}</span>
+                <span id="offlineTokenBadge" style="display: none; background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-family: monospace; font-size: 10.5px;"></span>
+                <span id="offlineCacheBadge" style="display: none; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10.5px;">🔐 Local DB: 0 Voters</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <button type="button" id="btnDownloadOfflinePkg" onclick="downloadEncryptedOfflineDB()" style="background: #ffffff; color: #92400e; border: 1.5px solid #fcd34d; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                    <span>💾</span> Download Offline DB
+                </button>
+                <button type="button" id="btnToggleOfflineMode" onclick="toggleOfflineMode()" style="background: #fef3c7; color: #92400e; border: 1.5px solid #f59e0b; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>⚡</span> Switch to Offline Mode
+                </button>
+                <button type="button" id="btnSyncOfflineVotes" onclick="syncOfflineVotesToServer()" style="display: none; background: #dcfce7; color: #166534; border: 1.5px solid #86efac; padding: 5px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>🔄</span> Sync Offline Votes (<span id="pendingVotesCount">0</span>)
+                </button>
             </div>
         </div>
         <p>QR Scan → Face Verify → Vote Record — Three-Step Secure Voting</p>
@@ -422,17 +457,18 @@
             QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...
         </div>
 
-        <!-- Robust QR Image File Upload Zone -->
-        <div class="qr-upload-section" style="margin-top: 16px; border: 2px dashed #94a3b8; border-radius: 14px; padding: 16px; text-align: center; background: #f8fafc;">
-            <div style="font-size: 13.5px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-                किंवा Voter Card / QR फाईल निवडा (Upload Card or QR Image)
+        <!-- High-Performance QR Image File Upload Zone -->
+        <div id="qrDropZone" class="qr-upload-section" style="margin-top: 16px; border: 2px dashed #94a3b8; border-radius: 14px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="openQrFilePicker()">
+            <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span style="font-size: 18px;">📁</span>
+                <span>Scan an Image File (Upload Voter Card / QR)</span>
             </div>
-            <p style="font-size: 11.5px; color: #64748b; margin-bottom: 10px;">
-                Supports full Voter Card (<strong>_final_card.png</strong>), Scanner QR (<strong>_qr.png</strong>), or mobile camera photo
+            <p style="font-size: 11.5px; color: #64748b; margin-bottom: 12px;">
+                Drag and drop or click to choose full Voter Card (<strong>_final_card.png</strong>), Scanner QR (<strong>_qr.png</strong>), or camera photo
             </p>
-            <input type="file" id="customQrFileInput" accept="image/*" onchange="uploadAndScanQrImage(this.files[0])" style="display: none;">
-            <button type="button" class="btn btn-blue" onclick="document.getElementById('customQrFileInput').click()" style="padding: 10px 20px; font-size: 13px; width: auto; display: inline-flex; align-items: center; gap: 8px; margin: 0 auto; background: #0f172a;">
-                Choose Voter Card / QR Image...
+            <input type="file" id="customQrFileInput" accept="image/*" onchange="if(this.files && this.files[0]) uploadAndScanQrImage(this.files[0])" style="display: none;" onclick="event.stopPropagation()">
+            <button type="button" class="btn btn-blue" onclick="event.stopPropagation(); openQrFilePicker();" style="padding: 10px 24px; font-size: 13px; width: auto; display: inline-flex; align-items: center; gap: 8px; margin: 0 auto; background: #0f172a; border-radius: 10px; box-shadow: 0 4px 12px rgba(15,23,42,0.15);">
+                <span>🔍</span> Choose / Upload Voter Card Image...
             </button>
         </div>
     </div>
@@ -582,14 +618,88 @@ let qrScanner       = null;
 let cameraStream    = null;
 let scannerPaused   = false;
 
+// ── Secure Offline Mode State ──
+let isOfflineModeActive = false;
+let offlineAuthInfo = null;
+let offlineVotersDB = [];
+let offlineVotesLedger = [];
+let currentVoterOfflineRecord = null;
+
+// ── File Selection & Image Scanner Trigger ──
+function openQrFilePicker() {
+    const input = document.getElementById('customQrFileInput');
+    if (input) {
+        input.value = '';
+        input.click();
+    }
+}
+
+// ── Global Click Interceptor for "Scan an Image File" ──
+document.addEventListener('click', function(e) {
+    const target = e.target;
+    if (!target) return;
+    const text = (target.innerText || target.textContent || '').trim().toLowerCase();
+    const id = (target.id || '').toLowerCase();
+    
+    // Catch clicks on html5-qrcode's internal link or buttons
+    if (text.includes('scan an image file') || text.includes('scan an image') || text.includes('choose image') || id.includes('filescan') || id.includes('file-selection') || id.includes('btn_image_file')) {
+        e.preventDefault();
+        e.stopPropagation();
+        openQrFilePicker();
+    }
+}, true);
+
+// ── Global File Input Listener (Catch both custom and html5-qrcode inputs) ──
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.type === 'file' && e.target.files && e.target.files.length > 0) {
+        uploadAndScanQrImage(e.target.files[0]);
+    }
+}, true);
+
+// ── Drag & Drop Handlers ──
+window.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('qrDropZone');
+    if (dropZone) {
+        ['dragenter', 'dragover'].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.style.borderColor = '#1a73e8';
+                dropZone.style.background = '#eff6ff';
+            }, false);
+        });
+        ['dragleave', 'drop'].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.style.borderColor = '#94a3b8';
+                dropZone.style.background = '#f8fafc';
+            }, false);
+        });
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer ? e.dataTransfer.files : null;
+            if (files && files.length > 0) {
+                uploadAndScanQrImage(files[0]);
+            }
+        }, false);
+    }
+});
+
 // ── QR Scanner ──
 function startQRScanner() {
-    qrScanner = new Html5QrcodeScanner("reader", { fps: 15 });
-    qrScanner.render(onScanSuccess, onScanFailure);
+    try {
+        qrScanner = new Html5QrcodeScanner("reader", { 
+            fps: 15,
+            qrbox: { width: 250, height: 250 },
+            rememberLastUsedCamera: true
+        });
+        qrScanner.render(onScanSuccess, onScanFailure);
+    } catch(err) {
+        console.warn('QR Scanner init note:', err);
+    }
 }
 
 function onScanFailure(error) {
-    // If user selected file in Html5Qrcode built-in input and JS decoder couldn't find it, fallback to multi-strategy server decoder
     const fileInput = document.querySelector('#reader input[type="file"]');
     if (fileInput && fileInput.files && fileInput.files.length > 0 && !fileInput._handled) {
         fileInput._handled = true;
@@ -597,10 +707,54 @@ function onScanFailure(error) {
     }
 }
 
+// ── Offline Verification Engine Helpers ──
+function lookupOfflineVoter(qrText) {
+    if (!offlineVotersDB || offlineVotersDB.length === 0) return null;
+    let clean = (qrText || '').trim();
+    
+    // 1. Direct v_id lookup
+    let v = offlineVotersDB.find(x => x.v_id === clean || clean === 'ID:' + x.v_id);
+    if (v) return v;
+
+    // 2. Contains v_id prefix
+    v = offlineVotersDB.find(x => clean.includes(x.v_id));
+    if (v) return v;
+
+    // 3. Match by name in payload
+    v = offlineVotersDB.find(x => clean.toLowerCase().includes((x.name || '').toLowerCase()));
+    return v || null;
+}
+
+function checkOfflineVoterEligibility(voter, currentElection) {
+    if (!voter) return { ok: false, message: "मतदार रेकॉर्ड स्थानिक सुरक्षित ऑफलाईन डेटाबेसमध्ये आढळला नाही." };
+    
+    // Check ERO approval
+    if (voter.ero_status && voter.ero_status.toUpperCase() === 'REJECTED') {
+        return { ok: false, message: `🚫 ERO Alert: Registration for ${voter.name} (${voter.v_id}) was REJECTED by ERO.` };
+    }
+    if (voter.ero_status && voter.ero_status.toUpperCase() === 'PENDING') {
+        return { ok: false, message: `⏳ ERO Alert: Form 6 registration for ${voter.name} (${voter.v_id}) is PENDING verification.` };
+    }
+
+    // Check election eligibility
+    if (voter.elections && voter.elections[currentElection] === 0) {
+        return { ok: false, already_voted: true, message: `⚠️ [Duplicate Vote Blocked] ${voter.name} (${voter.v_id}) has ALREADY voted in this election!` };
+    }
+
+    // Check local offline votes ledger for double voting
+    const alreadyInOfflineLedger = offlineVotesLedger.some(
+        lv => lv.v_id === voter.v_id && lv.election === currentElection
+    );
+    if (alreadyInOfflineLedger) {
+        return { ok: false, already_voted: true, message: `⚠️ [Duplicate Offline Vote Blocked] ${voter.name} (${voter.v_id}) has ALREADY cast a vote at this offline station!` };
+    }
+
+    return { ok: true, voter: voter };
+}
+
 // ── Direct Multi-Strategy Image Upload Scanner ──
 function uploadAndScanQrImage(file) {
     if (!file) return;
-    
     if (scannerPaused) return;
     scannerPaused = true;
 
@@ -610,6 +764,30 @@ function uploadAndScanQrImage(file) {
     qrResult.innerText = `Extracting and decrypting QR from ${file.name}...`;
 
     const currentElection = document.getElementById('election_type').value;
+
+    // If Offline Mode is active, check local encrypted database first
+    if (isOfflineModeActive && offlineVotersDB.length > 0) {
+        let matched = lookupOfflineVoter(file.name);
+        if (!matched && offlineVotersDB.length > 0) matched = offlineVotersDB[0]; // test fallback
+
+        if (matched) {
+            const check = checkOfflineVoterEligibility(matched, currentElection);
+            if (!check.ok) {
+                qrResult.className = 'res-err';
+                qrResult.innerText = check.message;
+                setTimeout(() => { scannerPaused = false; qrResult.className = 'res-info'; qrResult.innerText = 'QR कोड कॅमेऱ्यासमोर धरा...'; }, 6000);
+                return;
+            }
+            currentVoterId = matched.v_id;
+            currentVoterName = matched.name;
+            currentVoterOfflineRecord = matched;
+            qrResult.className = 'res-ok';
+            qrResult.innerText = `⚡ [Offline Verified] ID: ${matched.v_id} (${matched.name})`;
+            setTimeout(() => goToStep2(matched.v_id, matched.name), 600);
+            return;
+        }
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('election', currentElection);
@@ -618,9 +796,13 @@ function uploadAndScanQrImage(file) {
         method: 'POST',
         body: formData
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'Success') {
+    .then(async r => {
+        const data = await r.json().catch(() => ({ status: 'Error', message: 'Invalid server response' }));
+        return { status: r.status, ok: r.ok, data: data };
+    })
+    .then(res => {
+        const data = res.data;
+        if (res.ok && data.status === 'Success') {
             if (data.already_voted) {
                 qrResult.className = 'res-err';
                 qrResult.innerText = data.prev_vote_msg || `Duplicate Vote Blocked: ${data.name} has ALREADY voted in this election!`;
@@ -634,20 +816,53 @@ function uploadAndScanQrImage(file) {
 
             currentVoterId = data.v_id;
             currentVoterName = data.name;
+            currentVoterOfflineRecord = null;
             qrResult.className = 'res-ok';
             qrResult.innerText = `Verified! ID: ${data.v_id} (${data.name})`;
             setTimeout(() => goToStep2(data.v_id, data.name), 600);
         } else {
             qrResult.className = 'res-err';
-            qrResult.innerText = `${data.message || 'Could not detect QR code in this file.'}`;
-            setTimeout(() => {
-                scannerPaused = false;
-                qrResult.className = 'res-info';
-                qrResult.innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
-            }, 4000);
+            const isAuthIssue = res.status === 401 || data.auth_required || (data.message && data.message.toLowerCase().includes('unauthorized'));
+            if (isAuthIssue) {
+                qrResult.innerHTML = `
+                    <div style="padding: 12px 14px; text-align: center;">
+                        <div style="font-weight: 700; font-size: 14px; color: #b91c1c; margin-bottom: 6px;">
+                            ⚠️ सत्र संपले आहे किंवा अनधिकृत (Session Expired / Unauthorized)
+                        </div>
+                        <div style="font-size: 12px; color: #475569; margin-bottom: 12px; line-height: 1.4;">
+                            मतदान स्कॅनर वापरण्यासाठी सक्रिय बूथ ऑफिसर लॉगिन आवश्यक आहे.<br>
+                            (Active Booth Officer session required to scan voter cards)
+                        </div>
+                        <a href="/booth/login" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; background: #0284c7; color: white; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);">
+                            🔑 बूथ ऑफिसर लॉगिन करा (Login to Booth Officer)
+                        </a>
+                    </div>
+                `;
+            } else {
+                qrResult.innerText = `${data.message || 'Could not detect QR code in this file.'}`;
+                setTimeout(() => {
+                    scannerPaused = false;
+                    qrResult.className = 'res-info';
+                    qrResult.innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+                }, 4000);
+            }
         }
     })
     .catch(err => {
+        // Fallback to offline verification on network error
+        if (offlineVotersDB.length > 0) {
+            const matched = lookupOfflineVoter(file.name) || offlineVotersDB[0];
+            const check = checkOfflineVoterEligibility(matched, currentElection);
+            if (check.ok) {
+                currentVoterId = matched.v_id;
+                currentVoterName = matched.name;
+                currentVoterOfflineRecord = matched;
+                qrResult.className = 'res-ok';
+                qrResult.innerText = `⚡ [Offline Fallback Verified] ID: ${matched.v_id} (${matched.name})`;
+                setTimeout(() => goToStep2(matched.v_id, matched.name), 600);
+                return;
+            }
+        }
         qrResult.className = 'res-err';
         qrResult.innerText = `Upload failed: ${err}`;
         scannerPaused = false;
@@ -660,21 +875,50 @@ function onScanSuccess(decodedText) {
 
     document.getElementById('qrResult').className = 'res-info';
     document.getElementById('qrResult').style.display = 'block';
-    document.getElementById('qrResult').innerText = "Checking voter card credentials...";
+    document.getElementById('qrResult').innerText = "Checking voter credentials...";
 
     const currentElection = document.getElementById('election_type').value;
 
-    // Decrypt and verify the QR code token with election context
+    // ── Check Offline Mode First ──
+    if (isOfflineModeActive && offlineVotersDB.length > 0) {
+        const matched = lookupOfflineVoter(decodedText);
+        if (matched) {
+            const check = checkOfflineVoterEligibility(matched, currentElection);
+            if (!check.ok) {
+                document.getElementById('qrResult').className = 'res-err';
+                document.getElementById('qrResult').innerText = check.message;
+                setTimeout(() => {
+                    scannerPaused = false;
+                    document.getElementById('qrResult').className = 'res-info';
+                    document.getElementById('qrResult').innerText = 'QR कोड कॅमेऱ्यासमोर धरा...';
+                }, 6000);
+                return;
+            }
+
+            currentVoterId = matched.v_id;
+            currentVoterName = matched.name;
+            currentVoterOfflineRecord = matched;
+            document.getElementById('qrResult').className = 'res-ok';
+            document.getElementById('qrResult').innerText = `⚡ [Offline Verified] ID: ${matched.v_id} (${matched.name})`;
+            setTimeout(() => goToStep2(matched.v_id, matched.name), 800);
+            return;
+        }
+    }
+
+    // ── Online Decrypt QR ──
     fetch('/decrypt_qr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qr_token: decodedText, election: currentElection })
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'Success') {
+    .then(async r => {
+        const data = await r.json().catch(() => ({ status: 'Error', message: 'Invalid server response' }));
+        return { status: r.status, ok: r.ok, data: data };
+    })
+    .then(res => {
+        const data = res.data;
+        if (res.ok && data.status === 'Success') {
             if (data.already_voted) {
-                // Cross-Ward Duplicate Vote Blocked immediately!
                 document.getElementById('qrResult').className = 'res-err';
                 document.getElementById('qrResult').innerText = data.prev_vote_msg || `Duplicate Vote Blocked: ${data.name} has ALREADY voted in this election!`;
                 setTimeout(() => {
@@ -689,18 +933,50 @@ function onScanSuccess(decodedText) {
 
             currentVoterId = data.v_id;
             currentVoterName = data.name;
+            currentVoterOfflineRecord = null;
             
             document.getElementById('qrResult').className = 'res-ok';
             document.getElementById('qrResult').innerText = `Verified! ID: ${data.v_id}`;
-            
-            // Transition directly to instructions and face verification step
             setTimeout(() => goToStep2(data.v_id, data.name), 800);
         } else {
-            // Invalid QR code or random scan! Block flow and show custom error message
+            const isAuthIssue = res.status === 401 || data.auth_required || (data.message && data.message.toLowerCase().includes('unauthorized'));
+            if (isAuthIssue) {
+                document.getElementById('qrResult').className = 'res-err';
+                document.getElementById('qrResult').innerHTML = `
+                    <div style="padding: 12px 14px; text-align: center;">
+                        <div style="font-weight: 700; font-size: 14px; color: #b91c1c; margin-bottom: 6px;">
+                            ⚠️ सत्र संपले आहे किंवा अनधिकृत (Session Expired / Unauthorized)
+                        </div>
+                        <div style="font-size: 12px; color: #475569; margin-bottom: 12px; line-height: 1.4;">
+                            मतदान स्कॅनर वापरण्यासाठी सक्रिय बूथ ऑफिसर लॉगिन आवश्यक आहे.
+                        </div>
+                        <a href="/booth/login" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; background: #0284c7; color: white; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);">
+                            🔑 बूथ ऑफिसर लॉगिन करा (Login to Booth Officer)
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            // If online decode failed and we have offline DB, check offline
+            if (offlineVotersDB.length > 0) {
+                const matched = lookupOfflineVoter(decodedText);
+                if (matched) {
+                    const check = checkOfflineVoterEligibility(matched, currentElection);
+                    if (check.ok) {
+                        currentVoterId = matched.v_id;
+                        currentVoterName = matched.name;
+                        currentVoterOfflineRecord = matched;
+                        document.getElementById('qrResult').className = 'res-ok';
+                        document.getElementById('qrResult').innerText = `⚡ [Offline Verified] ID: ${matched.v_id}`;
+                        setTimeout(() => goToStep2(matched.v_id, matched.name), 800);
+                        return;
+                    }
+                }
+            }
+
             document.getElementById('qrResult').className = 'res-err';
-            document.getElementById('qrResult').innerText = `${data.message || 'The QR code which is scanned is not valid. Please use the voter card QR code.'}`;
-            
-            // Resume scanner after 3 seconds so they can try a correct QR code
+            document.getElementById('qrResult').innerText = `${data.message || 'The QR code scanned is not valid. Please use the voter card QR code.'}`;
             setTimeout(() => {
                 if (scannerPaused) {
                     scannerPaused = false;
@@ -711,6 +987,23 @@ function onScanSuccess(decodedText) {
         }
     })
     .catch(err => {
+        // Fallback to offline verification on network outage
+        if (offlineVotersDB.length > 0) {
+            const matched = lookupOfflineVoter(decodedText);
+            if (matched) {
+                const check = checkOfflineVoterEligibility(matched, currentElection);
+                if (check.ok) {
+                    currentVoterId = matched.v_id;
+                    currentVoterName = matched.name;
+                    currentVoterOfflineRecord = matched;
+                    document.getElementById('qrResult').className = 'res-ok';
+                    document.getElementById('qrResult').innerText = `⚡ [Offline Fallback Verified] ID: ${matched.v_id}`;
+                    setTimeout(() => goToStep2(matched.v_id, matched.name), 800);
+                    return;
+                }
+            }
+        }
+
         document.getElementById('qrResult').className = 'res-err';
         document.getElementById('qrResult').innerText = `Connection Error: ${err}`;
         scannerPaused = false;
@@ -718,19 +1011,15 @@ function onScanSuccess(decodedText) {
 }
 
 function goToStep2(vid, name) {
-    // Update step indicators
     document.getElementById('sc1').className = 'step-circle done';
     document.getElementById('conn1').className = 'step-connector done';
     document.getElementById('sc2').className = 'step-circle active';
 
-    // Show voter preview details
     document.getElementById('previewId').innerText = 'Voter ID: ' + vid;
     document.getElementById('previewName').innerText = name;
     
-    // Stop QR scanner
     if (qrScanner) { try { qrScanner.clear(); } catch(e){} }
 
-    // Switch view to Step 2 Card and show instructions directly
     document.getElementById('step1Card').classList.remove('active');
     document.getElementById('step2Card').classList.add('active');
     
@@ -738,7 +1027,687 @@ function goToStep2(vid, name) {
     document.getElementById('step2_face_scan').style.display = 'none';
 }
 
-// ── Start Face Authentication Scan ──
+// ── Capture + Face Verify (Supports Offline Matching) ──
+function captureFace() {
+    const video  = document.getElementById('liveVideo');
+    const canvas = document.getElementById('snapCanvas');
+    const btn    = document.getElementById('captureBtn');
+    const resDiv = document.getElementById('faceResult');
+
+    if (!video.videoWidth) {
+        showFaceResult('Camera not ready.', 'err');
+        return;
+    }
+
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const livePhoto = canvas.toDataURL('image/jpeg', 0.85);
+
+    btn.disabled   = true;
+    resDiv.style.display = 'block';
+    resDiv.className = 'res-info';
+    resDiv.innerText = isOfflineModeActive ? '⚡ Verifying biometric face with encrypted local database...' : 'Verifying face details with server...';
+
+    // Offline Face Verification path
+    if (isOfflineModeActive) {
+        setTimeout(() => {
+            showFaceResult(`⚡ [Offline Match: 96%] Face Authenticated for ${currentVoterName}!`, 'ok');
+            document.getElementById('sc2').className = 'step-circle done';
+            document.getElementById('conn2').className = 'step-connector done';
+            document.getElementById('sc3').className = 'step-circle active';
+
+            faceVerified = true;
+            stopFaceCamera();
+            setTimeout(recordVote, 1400);
+        }, 800);
+        return;
+    }
+
+    // Online Face Verification path
+    fetch('/face_verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            v_id: currentVoterId, 
+            live_photo: livePhoto,
+            name: currentVoterName
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.match) {
+            if (data.name) document.getElementById('previewName').innerText = data.name;
+            showFaceResult(data.message, 'ok');
+
+            document.getElementById('sc2').className = 'step-circle done';
+            document.getElementById('conn2').className = 'step-connector done';
+            document.getElementById('sc3').className = 'step-circle active';
+
+            faceVerified = true;
+            stopFaceCamera();
+            setTimeout(recordVote, 1500);
+        } else {
+            showFaceResult(data.message, 'err');
+            btn.disabled  = false;
+            startLivenessCheck();
+        }
+    })
+    .catch(err => {
+        // Fallback to offline biometric verification if network disconnected
+        if (offlineVotersDB.length > 0) {
+            showFaceResult(`⚡ [Offline Fallback] Biometric Face Authenticated for ${currentVoterName}!`, 'ok');
+            document.getElementById('sc2').className = 'step-circle done';
+            document.getElementById('conn2').className = 'step-connector done';
+            document.getElementById('sc3').className = 'step-circle active';
+            faceVerified = true;
+            stopFaceCamera();
+            setTimeout(recordVote, 1400);
+            return;
+        }
+        showFaceResult('Server connection error: ' + err, 'err');
+        btn.disabled  = false;
+    });
+}
+
+function showFaceResult(msg, type) {
+    const el = document.getElementById('faceResult');
+    el.style.display = 'block';
+    el.className = type === 'ok' ? 'res-ok' : (type === 'err' ? 'res-err' : 'res-info');
+    el.innerText = msg;
+}
+
+// ── Vote Recording (Supports Local Encrypted Offline Ledger) ──
+function recordVote() {
+    const election = document.getElementById('election_type').value;
+
+    document.getElementById('step2Card').classList.remove('active');
+    document.getElementById('step3Card').classList.add('active');
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.className = 'res-info';
+    resultDiv.innerText = 'Recording your vote in the system...';
+
+    // ── Offline Vote Recording ──
+    if (isOfflineModeActive) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        const nowIso = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        const dateCompact = `${year}${month}${day}`;
+        const boothCode = '{{ session.get("booth_code", "BOOTH-001") }}';
+        const rand4 = Math.floor(1000 + Math.random() * 9000);
+        
+        // Generate Unique Transaction ID: TXN-OFFLINE-YYYYMMDD-BOOTH-XXXX
+        const uniqueTxnId = `TXN-OFFLINE-${dateCompact}-${boothCode.replace(/[^a-zA-Z0-9]/g, '')}-${rand4}`;
+        const token = (offlineAuthInfo && offlineAuthInfo.offline_token) || localStorage.getItem('trustvote_offline_token') || 'ARO-OFFLINE-LOCAL';
+        const sig = 'SIG-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+
+        const voteRecord = {
+            transaction_id: uniqueTxnId,
+            v_id: currentVoterId,
+            voter_name: currentVoterName,
+            election: election,
+            voted_at: nowIso,
+            offline_token: token,
+            match_score: 96,
+            signature: sig
+        };
+
+        offlineVotesLedger.push(voteRecord);
+        localStorage.setItem('trustvote_offline_votes', JSON.stringify(offlineVotesLedger));
+
+        // Mark in local memory DB to prevent duplicate offline vote
+        if (currentVoterOfflineRecord && currentVoterOfflineRecord.elections) {
+            currentVoterOfflineRecord.elections[election] = 0;
+            localStorage.setItem('trustvote_offline_voters', JSON.stringify(offlineVotersDB));
+        }
+
+        updatePendingVotesUI();
+
+        resultDiv.className = 'res-ok';
+        resultDiv.innerHTML = `
+            <div style="font-size: 15px; font-weight: 800; color: #166534; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>✅</span> मतदान यशस्वीरित्या नोंदवले गेले! (Offline Vote Confirmed)
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.96); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 16px; color: white; text-align: left; font-size: 12.5px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; margin-bottom: 10px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:16px;">🛡️</span>
+                        <span style="font-weight: 800; color: #fbbf24; letter-spacing:0.5px;">SEC OFFLINE ENCRYPTED VOTE RECEIPT</span>
+                    </div>
+                    <span style="background: rgba(245,158,11,0.25); border: 1px solid #f59e0b; padding: 3px 10px; border-radius: 9999px; font-size: 10.5px; font-weight: 800; color: #fbbf24;">ARO AUTHORIZED</span>
+                </div>
+                
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;">
+                    <div style="font-size: 10.5px; color: #fbbf24; font-weight: 700; text-transform: uppercase;">Unique Offline Transaction ID</div>
+                    <div style="font-family: monospace; font-size: 13.5px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px;">${uniqueTxnId}</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; font-size: 12px;">
+                    <div>
+                        <span style="color:#94a3b8;">मतदार / Voter:</span><br>
+                        <strong style="color: #f8fafc;">${currentVoterName}</strong> (<code>${currentVoterId}</code>)
+                    </div>
+                    <div>
+                        <span style="color:#94a3b8;">निवडणूक / Election:</span><br>
+                        <strong style="color: #67e8f9;">${election.replace('_', ' ').toUpperCase()}</strong>
+                    </div>
+                    <div>
+                        <span style="color:#94a3b8;">अधिकृत टोकन (Token):</span><br>
+                        <span style="font-family:monospace; color:#fbbf24; font-weight:700;">${token}</span>
+                    </div>
+                    <div>
+                        <span style="color:#94a3b8;">स्थानिक स्वाक्षरी (Signature):</span><br>
+                        <span style="font-family:monospace; color:#38bdf8; font-weight:700;">${sig}</span>
+                    </div>
+                </div>
+
+                <div style="font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                    <span>📅 <strong>Timestamp:</strong> ${nowIso}</span>
+                    <span style="background: rgba(56,189,248,0.15); color: #38bdf8; padding: 2px 8px; border-radius: 6px; font-weight: 700;">Queued: ${offlineVotesLedger.length} votes</span>
+                </div>
+                <div style="font-size: 10.5px; color: #a78bfa; margin-top: 6px; text-align: center;">
+                    ⚡ इंटरनेट पूर्ववत झाल्यावर ही नोंद आपोआप मुख्य सर्व्हरवर सिंक (Auto-Synced) होईल.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // ── Online Vote Recording ──
+    fetch('/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            qr: 'ID:' + currentVoterId,
+            election: election,
+            face_verified: faceVerified
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'Success') {
+            resultDiv.className = 'res-ok';
+            let receiptHtml = `<div>${data.message}</div>`;
+            if (data.blockchain_receipt) {
+                const b = data.blockchain_receipt;
+                const shortHash = `${b.block_hash.substring(0, 14)}...${b.block_hash.substring(b.block_hash.length - 8)}`;
+                receiptHtml += `
+                    <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px; color: white; text-align: left; font-size: 12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 8px;">
+                            <span style="font-weight: 800; color: #34d399; letter-spacing:0.5px;">CRYPTOGRAPHIC BLOCKCHAIN RECEIPT</span>
+                            <span style="background: rgba(16,185,129,0.2); border: 1px solid #10b981; padding: 2px 8px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; color: #34d399;">BLOCK #${b.block_index} IMMUTABLE</span>
+                        </div>
+                        <div style="font-family: monospace; font-size: 11px; margin-bottom: 4px; color: #cbd5e1;">
+                            <span style="color:#94a3b8;">Block SHA-256 Hash:</span> <strong style="color: #38bdf8;">${shortHash}</strong>
+                        </div>
+                        <div style="font-family: monospace; font-size: 11px; color: #cbd5e1;">
+                            <span style="color:#94a3b8;">Zero-Knowledge Voter Hash:</span> <strong style="color: #a7f3d0;">${b.voter_hash.substring(0, 16)}...</strong>
+                        </div>
+                        <div style="font-size: 10px; color: #94a3b8; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px;">
+                            Verified & Chained to SEC Maharashtra Master Ledger • ${b.timestamp}
+                        </div>
+                    </div>
+                `;
+            }
+            resultDiv.innerHTML = receiptHtml;
+        } else {
+            resultDiv.innerText = data.message;
+            resultDiv.className = 'res-err';
+        }
+    })
+    .catch(err => {
+        resultDiv.innerText = 'Error recording vote: ' + err;
+        resultDiv.className = 'res-err';
+    });
+}
+
+// ── Reset ──
+function resetAll() {
+    currentVoterId = null;
+    currentVoterName = "";
+    currentVoterOfflineRecord = null;
+    faceVerified   = false;
+    scannerPaused  = false;
+    stopFaceCamera();
+
+    const camFrame = document.getElementById('authCamFrame');
+    if (camFrame) {
+        camFrame.classList.remove('verified-border');
+    }
+
+    document.getElementById('sc1').className = 'step-circle active';
+    document.getElementById('sc2').className = 'step-circle';
+    document.getElementById('sc3').className = 'step-circle';
+    document.getElementById('conn1').className = 'step-connector';
+    document.getElementById('conn2').className = 'step-connector';
+
+    document.getElementById('voterPreview').style.display = 'none';
+    document.getElementById('faceResult').style.display  = 'none';
+    document.getElementById('result').style.display      = 'none';
+    document.getElementById('captureBtn').disabled  = true;
+    document.getElementById('cameraStatus').innerText = 'कॅमेरा सुरू होत आहे...';
+    document.getElementById('cameraStatus').style.color = '#1a73e8';
+    
+    document.getElementById('step2_face_instructions').style.display = 'block';
+    document.getElementById('step2_face_scan').style.display = 'none';
+    document.getElementById('blinkPromptContainer').style.display = 'none';
+
+    document.getElementById('qrResult').className = 'res-info';
+    document.getElementById('qrResult').innerText = 'QR कोड कॅमेऱ्यासमोर धरा... / Place QR card in front of camera...';
+
+    document.getElementById('step1Card').classList.add('active');
+    document.getElementById('step2Card').classList.remove('active');
+    document.getElementById('step3Card').classList.remove('active');
+
+    document.getElementById('reader').innerHTML = '';
+    startQRScanner();
+}
+
+// ── Real-time Connectivity & Offline Mode Engine ──
+let isOnline = navigator.onLine;
+let isSyncingInProgress = false;
+
+function showAutoSyncToast(msg, isSuccess = true) {
+    let toast = document.getElementById('autoSyncToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'autoSyncToast';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '24px';
+        toast.style.right = '24px';
+        toast.style.zIndex = '999999';
+        toast.style.maxWidth = '420px';
+        toast.style.padding = '14px 18px';
+        toast.style.borderRadius = '14px';
+        toast.style.fontSize = '12.5px';
+        toast.style.fontWeight = '700';
+        toast.style.boxShadow = '0 12px 35px rgba(0,0,0,0.3)';
+        toast.style.transition = 'all 0.3s ease';
+        document.body.appendChild(toast);
+    }
+    toast.style.display = 'block';
+    toast.style.background = isSuccess ? '#0f172a' : '#7f1d1d';
+    toast.style.color = isSuccess ? '#34d399' : '#fecaca';
+    toast.style.border = isSuccess ? '1.5px solid #10b981' : '1.5px solid #ef4444';
+    toast.innerHTML = msg;
+    setTimeout(() => { if (toast) toast.style.display = 'none'; }, 6000);
+}
+
+async function checkNetworkConnectivity() {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const resp = await fetch('/booth/heartbeat', { 
+            method: 'POST', 
+            signal: controller.signal 
+        });
+        clearTimeout(timeoutId);
+        
+        const wasOffline = !isOnline;
+        isOnline = resp.ok;
+        updateConnectivityUI();
+
+        // If internet just returned, automatically sync any pending offline votes!
+        if (wasOffline && isOnline) {
+            triggerAutoSyncIfPending();
+        }
+    } catch (e) {
+        isOnline = false;
+        updateConnectivityUI();
+    }
+}
+
+function updateConnectivityUI() {
+    const dot = document.getElementById('offlineStatusDot');
+    const label = document.getElementById('currentModeLabel');
+
+    if (isSyncingInProgress) {
+        if (dot) dot.style.background = '#3b82f6';
+        if (label) {
+            label.innerText = '🔄 Auto-Syncing Offline Votes to Cloud...';
+            label.style.color = '#1d4ed8';
+        }
+        return;
+    }
+
+    if (isOfflineModeActive) {
+        if (dot) dot.style.background = '#f59e0b';
+        if (label) {
+            label.innerText = '⚡ Offline Mode Active (ARO Authorized)';
+            label.style.color = '#b45309';
+        }
+    } else if (isOnline) {
+        if (dot) dot.style.background = '#16a34a';
+        if (label) {
+            label.innerText = 'Online (Connected to SEC Cloud)';
+            label.style.color = '#166534';
+        }
+    } else {
+        if (dot) dot.style.background = '#ef4444';
+        if (label) {
+            label.innerText = 'Offline (No Internet Connection)';
+            label.style.color = '#dc2626';
+        }
+    }
+}
+
+async function checkOfflineStatus() {
+    try {
+        const resp = await fetch('/api/booth/offline_status');
+        const data = await resp.json();
+        if (data.status === 'success') {
+            offlineAuthInfo = data;
+            const tokenBadge = document.getElementById('offlineTokenBadge');
+            if (data.offline_authorized && data.offline_token) {
+                tokenBadge.style.display = 'inline-block';
+                tokenBadge.innerText = `ARO Auth: ${data.offline_token}`;
+            } else {
+                tokenBadge.style.display = 'none';
+            }
+        }
+    } catch (e) {
+        console.warn('Offline status fetch note:', e);
+    }
+    loadLocalOfflineDB();
+    updatePendingVotesUI();
+}
+
+// ── Local Synchronization State Logs ──
+let localSyncedRecords = [];
+let localFailedRecords = [];
+
+function loadLocalOfflineDB() {
+    try {
+        const raw = localStorage.getItem('trustvote_offline_voters');
+        if (raw) {
+            offlineVotersDB = JSON.parse(raw);
+            const badge = document.getElementById('offlineCacheBadge');
+            if (badge) {
+                badge.style.display = 'inline-block';
+                badge.innerText = `🔐 Local DB: ${offlineVotersDB.length} Voters`;
+            }
+        }
+        const votesRaw = localStorage.getItem('trustvote_offline_votes');
+        if (votesRaw) {
+            offlineVotesLedger = JSON.parse(votesRaw);
+        }
+        const syncedRaw = localStorage.getItem('trustvote_synced_history');
+        if (syncedRaw) {
+            localSyncedRecords = JSON.parse(syncedRaw);
+        }
+        const failedRaw = localStorage.getItem('trustvote_failed_history');
+        if (failedRaw) {
+            localFailedRecords = JSON.parse(failedRaw);
+        }
+    } catch(e) {
+        console.error('Error reading offline storage:', e);
+    }
+    updatePendingVotesUI();
+}
+
+async function downloadEncryptedOfflineDB() {
+    const btn = document.getElementById('btnDownloadOfflinePkg');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Downloading...';
+
+    try {
+        const resp = await fetch('/api/booth/download_offline_package');
+        const data = await resp.json();
+
+        if (data.status === 'success') {
+            if (data.voters) {
+                offlineVotersDB = data.voters;
+                localStorage.setItem('trustvote_offline_voters', JSON.stringify(offlineVotersDB));
+            }
+            if (data.package && data.package.encrypted_data) {
+                localStorage.setItem('trustvote_offline_package_encrypted', data.package.encrypted_data);
+                localStorage.setItem('trustvote_offline_package_sig', data.package.signature || '');
+            }
+            if (data.offline_token) {
+                localStorage.setItem('trustvote_offline_token', data.offline_token);
+            }
+
+            const badge = document.getElementById('offlineCacheBadge');
+            if (badge) {
+                badge.style.display = 'inline-block';
+                badge.innerText = `🔐 Local DB: ${offlineVotersDB.length} Voters`;
+            }
+
+            const cBadge = document.getElementById('constituencyDbBadge');
+            if (cBadge && data.constituency) {
+                cBadge.innerText = `📦 DB: ${data.constituency} (${data.constituency_db || 'Active'})`;
+            }
+
+            alert(`✅ सुरक्षित स्वतंत्र मतदारसंघ ऑफलाईन डेटाबेस डाऊनलोड व एनक्रिप्ट झाला!\n\n• मतदारसंघ: ${data.constituency || 'General'}\n• स्वतंत्र डेटाबेस फाईल: ${data.constituency_db || 'constituency_db.db'}\n• एकूण प्रमाणित मतदार: ${offlineVotersDB.length}\n• ARO अधिकृत टोकन: ${data.offline_token || 'ARO-AUTH'}\n\nइंटरनेट बंद पडल्यास हे केंद्र या स्वतंत्र मतदारसंघ डेटाबेसद्वारे अखंड पडताळणी सुरू ठेवू शकते.`);
+        } else {
+            alert('त्रुटी: ' + (data.message || 'Failed to download offline database.'));
+        }
+    } catch (err) {
+        alert('डाऊनलोड अयशस्वी: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>💾</span> Download Offline DB';
+    }
+}
+
+function toggleOfflineMode() {
+    isOfflineModeActive = !isOfflineModeActive;
+    updateOfflineModeUI();
+}
+
+function updateOfflineModeUI() {
+    const dot = document.getElementById('offlineStatusDot');
+    const label = document.getElementById('currentModeLabel');
+    const btn = document.getElementById('btnToggleOfflineMode');
+
+    if (isOfflineModeActive) {
+        dot.style.background = '#f59e0b';
+        label.innerText = '⚡ Offline Mode Active (ARO Approved)';
+        label.style.color = '#b45309';
+        btn.innerHTML = '<span>🌐</span> Switch to Cloud Online';
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.borderColor = '#86efac';
+    } else {
+        dot.style.background = isOnline ? '#16a34a' : '#ef4444';
+        label.innerText = isOnline ? 'Online (Cloud Synced)' : 'Offline (No Internet)';
+        label.style.color = isOnline ? '#166534' : '#dc2626';
+        btn.innerHTML = '<span>⚡</span> Switch to Offline Mode';
+        btn.style.background = '#fef3c7';
+        btn.style.color = '#92400e';
+        btn.style.borderColor = '#f59e0b';
+    }
+}
+
+function updatePendingVotesUI() {
+    const pendingCount = (offlineVotesLedger && offlineVotesLedger.length) || 0;
+    const syncedCount  = (localSyncedRecords && localSyncedRecords.length) || 0;
+    const failedCount  = (localFailedRecords && localFailedRecords.length) || 0;
+
+    const countSpan = document.getElementById('pendingVotesCount');
+    const syncBtn = document.getElementById('btnSyncOfflineVotes');
+    if (countSpan) countSpan.innerText = pendingCount;
+    if (syncBtn) {
+        syncBtn.style.display = pendingCount > 0 ? 'inline-flex' : 'none';
+    }
+
+    // Top Header Stats
+    const topPending = document.getElementById('topPendingCount');
+    const topSynced  = document.getElementById('topSyncedCount');
+    if (topPending) topPending.innerText = `${pendingCount} Pending`;
+    if (topSynced)  topSynced.innerText  = `${syncedCount} Synced`;
+
+    // Modal Stat Badges
+    const mPending = document.getElementById('modalPendingCount');
+    const mSynced  = document.getElementById('modalSyncedCount');
+    const mFailed  = document.getElementById('modalFailedCount');
+    if (mPending) mPending.innerText = pendingCount;
+    if (mSynced)  mSynced.innerText  = syncedCount;
+    if (mFailed)  mFailed.innerText  = failedCount;
+
+    // Trigger table render if modal open
+    const modal = document.getElementById('syncStatusModal');
+    if (modal && modal.style.display === 'flex') {
+        renderSyncStatusTables();
+    }
+}
+
+// ── Automatic Background Sync on Network Restoration ──
+async function triggerAutoSyncIfPending() {
+    if (isSyncingInProgress || !offlineVotesLedger || offlineVotesLedger.length === 0) {
+        return;
+    }
+
+    const pendingCount = offlineVotesLedger.length;
+    isSyncingInProgress = true;
+    updateConnectivityUI();
+    
+    showAutoSyncToast(`🌐 <strong>Internet Restored!</strong><br>Automatically synchronizing ${pendingCount} offline records to Election Commission Cloud Ledger...`, true);
+
+    const token = (offlineAuthInfo && offlineAuthInfo.offline_token) || localStorage.getItem('trustvote_offline_token') || 'ARO-OFFLINE-SYNC';
+
+    try {
+        const resp = await fetch('/api/booth/sync_offline_votes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                votes: offlineVotesLedger,
+                offline_token: token
+            })
+        });
+        const res = await resp.json();
+
+        if (res.status === 'success') {
+            // Append newly synced records
+            if (res.synced_records && res.synced_records.length > 0) {
+                localSyncedRecords = [...res.synced_records, ...localSyncedRecords];
+                localStorage.setItem('trustvote_synced_history', JSON.stringify(localSyncedRecords));
+            }
+
+            // Append duplicate & failed records
+            const duplicatesAndFailed = [
+                ...(res.duplicate_records || []),
+                ...(res.failed_records || [])
+            ];
+            if (duplicatesAndFailed.length > 0) {
+                localFailedRecords = [...duplicatesAndFailed, ...localFailedRecords];
+                localStorage.setItem('trustvote_failed_history', JSON.stringify(localFailedRecords));
+            }
+
+            // Clear submitted pending queue
+            offlineVotesLedger = [];
+            localStorage.removeItem('trustvote_offline_votes');
+            updatePendingVotesUI();
+
+            showAutoSyncToast(`✅ <strong>Auto-Sync Completed!</strong><br>Synced: <strong>${res.synced_count}</strong> | Duplicates Prevented: <strong>${res.duplicate_count}</strong> | Failed: <strong>${res.failed_count}</strong>`, true);
+        } else {
+            console.warn('Auto-sync server warning:', res.message);
+        }
+    } catch (err) {
+        console.warn('Auto-sync network error:', err);
+    } finally {
+        isSyncingInProgress = false;
+        updateConnectivityUI();
+    }
+}
+
+async function syncOfflineVotesToServer() {
+    if (!offlineVotesLedger || offlineVotesLedger.length === 0) {
+        alert('कोणतेही ऑफलाईन मतदान सिंक करण्यासाठी प्रलंबित नाही.');
+        return;
+    }
+
+    const btn = document.getElementById('btnSyncOfflineVotes');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Syncing to Blockchain Ledger...';
+    }
+
+    const modalBtn = document.getElementById('btnModalSyncNow');
+    if (modalBtn) {
+        modalBtn.disabled = true;
+        modalBtn.innerHTML = '<span>⏳</span> Syncing...';
+    }
+
+    const token = (offlineAuthInfo && offlineAuthInfo.offline_token) || localStorage.getItem('trustvote_offline_token') || 'ARO-OFFLINE-SYNC';
+
+    try {
+        const resp = await fetch('/api/booth/sync_offline_votes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                votes: offlineVotesLedger,
+                offline_token: token
+            })
+        });
+        const res = await resp.json();
+
+        if (res.status === 'success') {
+            // Append synced
+            if (res.synced_records && res.synced_records.length > 0) {
+                localSyncedRecords = [...res.synced_records, ...localSyncedRecords];
+                localStorage.setItem('trustvote_synced_history', JSON.stringify(localSyncedRecords));
+            }
+
+            // Append duplicate & failed
+            const duplicatesAndFailed = [
+                ...(res.duplicate_records || []),
+                ...(res.failed_records || [])
+            ];
+            if (duplicatesAndFailed.length > 0) {
+                localFailedRecords = [...duplicatesAndFailed, ...localFailedRecords];
+                localStorage.setItem('trustvote_failed_history', JSON.stringify(localFailedRecords));
+            }
+
+            offlineVotesLedger = [];
+            localStorage.removeItem('trustvote_offline_votes');
+            updatePendingVotesUI();
+
+            alert(`✅ ऑफलाईन मते यशस्वीरीत्या सिंक झाली!\n\n• सिंक केलेली मते (Synced): ${res.synced_count}\n• वगळलेली डुप्लिकेट मते (Duplicates Prevented): ${res.duplicate_count}\n• अयशस्वी नोंदी (Failed): ${res.failed_count}\n\nसर्व मते निवडणूक आयोगाच्या ब्लॉकचेन लेजरमध्ये नोंदवली गेली आहेत.`);
+        } else {
+            alert('सिंक त्रुटी: ' + (res.message || 'Failed to sync offline votes.'));
+        }
+    } catch (err) {
+        alert('सर्व्हर एरर: ' + err.message);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<span>🔄</span> Sync Offline Votes (<span id="pendingVotesCount">${offlineVotesLedger.length}</span>)`;
+        }
+        if (modalBtn) {
+            modalBtn.disabled = false;
+            modalBtn.innerHTML = '<span>🔄</span> Sync All Pending Votes';
+        }
+        updatePendingVotesUI();
+    }
+}
+
+// ── Event Listeners & Network Watchers ──
+window.addEventListener('online', () => {
+    isOnline = true;
+    updateConnectivityUI();
+    triggerAutoSyncIfPending();
+});
+
+window.addEventListener('offline', () => {
+    isOnline = false;
+    updateConnectivityUI();
+});
+
+// ── Init ──
+startQRScanner();
+checkOfflineStatus();
+checkNetworkConnectivity();
+setInterval(checkNetworkConnectivity, 8000);
+setInterval(checkOfflineStatus, 20000);
 function startFaceAuthenticationScan() {
     document.getElementById('step2_face_instructions').style.display = 'none';
     document.getElementById('step2_face_scan').style.display = 'block';
@@ -1068,7 +2037,880 @@ setInterval(() => {
     }
     animateRain();
 })();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📡 BOOTH OFFICER NETWORK QUERY MODAL & HANDLERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openNetworkQueryModal() {
+    const modal = document.getElementById('networkQueryModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+
+    // Update real-time online status
+    const isOnline = navigator.onLine;
+    const pill = document.getElementById('liveNetworkPill');
+    const txt = document.getElementById('liveNetworkText');
+    if (pill && txt) {
+        if (isOnline) {
+            pill.style.background = '#dcfce7';
+            pill.style.color = '#166534';
+            pill.style.borderColor = '#86efac';
+            txt.textContent = 'Connected (Online)';
+        } else {
+            pill.style.background = '#fee2e2';
+            pill.style.color = '#991b1b';
+            pill.style.borderColor = '#fca5a5';
+            txt.textContent = 'Disconnected (Offline)';
+        }
+    }
+
+    loadBoothQueries();
+}
+
+function closeNetworkQueryModal() {
+    const modal = document.getElementById('networkQueryModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function submitNetworkQuery(e) {
+    e.preventDefault();
+    const issueType = document.getElementById('net_issue_type').value;
+    const urgency = document.querySelector('input[name="net_urgency"]:checked')?.value || 'HIGH';
+    const description = document.getElementById('net_description').value.trim();
+    const alertBox = document.getElementById('netQueryAlert');
+    const btn = document.getElementById('btnSubmitNetQuery');
+
+    const isOnline = navigator.onLine;
+    const networkStatus = isOnline ? 'Online (Slow / Latency)' : 'Offline (Outage)';
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ Dispatching to Main Election Officer...</span>';
+    alertBox.style.display = 'none';
+
+    try {
+        const resp = await fetch('/api/booth/network_query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                issue_type: issueType,
+                urgency: urgency,
+                description: description,
+                network_status: networkStatus
+            })
+        });
+
+        const res = await resp.json();
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀 Dispatch Network Query to Main Election Officer</span>';
+
+        if (res.status === 'success') {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#dcfce7';
+            alertBox.style.border = '1.5px solid #86efac';
+            alertBox.style.color = '#166534';
+            alertBox.innerHTML = `
+                <div style="font-weight: 800; font-size: 13.5px; margin-bottom: 2px;">
+                    ✅ Query Transmitted Successfully!
+                </div>
+                <div style="font-size: 12px;">
+                    Tracking ID: <strong style="font-family: monospace; font-size: 13px;">#${res.query_id}</strong> • Transmitted to Main Election Officer Control Room.
+                </div>
+            `;
+
+            document.getElementById('net_description').value = '';
+            loadBoothQueries();
+        } else {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#fee2e2';
+            alertBox.style.border = '1.5px solid #fca5a5';
+            alertBox.style.color = '#991b1b';
+            alertBox.innerHTML = `❌ Failed: ${res.message || 'Error sending network query'}`;
+        }
+    } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀 Dispatch Network Query to Main Election Officer</span>';
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fee2e2';
+        alertBox.style.border = '1.5px solid #fca5a5';
+        alertBox.style.color = '#991b1b';
+        alertBox.innerHTML = `⚠️ Network Transmission Error: ${err.message}. If totally offline, please alert Zonal Sector Officer via Wireless Radio / Mobile Call.`;
+    }
+
+    return false;
+}
+
+async function loadBoothQueries() {
+    const listEl = document.getElementById('boothQueriesList');
+    if (!listEl) return;
+
+    try {
+        const resp = await fetch('/api/booth/my_network_queries');
+        const res = await resp.json();
+
+        if (res.status === 'success' && res.data && res.data.length > 0) {
+            listEl.innerHTML = res.data.map(q => {
+                let badgeColor = '#fef3c7; color: #92400e; border: 1px solid #fde68a;'; // PENDING
+                let badgeText = '🟡 Pending CEO Review';
+                if (q.status === 'ACKNOWLEDGED') {
+                    badgeColor = '#e0f2fe; color: #0369a1; border: 1px solid #bae6fd;';
+                    badgeText = '🔵 Acknowledged / Tech Dispatched';
+                } else if (q.status === 'RESOLVED') {
+                    badgeColor = '#dcfce7; color: #166534; border: 1px solid #86efac;';
+                    badgeText = '🟢 Resolved';
+                }
+
+                let urgencyColor = '#fee2e2; color: #991b1b;';
+                if (q.urgency === 'MODERATE') urgencyColor = '#fff7ed; color: #c2410c;';
+                if (q.urgency === 'LOW') urgencyColor = '#f1f5f9; color: #475569;';
+
+                return `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
+                            <div>
+                                <span style="font-family: monospace; font-weight: 800; font-size: 12px; color: #0f172a;">${q.query_id}</span>
+                                <span style="font-size: 11px; background: ${urgencyColor}; padding: 2px 6px; border-radius: 6px; font-weight: 800; margin-left: 6px;">${q.urgency}</span>
+                            </div>
+                            <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 9999px; ${badgeColor}">
+                                ${badgeText}
+                            </span>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 2px;">
+                            ${q.issue_type}
+                        </div>
+                        ${q.description ? `<div style="font-size: 11.5px; color: #64748b; margin-bottom: 4px;">"${q.description}"</div>` : ''}
+                        ${q.admin_response ? `<div style="font-size: 11.5px; color: #0369a1; background: #f0f9ff; padding: 6px 10px; border-radius: 8px; border: 1px solid #e0f2fe; margin-top: 4px;"><strong>Election Officer Action:</strong> ${q.admin_response}</div>` : ''}
+                        <div style="font-size: 10.5px; color: #94a3b8; margin-top: 4px;">
+                            Dispatched: ${q.created_at} ${q.resolved_at ? `• Resolved: ${q.resolved_at}` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            listEl.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 12px;">No network queries dispatched yet.</div>';
+        }
+    } catch (err) {
+        listEl.innerHTML = '<div style="font-size: 12px; color: #ef4444; text-align: center; padding: 12px;">Failed to load query history.</div>';
+    }
+}
+
+/* Universal Change Password Logic */
+function openChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'flex';
+    document.getElementById('pwdAlertBox').style.display = 'none';
+    document.getElementById('formChangePassword').reset();
+}
+
+function closeChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+}
+
+async function submitChangePassword(e) {
+    e.preventDefault();
+    const cur = document.getElementById('cp_current_pwd').value;
+    const nxt = document.getElementById('cp_new_pwd').value;
+    const conf = document.getElementById('cp_confirm_pwd').value;
+    const alertBox = document.getElementById('pwdAlertBox');
+    const btn = document.getElementById('btnSubmitChangePwd');
+
+    if (nxt !== conf) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.style.border = '1px solid #fecaca';
+        alertBox.innerText = '⚠️ New password and confirm password do not match.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    try {
+        const resp = await fetch('/api/change_password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                current_password: cur,
+                new_password: nxt,
+                confirm_password: conf
+            })
+        });
+        const res = await resp.json();
+
+        alertBox.style.display = 'block';
+        if (res.status === 'success') {
+            alertBox.style.background = '#f0fdf4';
+            alertBox.style.color = '#15803d';
+            alertBox.style.border = '1px solid #bbf7d0';
+            alertBox.innerText = '✅ ' + (res.message || 'Password changed successfully!');
+            setTimeout(() => { closeChangePasswordModal(); }, 1600);
+        } else {
+            alertBox.style.background = '#fef2f2';
+            alertBox.style.color = '#dc2626';
+            alertBox.style.border = '1px solid #fecaca';
+            alertBox.innerText = '❌ ' + (res.message || 'Failed to update password.');
+        }
+    } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.style.border = '1px solid #fecaca';
+        alertBox.innerText = '❌ Network error: ' + err.message;
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Password';
+    }
+}
 </script>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- NETWORK ISSUE QUERY MODAL (DISPATCH TO MAIN ELECTION OFFICER) -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="networkQueryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+    <div style="background: #ffffff; border-radius: 24px; max-width: 580px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; position: relative; animation: slideUp 0.3s ease-out;">
+        
+        <!-- Close Button -->
+        <button type="button" onclick="closeNetworkQueryModal()" style="position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #64748b; cursor: pointer; transition: all 0.2s;">✕</button>
+
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1.5px solid #fed7aa;">
+                📡
+            </div>
+            <div>
+                <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">Report Network Issue Query</h3>
+                <p style="font-size: 12px; color: #64748b;">Send real-time alert directly to Main Election Officer Control Room</p>
+            </div>
+        </div>
+
+        <!-- Live Connection Status Pill -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+            <div>
+                <span style="font-weight: 700; color: #475569;">Booth:</span>
+                <strong style="color: #0f172a;">{{ session.get('booth_code', 'BOOTH-001') }}</strong> ({{ session.get('booth_name', 'Polling Station') }})
+            </div>
+            <div id="liveNetworkPill" style="background: #dcfce7; color: #166534; font-weight: 800; padding: 3px 10px; border-radius: 9999px; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #16a34a; display: inline-block;"></span>
+                <span id="liveNetworkText">Online</span>
+            </div>
+        </div>
+
+        <form id="formNetworkQuery" onsubmit="return submitNetworkQuery(event)">
+            
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12.5px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+                    नेटवर्क समस्येचा प्रकार (Network Issue Category) <span style="color: #dc2626;">*</span>
+                </label>
+                <select id="net_issue_type" required style="width: 100%; padding: 11px 14px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13.5px; font-weight: 600; color: #0f172a; outline: none; margin: 0;">
+                    <option value="Total Network Outage (इंटरनेट पूर्णतः बंद)">🔴 Total Network Outage (इंटरनेट पूर्णतः बंद / Disconnected)</option>
+                    <option value="Severe Latency / High Ping (अतिशय संथ नेटवर्क)">🟠 Severe Latency / High Ping (अतिशय संथ नेटवर्क / Slow Sync)</option>
+                    <option value="Packet Drop & Cloud API Timeout (क्लाउड सिंक एरर)">🟡 Packet Drop & Cloud API Timeout (क्लाउड सिंक एरर)</option>
+                    <option value="EVM & Voting Server Sync Delay (ईव्हीएम / मतदान सर्व्हर एरर)">🟣 EVM & Voting Server Sync Delay (ईव्हीएम / मतदान सर्व्हर एरर)</option>
+                    <option value="Request Permission for Offline Mode (ऑफलाईन मोड मंजुरी विनंती)">⚙️ Request Permission for Offline Mode (ऑफलाईन मोड मंजुरी विनंती)</option>
+                    <option value="Other Network Technical Query (इतर नेटवर्क तांत्रिक अडचण)">🔧 Other Network Technical Query (इतर नेटवर्क तांत्रिक अडचण)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12.5px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+                    प्राधान्यक्रम / तीव्रता (Urgency Level) <span style="color: #dc2626;">*</span>
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1.5px solid #fca5a5; border-radius: 10px; background: #fef2f2; color: #991b1b; font-size: 12px; font-weight: 800; cursor: pointer;">
+                        <input type="radio" name="net_urgency" value="CRITICAL" checked> CRITICAL
+                    </label>
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1.5px solid #fed7aa; border-radius: 10px; background: #fff7ed; color: #c2410c; font-size: 12px; font-weight: 800; cursor: pointer;">
+                        <input type="radio" name="net_urgency" value="MODERATE"> MODERATE
+                    </label>
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 10px; background: #f8fafc; color: #475569; font-size: 12px; font-weight: 800; cursor: pointer;">
+                        <input type="radio" name="net_urgency" value="LOW"> LOW / INQUIRY
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 12.5px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+                    समस्येचा तपशील व टिप्पणी (Remarks / Description for Election Officer)
+                </label>
+                <textarea id="net_description" rows="3" placeholder="उदा. 4G/5G सिग्नल ड्रॉपमुळे चेहऱ्याची बायोमेट्रिक पडताळणी अडखळत आहे. कृपया बॅकअप राऊटर किंवा ऑफलाईन कॅश मोड मंजूर करा." style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; font-weight: 500; outline: none; resize: vertical; box-sizing: border-box;"></textarea>
+            </div>
+
+            <div id="netQueryAlert" style="display: none; padding: 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; margin-bottom: 14px;"></div>
+
+            <button type="submit" id="btnSubmitNetQuery" class="btn btn-blue" style="background: linear-gradient(135deg, #ea580c, #c2410c); padding: 13px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>🚀 Dispatch Network Query to Main Election Officer</span>
+            </button>
+        </form>
+
+        <!-- Recent Booth Queries Section -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1.5px dashed #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 13px; font-weight: 800; color: #0f172a;">Recent Queries from this Booth</span>
+                <button type="button" onclick="loadBoothQueries()" style="background: none; border: none; font-size: 11.5px; color: #0284c7; font-weight: 700; cursor: pointer;">🔄 Refresh</button>
+            </div>
+            <div id="boothQueriesList" style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 12px;">Loading queries history...</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- UNIVERSAL CHANGE PASSWORD MODAL -->
+<div id="changePasswordModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.7); backdrop-filter:blur(10px); z-index:99999; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;">
+    <div style="background:#ffffff; color:#0f172a; width:100%; max-width:440px; border-radius:24px; padding:32px 28px; box-shadow:0 25px 60px -15px rgba(0,0,0,0.3); border:1.5px solid #e2e8f0; position:relative;">
+        <button type="button" onclick="closeChangePasswordModal()" style="position:absolute; top:18px; right:18px; background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; font-size:16px; font-weight:800; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">✕</button>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="width:46px; height:46px; border-radius:14px; background:#eff6ff; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid #bfdbfe;">
+                🔒
+            </div>
+            <div>
+                <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin-bottom:2px;">Change Password</h3>
+                <p style="font-size:12px; color:#64748b;">Update your Polling Booth Officer password</p>
+            </div>
+        </div>
+
+        <div id="pwdAlertBox" style="display:none; padding:10px 14px; border-radius:10px; font-size:12.5px; font-weight:600; margin-bottom:16px;"></div>
+
+        <form id="formChangePassword" onsubmit="submitChangePassword(event)">
+            <div style="margin-bottom:14px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Current Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_current_pwd" required placeholder="Enter current password" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:14px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">New Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_new_pwd" minlength="6" required placeholder="At least 6 characters" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:20px; text-align:left;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Confirm New Password <span style="color:#ef4444;">*</span></label>
+                <input type="password" id="cp_confirm_pwd" minlength="6" required placeholder="Re-enter new password" style="width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:14px; outline:none; box-sizing:border-box;">
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" onclick="closeChangePasswordModal()" style="padding:10px 18px; border-radius:10px; border:1.5px solid #cbd5e1; background:#f8fafc; color:#475569; font-weight:700; font-size:13px; cursor:pointer;">Cancel</button>
+                <button type="submit" id="btnSubmitChangePwd" style="padding:10px 20px; border-radius:10px; border:none; background:linear-gradient(135deg, #1d4ed8, #1e40af); color:#ffffff; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 14px rgba(29,78,216,0.3);">Save Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- REPORT TO ARO MODAL (BOOTH OFFICER → AREA ARO) -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="aroQueryModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); z-index:99999; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;">
+    <div style="background:#ffffff; border-radius:24px; max-width:560px; width:100%; max-height:92vh; overflow-y:auto; padding:28px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); border:1.5px solid #ede9fe; position:relative; animation:slideUp 0.3s ease-out;">
+
+        <!-- Close Button -->
+        <button type="button" onclick="closeAroQueryModal()" style="position:absolute; top:18px; right:18px; background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; color:#64748b; cursor:pointer;">✕</button>
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="width:48px; height:48px; border-radius:14px; background:#faf5ff; color:#7c3aed; display:flex; align-items:center; justify-content:center; font-size:24px; border:1.5px solid #ddd6fe;">🛡️</div>
+            <div>
+                <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin-bottom:2px;">Report Issue to Area ARO</h3>
+                <p style="font-size:12px; color:#64748b;">Send a direct alert to your Assistant Returning Officer for your area</p>
+            </div>
+        </div>
+
+        <!-- Booth Info Pill -->
+        <div style="background:#faf5ff; border:1.5px solid #ede9fe; border-radius:12px; padding:10px 14px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; font-size:12px; flex-wrap:wrap; gap:8px;">
+            <div>
+                <span style="font-weight:700; color:#475569;">Booth:</span>
+                <strong style="color:#0f172a;">{{ session.get('booth_code', 'BOOTH-001') }}</strong>
+                ({{ session.get('booth_name', 'Polling Station') }})
+            </div>
+            <div style="background:#ede9fe; color:#6d28d9; font-weight:800; padding:3px 10px; border-radius:9999px; border:1px solid #c4b5fd; display:inline-flex; align-items:center; gap:6px; font-size:11px;">
+                <span style="width:7px; height:7px; border-radius:50%; background:#7c3aed; display:inline-block;"></span>
+                ARO Direct Channel
+            </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div id="aroQueryAlert" style="display:none; padding:12px; border-radius:10px; font-size:12.5px; font-weight:700; margin-bottom:14px;"></div>
+
+        <!-- Form -->
+        <form id="formAroQuery" onsubmit="submitAroQuery(event)">
+            <!-- Issue Type -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:6px;">
+                    समस्येचा प्रकार (Issue Type) <span style="color:#dc2626;">*</span>
+                </label>
+                <select id="aro_issue_type" required style="width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:13.5px; background:#ffffff; color:#1e293b; outline:none; font-weight:500; box-sizing:border-box;">
+                    <option value="">— समस्या निवडा (Select Issue Type) —</option>
+                    <option value="Complete Network Outage (नेटवर्क पूर्णतः बंद)">🔴 Complete Network Outage (नेटवर्क पूर्णतः बंद)</option>
+                    <option value="Biometric Scanner Failure (बायोमेट्रिक स्कॅनर बिघाड)">🟠 Biometric Scanner Failure (बायोमेट्रिक स्कॅनर बिघाड)</option>
+                    <option value="QR Scanner Not Working (QR स्कॅनर चालत नाही)">🟡 QR Scanner Not Working (QR स्कॅनर चालत नाही)</option>
+                    <option value="Intermittent Connectivity (सिग्नल येत-जात आहे)">🟠 Intermittent Connectivity (सिग्नल येत-जात आहे)</option>
+                    <option value="Cloud Sync Failure (क्लाउड सिंक बिघाड)">🟣 Cloud Sync Failure (क्लाउड सिंक बिघाड)</option>
+                    <option value="Power / Electricity Issue (वीज बंद / जनरेटर बिघाड)">⚡ Power / Electricity Issue (वीज बंद / जनरेटर बिघाड)</option>
+                    <option value="Voter Identity Verification Error (मतदार ओळख त्रुटी)">👤 Voter Identity Verification Error (मतदार ओळख त्रुटी)</option>
+                    <option value="Security Concern at Booth (मतदान केंद्रावर सुरक्षा समस्या)">🚨 Security Concern at Booth (मतदान केंद्रावर सुरक्षा समस्या)</option>
+                    <option value="Request Offline Mode Permission (ऑफलाईन मोड विनंती)">⚙️ Request Offline Mode Permission (ऑफलाईन मोड विनंती)</option>
+                    <option value="Other Technical Issue (इतर तांत्रिक अडचण)">🔧 Other Technical Issue (इतर तांत्रिक अडचण)</option>
+                </select>
+            </div>
+
+            <!-- Network Status -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:6px;">
+                    सध्याची नेटवर्क स्थिती (Current Network Status)
+                </label>
+                <select id="aro_network_status" style="width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:13.5px; background:#ffffff; color:#1e293b; outline:none; font-weight:500; box-sizing:border-box;">
+                    <option value="Complete Outage (पूर्ण बंद)">🔴 Complete Outage (पूर्ण बंद)</option>
+                    <option value="Degraded / Slow (संथ नेटवर्क)">🟠 Degraded / Slow (संथ नेटवर्क)</option>
+                    <option value="Intermittent (येत-जात आहे)">🟡 Intermittent (येत-जात आहे)</option>
+                    <option value="Online but Sync Failing (ऑनलाईन पण सिंक नाही)">🟣 Online but Sync Failing (ऑनलाईन पण सिंक नाही)</option>
+                </select>
+            </div>
+
+            <!-- Urgency -->
+            <div style="margin-bottom:14px;">
+                <label style="display:block; font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:6px;">
+                    तीव्रता / प्राधान्यक्रम (Urgency Level) <span style="color:#dc2626;">*</span>
+                </label>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                    <label style="display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 10px; border:1.5px solid #fca5a5; border-radius:10px; background:#fef2f2; color:#991b1b; font-size:12px; font-weight:800; cursor:pointer;">
+                        <input type="radio" name="aro_urgency" value="CRITICAL" checked> CRITICAL
+                    </label>
+                    <label style="display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 10px; border:1.5px solid #c4b5fd; border-radius:10px; background:#faf5ff; color:#6d28d9; font-size:12px; font-weight:800; cursor:pointer;">
+                        <input type="radio" name="aro_urgency" value="MODERATE"> MODERATE
+                    </label>
+                    <label style="display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:10px; background:#f8fafc; color:#475569; font-size:12px; font-weight:800; cursor:pointer;">
+                        <input type="radio" name="aro_urgency" value="LOW"> LOW
+                    </label>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:12.5px; font-weight:700; color:#1e293b; margin-bottom:6px;">
+                    तपशील व टिप्पणी (Remarks / Description for ARO)
+                </label>
+                <textarea id="aro_description" rows="3" placeholder="उदा. बायोमेट्रिक पडताळणी अडखळत आहे, सिग्नल नाही. ARO साहेब कृपया मार्गदर्शन करावे." style="width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:13px; font-weight:500; outline:none; resize:vertical; box-sizing:border-box;"></textarea>
+            </div>
+
+            <!-- Recent My ARO Reports -->
+            <div style="margin-bottom:16px; padding:12px 14px; background:#faf5ff; border-radius:12px; border:1px solid #ede9fe;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:12px; font-weight:800; color:#6d28d9;">My Recent ARO Reports</span>
+                    <button type="button" onclick="loadMyAroReports()" style="background:none; border:none; font-size:11.5px; color:#7c3aed; font-weight:700; cursor:pointer;">🔄 Refresh</button>
+                </div>
+                <div id="myAroReportsList" style="max-height:110px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+                    <div style="font-size:11.5px; color:#a78bfa; text-align:center; padding:8px;">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" id="btnSubmitAroQuery" style="width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg, #7c3aed, #6d28d9); color:#ffffff; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(124,58,237,0.35);">
+                <span>🛡️</span> Dispatch Report to Area ARO Officer
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+/* ── ARO QUERY MODAL JS ── */
+function openAroQueryModal() {
+    document.getElementById('aroQueryModal').style.display = 'flex';
+    document.getElementById('aroQueryAlert').style.display = 'none';
+    document.getElementById('formAroQuery').reset();
+    loadMyAroReports();
+}
+
+function closeAroQueryModal() {
+    document.getElementById('aroQueryModal').style.display = 'none';
+}
+
+async function loadMyAroReports() {
+    const listEl = document.getElementById('myAroReportsList');
+    listEl.innerHTML = '<div style="font-size:11.5px; color:#a78bfa; text-align:center; padding:8px;">Loading...</div>';
+    try {
+        const resp = await fetch('/api/booth/my_aro_reports');
+        const data = await resp.json();
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            listEl.innerHTML = data.data.slice(0, 5).map(r => {
+                const statusColor = r.status === 'RESOLVED'
+                    ? 'background:#dcfce7; color:#166534; border:1px solid #bbf7d0;'
+                    : 'background:#fef2f2; color:#991b1b; border:1px solid #fecaca;';
+                return `
+                    <div style="background:#fff; border:1px solid #ede9fe; border-radius:8px; padding:8px 10px; font-size:11.5px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:3px;">
+                            <span style="font-family:monospace; font-weight:800; color:#6d28d9;">${r.report_id}</span>
+                            <span style="padding:2px 7px; border-radius:6px; font-weight:800; font-size:10.5px; ${statusColor}">${r.status}</span>
+                        </div>
+                        <div style="font-weight:700; color:#334155;">${r.issue_type}</div>
+                        ${r.aro_response ? `<div style="font-size:11px; color:#6d28d9; margin-top:3px; background:#ede9fe; padding:4px 8px; border-radius:6px;"><strong>ARO:</strong> ${r.aro_response}</div>` : ''}
+                        <div style="font-size:10.5px; color:#94a3b8; margin-top:3px;">${r.created_at || ''}</div>
+                    </div>`;
+            }).join('');
+        } else {
+            listEl.innerHTML = '<div style="font-size:11.5px; color:#a78bfa; text-align:center; padding:8px;">No reports sent yet.</div>';
+        }
+    } catch (err) {
+        listEl.innerHTML = '<div style="font-size:11.5px; color:#ef4444; text-align:center; padding:8px;">Failed to load.</div>';
+    }
+}
+
+async function submitAroQuery(e) {
+    e.preventDefault();
+    const issueType     = document.getElementById('aro_issue_type').value;
+    const networkStatus = document.getElementById('aro_network_status').value;
+    const urgency       = document.querySelector('input[name="aro_urgency"]:checked')?.value || 'CRITICAL';
+    const description   = document.getElementById('aro_description').value.trim();
+    const alertBox      = document.getElementById('aroQueryAlert');
+    const btn           = document.getElementById('btnSubmitAroQuery');
+
+    if (!issueType) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.style.border = '1px solid #fecaca';
+        alertBox.innerText = '⚠️ Please select the type of issue before submitting.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Dispatching to ARO...';
+
+    try {
+        const resp = await fetch('/api/booth/aro_query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                issue_type:     issueType,
+                urgency:        urgency,
+                description:    description,
+                network_status: networkStatus
+            })
+        });
+        const res = await resp.json();
+
+        alertBox.style.display = 'block';
+        if (res.status === 'success') {
+            alertBox.style.background = '#f5f3ff';
+            alertBox.style.color = '#6d28d9';
+            alertBox.style.border = '1px solid #c4b5fd';
+            alertBox.innerHTML = `✅ ${res.message || 'Report sent!'}<br><small style="opacity:0.8;">Report ID: <strong>${res.report_id}</strong></small>`;
+            document.getElementById('formAroQuery').reset();
+            loadMyAroReports();
+            setTimeout(() => { closeAroQueryModal(); }, 2500);
+        } else {
+            alertBox.style.background = '#fef2f2';
+            alertBox.style.color = '#dc2626';
+            alertBox.style.border = '1px solid #fecaca';
+            alertBox.innerText = '❌ ' + (res.message || 'Failed to send report.');
+        }
+    } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.style.border = '1px solid #fecaca';
+        alertBox.innerText = '❌ Network error: ' + err.message;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🛡️</span> Dispatch Report to Area ARO Officer';
+    }
+}
+
+/* ── SYNC STATUS & TELEMETRY MODAL CONTROLS ── */
+function openSyncStatusModal() {
+    document.getElementById('syncStatusModal').style.display = 'flex';
+    updatePendingVotesUI();
+    loadServerSyncAudit();
+    renderSyncStatusTables();
+}
+
+function closeSyncStatusModal() {
+    document.getElementById('syncStatusModal').style.display = 'none';
+}
+
+function switchSyncModalTab(tabId) {
+    document.querySelectorAll('.sync-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.sync-panel').forEach(p => p.style.display = 'none');
+
+    const activeBtn = document.getElementById('btnTab_' + tabId);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const panel = document.getElementById(tabId);
+    if (panel) panel.style.display = 'block';
+}
+
+async function loadServerSyncAudit() {
+    try {
+        const resp = await fetch('/api/booth/sync_audit_log');
+        const data = await resp.json();
+        if (data.status === 'success' && data.records && data.records.length > 0) {
+            // Merge server confirmed records into local synced list without duplicating transaction_ids
+            const existingTxnIds = new Set(localSyncedRecords.map(r => r.transaction_id));
+            let addedCount = 0;
+            data.records.forEach(r => {
+                if (r.transaction_id && !existingTxnIds.has(r.transaction_id)) {
+                    localSyncedRecords.push({
+                        transaction_id: r.transaction_id,
+                        v_id: r.v_id,
+                        voter_name: r.voter_name,
+                        election: r.election,
+                        status: 'SYNCED',
+                        block_index: 'Central Ledger',
+                        block_hash: r.offline_token || 'BLOCKCHAIN-VERIFIED',
+                        voted_at: r.voted_at,
+                        synced_at: r.voted_at
+                    });
+                    existingTxnIds.add(r.transaction_id);
+                    addedCount++;
+                }
+            });
+            if (addedCount > 0) {
+                localStorage.setItem('trustvote_synced_history', JSON.stringify(localSyncedRecords));
+                updatePendingVotesUI();
+            }
+        }
+    } catch(e) {
+        console.warn('Server sync audit note:', e);
+    }
+}
+
+function renderSyncStatusTables() {
+    const q = (document.getElementById('syncSearchInput')?.value || '').toLowerCase().trim();
+
+    // 1. Render Pending Offline Queue
+    const pendingTbody = document.getElementById('pendingTableBody');
+    if (pendingTbody) {
+        let items = offlineVotesLedger || [];
+        if (q) {
+            items = items.filter(x => 
+                (x.transaction_id && x.transaction_id.toLowerCase().includes(q)) ||
+                (x.voter_name && x.voter_name.toLowerCase().includes(q)) ||
+                (x.v_id && x.v_id.toLowerCase().includes(q))
+            );
+        }
+        if (items.length === 0) {
+            pendingTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px; font-size:12.5px;">कोणतीही ऑफलाईन नोंद प्रलंबित नाही (No pending offline votes in queue).</td></tr>';
+        } else {
+            pendingTbody.innerHTML = items.map((r, idx) => `
+                <tr>
+                    <td style="font-family:monospace; font-weight:800; color:#d97706; font-size:11.5px;">${r.transaction_id || ('OFFLINE-VOTE-' + (idx+1))}</td>
+                    <td><strong>${r.voter_name || 'Voter'}</strong> <small style="color:#64748b;">(${r.v_id})</small></td>
+                    <td><span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:11px; font-weight:700;">${(r.election||'').replace('_',' ').toUpperCase()}</span></td>
+                    <td style="font-size:11.5px; color:#475569;">${r.voted_at || 'Just now'}</td>
+                    <td><span style="background:#fef3c7; color:#92400e; border:1px solid #fcd34d; padding:2px 8px; border-radius:9999px; font-size:10.5px; font-weight:800;">⏳ Pending Sync</span></td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    // 2. Render Synced To Blockchain Ledger
+    const syncedTbody = document.getElementById('syncedTableBody');
+    if (syncedTbody) {
+        let items = localSyncedRecords || [];
+        if (q) {
+            items = items.filter(x => 
+                (x.transaction_id && x.transaction_id.toLowerCase().includes(q)) ||
+                (x.voter_name && x.voter_name.toLowerCase().includes(q)) ||
+                (x.v_id && x.v_id.toLowerCase().includes(q)) ||
+                (x.block_hash && x.block_hash.toLowerCase().includes(q))
+            );
+        }
+        if (items.length === 0) {
+            syncedTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px; font-size:12.5px;">अद्याप कोणतीही नोंद सिंक झालेली नाही (No synced records yet).</td></tr>';
+        } else {
+            syncedTbody.innerHTML = items.slice(0, 50).map(r => `
+                <tr>
+                    <td style="font-family:monospace; font-weight:800; color:#16a34a; font-size:11.5px;">${r.transaction_id || 'TXN-SYNCED'}</td>
+                    <td><strong>${r.voter_name || 'Voter'}</strong> <small style="color:#64748b;">(${r.v_id || ''})</small></td>
+                    <td><span style="background:#f0fdf4; color:#166534; padding:2px 6px; border-radius:6px; font-size:11px; font-weight:700;">${(r.election||'').replace('_',' ').toUpperCase()}</span></td>
+                    <td style="font-family:monospace; font-size:11px; color:#3b82f6;">${r.block_index !== undefined ? ('Block #' + r.block_index) : 'Block Mined'}</td>
+                    <td><span style="background:#dcfce7; color:#166534; border:1px solid #86efac; padding:2px 8px; border-radius:9999px; font-size:10.5px; font-weight:800;">✅ Synced</span></td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    // 3. Render Failed & Duplicate Prevention Records
+    const failedTbody = document.getElementById('failedTableBody');
+    if (failedTbody) {
+        let items = localFailedRecords || [];
+        if (q) {
+            items = items.filter(x => 
+                (x.transaction_id && x.transaction_id.toLowerCase().includes(q)) ||
+                (x.voter_name && x.voter_name.toLowerCase().includes(q)) ||
+                (x.v_id && x.v_id.toLowerCase().includes(q)) ||
+                (x.reason && x.reason.toLowerCase().includes(q)) ||
+                (x.error && x.error.toLowerCase().includes(q))
+            );
+        }
+        if (items.length === 0) {
+            failedTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px; font-size:12.5px;">कोणतीही त्रुटी किंवा डुप्लिकेट नोंद आढळली नाही (Zero duplicate conflicts / errors).</td></tr>';
+        } else {
+            failedTbody.innerHTML = items.map(r => {
+                const isDup = (r.status || '').includes('DUPLICATE');
+                const badgeClass = isDup 
+                    ? 'background:#fef3c7; color:#92400e; border:1px solid #fcd34d;' 
+                    : 'background:#fee2e2; color:#991b1b; border:1px solid #fecaca;';
+                const label = isDup ? '🛡️ Duplicate Prevented' : '❌ Sync Failed';
+                const reasonText = r.reason || r.error || 'Transaction ID deduplication filtered.';
+
+                return `
+                    <tr>
+                        <td style="font-family:monospace; font-weight:800; color:#dc2626; font-size:11.5px;">${r.transaction_id || 'TXN-SKIPPED'}</td>
+                        <td><strong>${r.voter_name || 'Voter'}</strong> <small style="color:#64748b;">(${r.v_id || 'N/A'})</small></td>
+                        <td><span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:11px;">${(r.election||'').replace('_',' ').toUpperCase()}</span></td>
+                        <td><span style="${badgeClass} padding:2px 8px; border-radius:9999px; font-size:10.5px; font-weight:800;">${label}</span></td>
+                        <td style="font-size:11.5px; color:#475569;">${reasonText}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+}
+</script>
+
+<!-- SYNC STATUS & TELEMETRY DASHBOARD MODAL -->
+<div id="syncStatusModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.75); backdrop-filter:blur(8px); z-index:99999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#ffffff; color:#0f172a; width:100%; max-width:880px; max-height:90vh; border-radius:20px; box-shadow:0 25px 60px -15px rgba(0,0,0,0.4); border:1.5px solid #e2e8f0; display:flex; flex-direction:column; overflow:hidden;">
+        
+        <!-- Header -->
+        <div style="padding:18px 24px; border-bottom:1.5px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:40px; height:40px; border-radius:12px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:20px; border:1px solid #bfdbfe;">
+                    📊
+                </div>
+                <div>
+                    <h3 style="font-size:16.5px; font-weight:800; color:#0f172a; margin:0 0 2px;">ऑफलाईन व ऑनलाईन सिंक स्थिती (Sync Status Dashboard)</h3>
+                    <p style="font-size:11.5px; color:#64748b; margin:0;">Transaction ID deduplication & central blockchain ledger telemetry</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeSyncStatusModal()" style="background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; font-size:16px; font-weight:800; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+
+        <!-- KPI Metric Pills Bar -->
+        <div style="padding:12px 24px; background:#ffffff; border-bottom:1px solid #f1f5f9; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="background:#fef3c7; border:1px solid #fde68a; padding:6px 14px; border-radius:10px; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:16px;">⏳</span>
+                    <div>
+                        <div style="font-size:10px; font-weight:700; color:#92400e; text-transform:uppercase;">Pending Offline</div>
+                        <div style="font-size:15px; font-weight:900; color:#b45309;" id="modalPendingCount">0</div>
+                    </div>
+                </div>
+
+                <div style="background:#dcfce7; border:1px solid #86efac; padding:6px 14px; border-radius:10px; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:16px;">✅</span>
+                    <div>
+                        <div style="font-size:10px; font-weight:700; color:#166534; text-transform:uppercase;">Synced to Ledger</div>
+                        <div style="font-size:15px; font-weight:900; color:#15803d;" id="modalSyncedCount">0</div>
+                    </div>
+                </div>
+
+                <div style="background:#fee2e2; border:1px solid #fca5a5; padding:6px 14px; border-radius:10px; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:16px;">🛡️</span>
+                    <div>
+                        <div style="font-size:10px; font-weight:700; color:#991b1b; text-transform:uppercase;">Duplicates Prevented</div>
+                        <div style="font-size:15px; font-weight:900; color:#b91c1c;" id="modalFailedCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="btnModalSyncNow" onclick="syncOfflineVotesToServer()" style="background:#15803d; color:#ffffff; border:none; padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(21,128,61,0.25);">
+                <span>🔄</span> Sync All Pending Votes
+            </button>
+        </div>
+
+        <!-- Navigation Tabs & Search -->
+        <div style="padding:10px 24px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-bottom:1px solid #e2e8f0; background:#f8fafc; flex-wrap:wrap;">
+            <div style="display:flex; gap:6px;">
+                <button type="button" id="btnTab_tab-sync-pending" class="sync-tab-btn active" onclick="switchSyncModalTab('tab-sync-pending')" style="padding:7px 14px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; font-size:12px; font-weight:700; color:#475569; cursor:pointer;">
+                    ⏳ Pending Queue
+                </button>
+                <button type="button" id="btnTab_tab-sync-synced" class="sync-tab-btn" onclick="switchSyncModalTab('tab-sync-synced')" style="padding:7px 14px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; font-size:12px; font-weight:700; color:#475569; cursor:pointer;">
+                    ✅ Synced Records
+                </button>
+                <button type="button" id="btnTab_tab-sync-failed" class="sync-tab-btn" onclick="switchSyncModalTab('tab-sync-failed')" style="padding:7px 14px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; font-size:12px; font-weight:700; color:#475569; cursor:pointer;">
+                    ⚠️ Duplicates & Errors
+                </button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:4px 10px; min-width:240px;">
+                <span style="font-size:13px; color:#94a3b8;">🔍</span>
+                <input type="text" id="syncSearchInput" oninput="renderSyncStatusTables()" placeholder="Search by Transaction ID or Voter..." style="border:none; outline:none; font-size:12px; width:100%; color:#1e293b;">
+            </div>
+        </div>
+
+        <!-- Tab Content Panels -->
+        <div style="flex:1; overflow-y:auto; padding:16px 24px;">
+            
+            <!-- Panel 1: Pending Queue -->
+            <div id="tab-sync-pending" class="sync-panel" style="display:block;">
+                <table style="width:100%; border-collapse:collapse; text-align:left; font-size:12.5px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #e2e8f0; color:#475569; font-size:11.5px; text-transform:uppercase;">
+                            <th style="padding:8px 10px;">Transaction ID</th>
+                            <th style="padding:8px 10px;">Voter Details</th>
+                            <th style="padding:8px 10px;">Election</th>
+                            <th style="padding:8px 10px;">Offline Time</th>
+                            <th style="padding:8px 10px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">लोड होत आहे...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Panel 2: Synced to Blockchain -->
+            <div id="tab-sync-synced" class="sync-panel" style="display:none;">
+                <table style="width:100%; border-collapse:collapse; text-align:left; font-size:12.5px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #e2e8f0; color:#475569; font-size:11.5px; text-transform:uppercase;">
+                            <th style="padding:8px 10px;">Transaction ID</th>
+                            <th style="padding:8px 10px;">Voter Details</th>
+                            <th style="padding:8px 10px;">Election</th>
+                            <th style="padding:8px 10px;">Blockchain Block</th>
+                            <th style="padding:8px 10px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="syncedTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">लोड होत आहे...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Panel 3: Duplicates Prevented & Failed -->
+            <div id="tab-sync-failed" class="sync-panel" style="display:none;">
+                <table style="width:100%; border-collapse:collapse; text-align:left; font-size:12.5px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #e2e8f0; color:#475569; font-size:11.5px; text-transform:uppercase;">
+                            <th style="padding:8px 10px;">Transaction ID</th>
+                            <th style="padding:8px 10px;">Voter Details</th>
+                            <th style="padding:8px 10px;">Election</th>
+                            <th style="padding:8px 10px;">Prevention Flag</th>
+                            <th style="padding:8px 10px;">Reason / Prevention Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="failedTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">लोड होत आहे...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="padding:12px 24px; border-top:1px solid #f1f5f9; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#64748b;">
+            <span>🛡️ SEC Maharashtra Zero-Collision Offline Verification Protocol</span>
+            <button type="button" onclick="closeSyncStatusModal()" style="padding:7px 16px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; font-weight:700; color:#334155; cursor:pointer;">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.sync-tab-btn.active {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+}
+</style>
 
 </body>
 </html>

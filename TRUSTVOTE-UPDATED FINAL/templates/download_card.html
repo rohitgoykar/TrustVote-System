@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First-Time Voter Portal & Form No. 6 | State Election Commission Maharashtra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.96);
+            --border-subtle: #e2e8f0;
+            --border-focus: #0284c7;
+            --accent-primary: #0284c7;
+            --accent-primary-hover: #0369a1;
+            --accent-saffron: #f97316;
+            --accent-green: #15803d;
+            --text-main: #0f172a;
+            --text-muted: #334155;
+            --text-subtle: #64748b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', 'Inter', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            background: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated Indian Flag Background */
+        .flag-bg-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .flag-bg-image {
+            position: absolute;
+            top: -6%; left: -6%;
+            width: 112%; height: 112%;
+            background: url('/static/india_flag_bg.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.92) saturate(1.18) contrast(1.05);
+            animation: flagCinematicMotion 24s ease-in-out infinite alternate;
+            transform-origin: 60% 40%;
+        }
+
+        @keyframes flagCinematicMotion {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+            35% { transform: scale(1.04) translate(-1.5%, 1%) rotate(0.4deg); }
+            70% { transform: scale(1.02) translate(1.2%, -0.8%) rotate(-0.3deg); }
+            100% { transform: scale(1.06) translate(0.5%, 1.2%) rotate(0.3deg); }
+        }
+
+        .flag-bg-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(248, 250, 252, 0.88) 45%, rgba(241, 245, 249, 0.96) 100%),
+                        radial-gradient(circle at 82% 18%, rgba(255, 153, 51, 0.16) 0%, transparent 55%),
+                        radial-gradient(circle at 18% 82%, rgba(21, 128, 61, 0.12) 0%, transparent 60%);
+        }
+
+        .flag-glow-aura {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 78% 22%, rgba(255, 190, 60, 0.18) 0%, transparent 48%);
+            animation: pulseGoldenAura 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGoldenAura {
+            0% { opacity: 0.35; }
+            50% { opacity: 0.75; }
+            100% { opacity: 0.45; }
+        }
+
+        /* Tricolor Top Bar */
+        .tricolor-stripe {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: linear-gradient(to right, #ff9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        #astroCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Top Navigation Header */
+        .portal-nav {
+            position: relative;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
+        }
+
+        .brand-logo img { width: 34px; height: 34px; object-fit: contain; }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+
+        .brand-sub {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0284c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-switch {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+        }
+
+        .user-pill {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-logout-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            max-width: 1060px;
+            width: 95%;
+            margin: 24px auto 60px;
+            flex: 1;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0369a1;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.12);
+        }
+
+        .hero-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .hero-sub {
+            font-size: 14px;
+            color: #475569;
+            max-width: 760px;
+            margin: 0 auto;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* ── SEPARATED TOP PRIMARY ACTION CARDS ── */
+        .top-nav-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        @media (max-width: 768px) {
+            .top-nav-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        .top-action-card {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 20px 22px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.06);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: left;
+            user-select: none;
+        }
+
+        .top-action-card:hover {
+            transform: translateY(-3px);
+            border-color: #38bdf8;
+            box-shadow: 0 16px 36px -8px rgba(2, 132, 199, 0.2);
+            background: #ffffff;
+        }
+
+        .top-action-card.active {
+            background: #ffffff;
+            border-color: #0284c7;
+            box-shadow: 0 16px 35px -5px rgba(2, 132, 199, 0.25), 0 0 0 2px #0284c7;
+        }
+
+        .top-action-card.active.card-form6 {
+            border-color: #2563eb;
+            box-shadow: 0 16px 35px -5px rgba(37, 99, 235, 0.28), 0 0 0 2px #2563eb;
+        }
+
+        .top-action-card.active::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #0284c7, #2563eb);
+        }
+
+        .top-action-card.active.card-form6::before {
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+        }
+
+        .top-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .top-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        .top-action-card:not(.active) .top-card-icon {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .top-action-card.active.card-form6 .top-card-icon {
+            background: #eff6ff;
+            color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .top-action-card.active.card-download .top-card-icon {
+            background: #e0f2fe;
+            color: #0284c7;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+
+        .top-card-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.3px;
+        }
+
+        .top-action-card.active.card-form6 .top-card-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .top-action-card.active.card-download .top-card-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .top-action-card:not(.active) .top-card-badge {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .top-card-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 2px;
+            letter-spacing: -0.2px;
+        }
+
+        .top-card-mr {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #0284c7;
+            margin-bottom: 6px;
+        }
+        .top-action-card.card-form6 .top-card-mr {
+            color: #2563eb;
+        }
+
+        .top-card-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .top-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .top-action-card.active.card-form6 .top-card-footer {
+            color: #2563eb;
+        }
+
+        .top-action-card.active.card-download .top-card-footer {
+            color: #0284c7;
+        }
+
+        .top-action-card:not(.active) .top-card-footer {
+            color: #64748b;
+        }
+
+        /* ── SECTION CARDS ── */
+        .content-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(203, 213, 225, 0.95);
+            border-radius: 24px;
+            padding: 32px 36px;
+            box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff9933 0%, #0284c7 50%, #15803d 100%);
+        }
+
+        /* ── FORM NO. 6 SPECIFIC STYLES ── */
+        .form6-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .form6-title-group h2 {
+            font-size: 20px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .form6-title-group p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin: 24px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-3, .grid-2 { grid-template-columns: 1fr; }
+            .portal-nav { padding: 12px 18px; }
+            .content-card { padding: 22px 20px; }
+            .primary-tab-btn { font-size: 12.5px; padding: 10px 12px; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .req-star { color: #dc2626; font-weight: 900; }
+
+        .form-control {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 11px 14px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Camera Box */
+        .camera-container {
+            background: #f8fafc;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .video-preview-box {
+            position: relative;
+            width: 280px;
+            height: 210px;
+            margin: 0 auto 14px;
+            background: #0f172a;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25);
+        }
+
+        .video-preview-box video, .video-preview-box canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cam {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cam-capture {
+            background: #0f172a;
+            color: #ffffff;
+        }
+        .btn-cam-capture:hover { background: #1e293b; }
+
+        .btn-cam-retake {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            display: none;
+        }
+        .btn-cam-retake:hover { background: #fecaca; }
+
+        /* Local Body Pills */
+        .local-body-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .lb-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: #f1f5f9;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lb-pill input { cursor: pointer; }
+        .lb-pill:has(input:checked) {
+            background: #e0f2fe;
+            border-color: #0284c7;
+            color: #0369a1;
+        }
+
+        .btn-submit-form6 {
+            width: 100%;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+            transition: all 0.25s;
+        }
+
+        .btn-submit-form6:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px -4px rgba(37, 99, 235, 0.55);
+        }
+
+        .btn-submit-form6:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── TAB 2 LOGIN CREDENTIAL CARD / GATE ── */
+        .login-gate-box {
+            max-width: 580px;
+            margin: 10px auto 20px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 32px 36px;
+            box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.08);
+            position: relative;
+        }
+
+        .login-gate-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0284c7, #2563eb);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .login-gate-header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .lock-icon-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            border: 1.5px solid #bae6fd;
+            font-size: 24px;
+        }
+
+        .login-gate-title {
+            font-size: 21px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .login-gate-sub {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.45;
+        }
+
+        .auth-mode-pills {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .auth-mode-btn {
+            padding: 9px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #64748b;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .auth-mode-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+        }
+
+        .auth-mode-btn.active.mode-signup {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.35);
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 16px 12px 42px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .input-field:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.14);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        .btn-auth-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px;
+            font-size: 14.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.4);
+            transition: all 0.25s;
+            margin-top: 8px;
+        }
+
+        .btn-auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.6);
+        }
+
+        .btn-auth-submit.btn-signup-action {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            box-shadow: 0 8px 24px -4px rgba(22, 163, 74, 0.4);
+        }
+        .btn-auth-submit.btn-signup-action:hover {
+            box-shadow: 0 12px 28px -4px rgba(22, 163, 74, 0.6);
+        }
+
+        .alert-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-box.success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12.5px;
+            color: #64748b;
+        }
+
+        .switch-link a {
+            color: #0284c7;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .switch-link a:hover { text-decoration: underline; }
+
+        /* ── SEARCH & DOWNLOAD TAB STYLES (AUTHENTICATED) ── */
+        .user-auth-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 14px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border-color: #0284c7;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 30px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.4);
+            transition: all 0.25s;
+            height: 48px;
+            white-space: nowrap;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.6);
+        }
+
+        /* Result Container */
+        #result-container {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-card {
+            border-radius: 20px;
+            padding: 26px 30px;
+            margin-bottom: 24px;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .status-card.pending {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            box-shadow: 0 15px 40px -10px rgba(245, 158, 11, 0.15);
+        }
+
+        .status-card.approved {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            box-shadow: 0 15px 40px -10px rgba(22, 163, 74, 0.15);
+        }
+
+        .status-card.rejected {
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            box-shadow: 0 15px 40px -10px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Success Submission Box */
+        .app-success-modal {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 22px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 40px -10px rgba(22, 163, 74, 0.2);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .app-id-pill-lg {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-size: 24px;
+            font-weight: 900;
+            font-family: monospace;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin: 14px 0;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Step Roadmaps */
+        .step-roadmap {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step-point {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            margin: 0 auto 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle.done { background: #16a34a; color: white; }
+        .step-circle.active { background: #2563eb; color: white; box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.2); }
+        .step-circle.wait { background: #e2e8f0; color: #64748b; }
+
+        .step-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        /* Card Previews */
+        .card-preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .preview-pane {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 8px 20px -6px rgba(0,0,0,0.06);
+        }
+
+        .preview-pane img {
+            width: 100%;
+            max-height: 260px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-download-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-dl-green {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-dl-green:hover { background: #15803d; transform: translateY(-1px); }
+
+        .btn-dl-blue {
+            background: #0284c7;
+            color: white;
+        }
+        .btn-dl-blue:hover { background: #0369a1; transform: translateY(-1px); }
+
+        .btn-dl-purple {
+            background: #7c3aed;
+            color: white;
+        }
+        .btn-dl-purple:hover { background: #6d28d9; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div class="tricolor-stripe"></div>
+
+    <!-- Animated Flags & Lights -->
+    <div class="flag-bg-container">
+        <div class="flag-bg-image"></div>
+        <div class="flag-bg-overlay"></div>
+        <div class="flag-glow-aura"></div>
+    </div>
+    <canvas id="astroCanvas"></canvas>
+
+    <!-- Top Navigation -->
+    <nav class="portal-nav">
+        <a href="/" class="brand-group">
+            <div class="brand-logo">
+                <img src="/static/logo.png" onerror="this.src='/static/india_flag_bg.png'" alt="SEC Emblem">
+            </div>
+            <div>
+                <div class="brand-title">महाराष्ट्र राज्य निवडणूक आयोग</div>
+                <div class="brand-sub">State Election Commission of Maharashtra • First-Time Voter Portal</div>
+            </div>
+        </a>
+
+        <div class="nav-actions">
+            <div class="user-pill" id="nav-user-pill">
+                <span>👤</span>
+                <span id="user-display-name">{% if is_logged_in and user and user.user_name %}{{ user.user_name }}{% else %}First-Time Applicant{% endif %}</span>
+            </div>
+            <div class="lang-switch">
+                <div class="lang-btn active" id="btn-lang-mr" onclick="setPortalLang('mr')">मराठी</div>
+                <div class="lang-btn" id="btn-lang-en" onclick="setPortalLang('en')">English</div>
+            </div>
+            <a href="/logout" class="nav-logout-btn" id="nav-logout-btn" style="{% if not is_logged_in %}display:none;{% endif %}">
+                <span>🚪</span> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        
+        <!-- Hero Header -->
+        <header class="hero-banner">
+            <div class="hero-badge">
+                <span>🏛️</span> SEC Maharashtra Certified • Form No. 6 & Digital e-EPIC System
+            </div>
+            <h1 class="hero-title" id="hero-title-text">नवीन मतदार नोंदणी व e-EPIC डाउनलोड पोर्टल</h1>
+            <p class="hero-sub" id="hero-sub-text">
+                Apply for your First-Time Voter ID (Form No. 6), obtain your official Application ID, track statutory ERO verification, and instantly download your certified e-EPIC Card & QR Voting Pass.
+            </p>
+        </header>
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <!-- ── SEPARATED TOP PRIMARY ACTION CARDS ── -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div class="top-nav-cards-grid" id="topNavCardsGrid">
+            <!-- 1. NEW REGISTRATION FOR FIRST TIME APPLICANT -->
+            <div class="top-action-card card-form6" id="btn-tab-form6" onclick="switchPrimaryTab('form6')">
+                <div class="top-card-header">
+                    <div class="top-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    </div>
+                    <span class="top-card-badge">नमुना ६ (Form No. 6)</span>
+                </div>
+                <div class="top-card-title">1. New Registration for First Time Applicant</div>
+                <div class="top-card-mr">नवीन मतदार नोंदणी अर्ज</div>
+                <p class="top-card-desc">Apply for inclusion in electoral roll (Age 18+), live photo biometric capture & instant Application ID.</p>
+                <div class="top-card-footer">
+                    <span>📋 Click to Open Form No. 6</span>
+                    <span>→</span>
+                </div>
+            </div>
+
+            <!-- 2. DOWNLOAD e-EPIC & TRACK CARD -->
+            <div class="top-action-card card-download" id="btn-tab-download" onclick="switchPrimaryTab('download')">
+                <div class="top-card-header">
+                    <div class="top-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <span class="top-card-badge">📥 e-EPIC & Status</span>
+                </div>
+                <div class="top-card-title">2. Download e-EPIC & Track Card</div>
+                <div class="top-card-mr">e-EPIC डाऊनलोड व कार्ड ट्रॅकिंग</div>
+                <p class="top-card-desc">Track statutory ERO verification status and download official digital Voter ID Card & QR Voting Pass.</p>
+                <div class="top-card-footer">
+                    <span>📥 Click to Open e-EPIC Download</span>
+                    <span>→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <!-- INITIAL SELECTION DASHBOARD (Shown before tab click)  -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <div id="welcome-selection-card" class="content-card" style="text-align: center; padding: 36px 30px;">
+            <div style="width: 58px; height: 58px; border-radius: 18px; background: linear-gradient(135deg, #e0f2fe, #dbeafe); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; border: 1.5px solid #bae6fd; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15);">
+                🏛️
+            </div>
+            <h2 style="font-size: 22px; font-weight: 900; color: #0f172a; margin-bottom: 6px;">
+                निवडणूक आयोग मतदार सेवेमध्ये आपले स्वागत आहे
+            </h2>
+            <p style="font-size: 13.5px; color: #475569; max-width: 620px; margin: 0 auto 24px; line-height: 1.5;">
+                कृपया पुढे जाण्यासाठी वरील दोन स्वतंत्र टॅबपैकी एकावर क्लिक करा (Please click on one of the two separated tabs above to open):
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 720px; margin: 0 auto 24px; text-align: left;">
+                <div onclick="switchPrimaryTab('form6')" style="background: #ffffff; border: 2px solid #bfdbfe; border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(37,99,235,0.06);" onmouseover="this.style.borderColor='#2563eb'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#bfdbfe'; this.style.transform='none';">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 24px;">📋</span>
+                        <span style="font-size: 11px; font-weight: 800; background: #dbeafe; color: #1d4ed8; padding: 3px 10px; border-radius: 9999px;">Tab 1</span>
+                    </div>
+                    <div style="font-size: 15px; font-weight: 900; color: #1e3a8a;">1. New Registration (नमुना ६)</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Fill Form No. 6, capture live photo & auto-verify Aadhaar.</div>
+                    <div style="font-size: 12px; font-weight: 800; color: #2563eb; margin-top: 10px;">Click to Open Form No. 6 →</div>
+                </div>
+
+                <div onclick="switchPrimaryTab('download')" style="background: #ffffff; border: 2px solid #bae6fd; border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(2,132,199,0.06);" onmouseover="this.style.borderColor='#0284c7'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#bae6fd'; this.style.transform='none';">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 24px;">📥</span>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 9999px;">Tab 2</span>
+                    </div>
+                    <div style="font-size: 15px; font-weight: 900; color: #0369a1;">2. Download e-EPIC & Track</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Track ERO verification status and download official digital Voter Card.</div>
+                    <div style="font-size: 12px; font-weight: 800; color: #0284c7; margin-top: 10px;">Click to Open Download Portal →</div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 16px; font-size: 12px; color: #64748b; font-weight: 700; flex-wrap: wrap;">
+                <span>🔒 SEC Official Enrolment</span>
+                <span>•</span>
+                <span>🪪 Instant Aadhaar Match Verification</span>
+                <span>•</span>
+                <span>⚡ Live Photo Biometric Capture</span>
+            </div>
+        </div>
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <!-- VIEW 1: FIRST-TIME APPLICANT FORM NO. 6 REGISTRATION -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <section id="view-form6" class="content-card" style="display: none;">
+            
+            <!-- Top Back Bar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; gap:10px;">
+                <button type="button" onclick="showSelectionOverview()" class="btn-cam" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:12px; padding:6px 14px;">
+                    ← Back to Options (पर्याय निवडीकडे परत जा)
+                </button>
+                <span style="font-size:12px; font-weight:800; color:#2563eb; background:#eff6ff; padding:4px 12px; border-radius:9999px; border:1px solid #bfdbfe;">
+                    Active Section: 1. New Registration (Form No. 6)
+                </span>
+            </div>
+            
+            <!-- Success Confirmation Box (Appears after submission) -->
+            <div id="form6-success-box" class="app-success-modal">
+                <div style="font-size:44px; margin-bottom:10px;">🎉</div>
+                <h2 style="font-size:24px; font-weight:900; color:#166534; margin-bottom:6px;">Form No. 6 Application Submitted Successfully!</h2>
+                <p style="font-size:14px; color:#15803d; max-width:600px; margin:0 auto 16px;">
+                    Your application has been registered with the State Election Commission and forwarded to your constituency <strong>Electoral Registration Officer (ERO)</strong>.
+                </p>
+
+                <div>
+                    <div style="font-size:12px; font-weight:800; color:#0369a1; text-transform:uppercase; letter-spacing:1px;">Your Official Application ID:</div>
+                    <div class="app-id-pill-lg" id="res-app-id">MHAPP00000000</div>
+                    <div>
+                        <button type="button" onclick="copyAppId()" class="btn-cam btn-cam-capture" style="padding:7px 16px; font-size:12px;">
+                            📋 Copy Application ID
+                        </button>
+                    </div>
+                </div>
+
+                <div class="step-roadmap" style="max-width:550px; margin:24px auto;">
+                    <div class="step-point">
+                        <div class="step-circle done">✓</div>
+                        <div class="step-label">Form 6 Submitted</div>
+                    </div>
+                    <div class="step-point">
+                        <div class="step-circle active">2</div>
+                        <div class="step-label">ERO Verification</div>
+                    </div>
+                    <div class="step-point">
+                        <div class="step-circle wait">3</div>
+                        <div class="step-label">e-EPIC Ready</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                    <button type="button" onclick="trackThisApplication()" class="btn-search" style="height:44px; padding:0 24px;">
+                        🔍 Track Status in Download Tab →
+                    </button>
+                    <button type="button" onclick="resetForm6()" class="btn-cam" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; height:44px;">
+                        + New Form 6 Application
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Form 6 Content -->
+            <div id="form6-form-container">
+                <div class="form6-header">
+                    <div class="form6-title-group">
+                        <h2>नवीन मतदार नोंदणी अर्ज (Form No. 6)</h2>
+                        <p>Application for Inclusion of Name in Electoral Roll for First-Time Voters (Age 18+)</p>
+                    </div>
+                    <span class="user-pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
+                        ⚡ Forwarded to Constituency ERO
+                    </span>
+                </div>
+
+                <form id="form-form6-application" onsubmit="return handleForm6Submit(event)">
+                    <input type="hidden" name="name" id="f6_full_name_hidden">
+                    <input type="hidden" name="photo" id="f6_photo_input">
+
+                    <!-- 1. PERSONAL INFORMATION -->
+                    <div class="form-section-title">
+                        <span>👤</span> 1. वैयक्तिक माहिती (Applicant Personal Details)
+                    </div>
+
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>पहिले नाव (First Name) <span class="req-star">*</span></label>
+                            <input type="text" class="form-control" id="f6_first_name" name="first_name" placeholder="उदा. राहुल / Rahul" required>
+                        </div>
+                        <div class="form-group">
+                            <label>नातेवाईकाचे नाव (Relative's Name) <span class="req-star">*</span></label>
+                            <input type="text" class="form-control" id="f6_relative_name" name="relative_name" placeholder="उदा. रमेश / Ramesh" required>
+                        </div>
+                        <div class="form-group">
+                            <label>आडनाव (Surname) <span class="req-star">*</span></label>
+                            <input type="text" class="form-control" id="f6_last_name" name="last_name" placeholder="उदा. शिंदे / Shinde" required>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin-top:14px;">
+                        <div class="form-group">
+                            <label>नाते (Relationship Type) <span class="req-star">*</span></label>
+                            <select class="form-control" name="relative_type" id="f6_relative_type">
+                                <option value="Father">वडील (Father)</option>
+                                <option value="Mother">आई (Mother)</option>
+                                <option value="Husband">पती (Husband)</option>
+                                <option value="Guardian">पालक (Legal Guardian)</option>
+                                <option value="Other">इतर (Other)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>लिंग (Gender) <span class="req-star">*</span></label>
+                            <select class="form-control" name="gender" id="f6_gender">
+                                <option value="Male">पुरुष (Male)</option>
+                                <option value="Female">स्त्री (Female)</option>
+                                <option value="Third Gender">तृतीयपंथी (Third Gender)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>जन्मतारीख (Date of Birth) <span class="req-star">*</span></label>
+                            <input type="date" class="form-control" id="f6_dob" name="dob" onchange="validateAgeLive(this.value)" required>
+                            <div id="age-validation-badge" style="font-size:11px; font-weight:800; margin-top:3px; display:none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin-top:14px;">
+                        <div class="form-group">
+                            <label>मोबाईल क्रमांक (Mobile Number) <span class="req-star">*</span></label>
+                            <input type="tel" maxlength="10" class="form-control" id="f6_mobile" name="mobile" placeholder="10-digit mobile" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ईमेल आयडी (Email Address)</label>
+                            <input type="email" class="form-control" id="f6_email" name="email" placeholder="applicant@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>आधार क्रमांक (12-Digit Aadhaar Number) <span class="req-star">*</span></label>
+                            <input type="text" maxlength="14" class="form-control" id="f6_aadhaar" name="aadhaar_no" placeholder="1234 5678 9012" oninput="formatAadhaarLive(this)" required>
+                            <div id="aadhaar-input-badge" style="font-size:11px; font-weight:800; margin-top:3px; display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- ── DEDICATED AADHAAR CARD UPLOAD & AUTOMATED MATCH CHECK ── -->
+                    <div style="background:#f8fafc; border:2px dashed #93c5fd; border-radius:16px; padding:18px 22px; margin-top:16px;" id="aadhaarUploadContainer">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                            <div>
+                                <label style="font-size:13px; font-weight:900; color:#1e293b; display:flex; align-items:center; gap:6px;">
+                                    <span>🪪</span> आधार कार्ड अपलोड व स्वयंचलित पडताळणी (Upload Aadhaar Card & Auto-Verify) <span class="req-star">*</span>
+                                </label>
+                                <p style="font-size:12px; color:#64748b; margin-top:2px;">
+                                    Upload your Aadhaar Card image. The system will automatically check whether the entered 12-digit Aadhaar Number matches the uploaded image. Only verified applications can be processed.
+                                </p>
+                            </div>
+                            <span class="tab-badge-pill" id="aadhaar-verif-badge-pill" style="background:#fef3c7; color:#92400e;">
+                                ⏳ Aadhaar Verification Required
+                            </span>
+                        </div>
+
+                        <input type="hidden" name="aadhaar_verified" id="f6_aadhaar_verified" value="0">
+                        <input type="hidden" name="ocr_text" id="f6_aadhaar_ocr_text" value="">
+
+                        <div style="display:grid; grid-template-columns: 1fr auto; gap:14px; align-items:center;">
+                            <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:14px; text-align:center; cursor:pointer; transition:all 0.2s;" id="aadhaarDropArea" onclick="document.getElementById('aadhaarFileInput').click()">
+                                <input type="file" id="aadhaarFileInput" name="aadhaar_file" accept="image/*,.pdf" style="display:none;" onchange="handleAadhaarFileSelect(this)">
+                                <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+                                    <span style="font-size:26px;">📁</span>
+                                    <div style="text-align:left;">
+                                        <div style="font-weight:800; color:#0f172a; font-size:13px;" id="aadhaarUploadLabel">Click to Upload Aadhaar Card (JPG / PNG / PDF)</div>
+                                        <div style="font-size:11.5px; color:#64748b;">Front / Full Aadhaar Card showing 12-digit UID or QR Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="triggerAadhaarVerification()" class="btn-search" id="btn-verify-aadhaar" style="height:48px; padding:0 20px; font-size:13px; background:linear-gradient(135deg, #0284c7, #0369a1);">
+                                <span>🔍 Verify Aadhaar</span>
+                            </button>
+                        </div>
+
+                        <!-- Verification Live Status Box -->
+                        <div id="aadhaarVerifyStatusBox" style="display:none; margin-top:12px; padding:12px 16px; border-radius:12px; font-size:12.5px; font-weight:700;"></div>
+                    </div>
+
+                    <!-- 2. BIOMETRIC LIVE WEBCAM PHOTO CAPTURE -->
+                    <div class="form-section-title">
+                        <span>📸</span> 2. थेट छायाचित्र व बायोमेट्रिक कॅप्चर (Live Biometric Photo)
+                    </div>
+
+                    <div class="camera-container">
+                        <div class="video-preview-box">
+                            <video id="f6-webcam-video" autoplay playsinline></video>
+                            <canvas id="f6-photo-canvas" style="display:none;"></canvas>
+                        </div>
+                        <div class="camera-actions">
+                            <button type="button" class="btn-cam btn-cam-capture" id="f6-btn-capture" onclick="captureLivePhoto()">
+                                📷 Capture Live Photo (फोटो काढा)
+                            </button>
+                            <button type="button" class="btn-cam btn-cam-retake" id="f6-btn-retake" onclick="retakeLivePhoto()">
+                                🔄 Retake Photo (पुन्हा काढा)
+                            </button>
+                            <label class="btn-cam" style="background:#e2e8f0; color:#334155; cursor:pointer;">
+                                📁 Upload Photo File
+                                <input type="file" accept="image/*" style="display:none;" onchange="handlePhotoFileUpload(event)">
+                            </label>
+                        </div>
+                        <p style="font-size:12px; color:#64748b; margin-top:10px;">
+                            Ensure your face is clearly visible with neutral lighting. SEC anti-duplicate matching active.
+                        </p>
+                    </div>
+
+                    <!-- 3. MAHARASHTRA JURISDICTION & LOCAL BODIES -->
+                    <div class="form-section-title">
+                        <span>📍</span> 3. मतदारसंघ व स्थानिक स्वराज्य संस्था (Constituency & Local Bodies)
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>जिल्हा (District - Maharashtra) <span class="req-star">*</span></label>
+                            <select class="form-control" id="f6_district" name="district" onchange="onDistrictChange()" required>
+                                <option value="">-- जिल्हा निवडा (Select District) --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>विधानसभा मतदारसंघ (Assembly Constituency) <span class="req-star">*</span></label>
+                            <select class="form-control" id="f6_constituency" name="constituency" required>
+                                <option value="">-- प्रथम जिल्हा निवडा --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <label style="font-size:12.5px; font-weight:800; color:#1e293b; margin-bottom:8px; display:block;">
+                            स्थानिक स्वराज्य संस्था प्रकार निवडा (Select Applicable Local Body Types):
+                        </label>
+                        <div class="local-body-pills">
+                            <label class="lb-pill">
+                                <input type="checkbox" id="chk_mnc" onchange="toggleLbSelect('mnc')"> महानगरापालिका (Mahanagarpalika)
+                            </label>
+                            <label class="lb-pill">
+                                <input type="checkbox" id="chk_zp" onchange="toggleLbSelect('zp')"> जिल्हा परिषद (Zilla Parishad)
+                            </label>
+                            <label class="lb-pill">
+                                <input type="checkbox" id="chk_ps" onchange="toggleLbSelect('ps')"> पंचायत समिती (Panchayat Samiti)
+                            </label>
+                            <label class="lb-pill">
+                                <input type="checkbox" id="chk_np" onchange="toggleLbSelect('np')"> नगर परिषद (Nagar Parishad)
+                            </label>
+                            <label class="lb-pill">
+                                <input type="checkbox" id="chk_npt" onchange="toggleLbSelect('npt')"> नगर पंचायत (Nagar Panchayat)
+                            </label>
+                        </div>
+
+                        <!-- Dynamic Local Body Dropdowns -->
+                        <div class="grid-2" style="margin-top:10px;">
+                            <div class="form-group" id="grp_mnc" style="display:none;">
+                                <label>महानगरपालिका नाव (MNC):</label>
+                                <select class="form-control" name="mahanagarpalika_name" id="sel_mnc"></select>
+                            </div>
+                            <div class="form-group" id="grp_zp" style="display:none;">
+                                <label>जिल्हा परिषद गट (ZP):</label>
+                                <select class="form-control" name="zilha_parishad_name" id="sel_zp"></select>
+                            </div>
+                            <div class="form-group" id="grp_ps" style="display:none;">
+                                <label>पंचायत समिती गण (PS):</label>
+                                <select class="form-control" name="panchayat_samiti_name" id="sel_ps"></select>
+                            </div>
+                            <div class="form-group" id="grp_np" style="display:none;">
+                                <label>नगर परिषद प्रभाग (NP):</label>
+                                <select class="form-control" name="nagar_parishad_name" id="sel_np"></select>
+                            </div>
+                            <div class="form-group" id="grp_npt" style="display:none;">
+                                <label>नगर पंचायत नाव:</label>
+                                <select class="form-control" name="nagar_panchayat_name" id="sel_npt"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. ADDRESS & PROOFS -->
+                    <div class="form-section-title">
+                        <span>🏠</span> 4. सध्याचा पत्ता व कागदपत्रे (Address & Supporting Proofs)
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>घर क्र. / इमारत / रस्ता (Address Line) <span class="req-star">*</span></label>
+                            <input type="text" class="form-control" id="f6_address" name="address_line" placeholder="उदा. फ्लॅट क्र. ४०२, साई रेसिडेन्सी, टिळक रोड" required>
+                        </div>
+                        <div class="form-group">
+                            <label>तालुका / गाव / शहर (Taluka / Town) <span class="req-star">*</span></label>
+                            <input type="text" class="form-control" id="f6_taluka" name="taluka" placeholder="उदा. हवेली / पुणे शहर" required>
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top:14px;">
+                        <div class="form-group">
+                            <label>पिनकोड (Pincode) <span class="req-star">*</span></label>
+                            <input type="text" maxlength="6" class="form-control" id="f6_pincode" name="pincode" placeholder="उदा. 411005" required>
+                        </div>
+                        <div class="form-group">
+                            <label>वयाचा पुरावा प्रकार (Age / Identity Proof Type) <span class="req-star">*</span></label>
+                            <select class="form-control" name="dob_proof_type" id="f6_proof_type">
+                                <option value="Aadhaar Card">आधार कार्ड (Aadhaar Card)</option>
+                                <option value="Birth Certificate">जन्म दाखला (Birth Certificate)</option>
+                                <option value="School Leaving Certificate">शाळा सोडल्याचा दाखला (LC / TC)</option>
+                                <option value="PAN Card">पॅन कार्ड (PAN Card)</option>
+                                <option value="Passport">पासपोर्ट (Indian Passport)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 5. FORM NO. 6 BLANK DOWNLOAD & SIGNED UPLOAD SECTION -->
+                    <div class="form-section-title" style="margin-top:28px;">
+                        <span>📑</span> 5. नमुना ६ अर्ज प्रत (Form No. 6 Blank Download & Signed Upload)
+                    </div>
+
+                    <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:16px; padding:22px; margin-bottom:18px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #e2e8f0;">
+                            <div>
+                                <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:3px;">
+                                    अधिकृत नमुना ६ अर्ज डाऊनलोड करा (Download Official Blank Form No. 6)
+                                </h4>
+                                <p style="font-size:12.5px; color:#64748b;">
+                                    Download the standard Form No. 6 blank template, print, sign and upload the scanned copy below.
+                                </p>
+                            </div>
+                            <a href="/download/form6_blank" target="_blank" class="btn-search" style="height:42px; padding:0 20px; font-size:13px; text-decoration:none; background:linear-gradient(135deg, #16a34a, #15803d); box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+                                📥 Download Blank Form No. 6 (कोरा अर्ज डाऊनलोड करा)
+                            </a>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:12.5px; font-weight:800; color:#1e293b; display:flex; justify-content:space-between; align-items:center;">
+                                <span>स्वाक्षरी केलेला नमुना ६ अर्ज अपलोड करा (Upload Signed Form No. 6):</span>
+                                <span style="font-size:11px; color:#2563eb; font-weight:700;">PDF / JPG / PNG (Max 15MB)</span>
+                            </label>
+                            
+                            <div style="background:#ffffff; border:2px dashed #93c5fd; border-radius:14px; padding:20px; text-align:center; cursor:pointer; transition:all 0.2s;" id="form6DropArea" onclick="document.getElementById('form6FileInput').click()">
+                                <input type="file" id="form6FileInput" name="form6_upload" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleForm6FileSelect(this)">
+                                <div style="font-size:30px; color:#2563eb; margin-bottom:6px;">☁️</div>
+                                <div style="font-weight:800; color:#1e293b; font-size:13.5px;" id="form6UploadTitle">Click or Drag & Drop Signed Form No. 6 Here</div>
+                                <div style="font-size:12px; color:#64748b; margin-top:2px;">नमुना ६ अर्जाची स्वाक्षरी केलेली स्कॅन किंवा फोटो प्रत निवडा</div>
+                            </div>
+
+                            <div id="form6FilePreview" style="display:none; align-items:center; justify-content:space-between; background:#dcfce7; border:1px solid #86efac; border-radius:10px; padding:10px 14px; margin-top:10px; font-size:12.5px; font-weight:700; color:#166534;">
+                                <span style="display:flex; align-items:center; gap:8px;">
+                                    <span>📄</span> <span id="form6FileName">form6_signed.pdf</span>
+                                </span>
+                                <button type="button" onclick="clearForm6File(event)" style="background:none; border:none; color:#dc2626; font-weight:900; font-size:16px; cursor:pointer;">✕</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit-form6" id="f6_submit_btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Submit Form No. 6 & Generate Application ID (अर्ज सादर करा)
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <!-- VIEW 2: DOWNLOAD e-EPIC & TRACK CARD (WITH LOGIN CREDENTIALS GATE) -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        <section id="view-download" class="content-card" style="display:none;">
+            
+            <!-- Top Back Bar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; gap:10px;">
+                <button type="button" onclick="showSelectionOverview()" class="btn-cam" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:12px; padding:6px 14px;">
+                    ← Back to Options (पर्याय निवडीकडे परत जा)
+                </button>
+                <span style="font-size:12px; font-weight:800; color:#0284c7; background:#e0f2fe; padding:4px 12px; border-radius:9999px; border:1px solid #bae6fd;">
+                    Active Section: 2. Download e-EPIC & Track Card
+                </span>
+            </div>
+            
+            <!-- ── SUB-VIEW 2A: LOGIN CREDENTIALS FORM (When Not Logged In) ── -->
+            <div id="tab2-login-gate" style="{% if is_logged_in %}display:none;{% else %}display:block;{% endif %}">
+                <div class="login-gate-box">
+                    <div class="login-gate-header">
+                        <div class="lock-icon-circle">🔐</div>
+                        <h2 class="login-gate-title" id="t-gate-title">e-EPIC प्रवेश व ओळख पडताळणी</h2>
+                        <p class="login-gate-sub" id="t-gate-sub">
+                            e-EPIC कार्ड डाउनलोड करण्यासाठी व अर्जाची स्थिती तपासण्यासाठी लॉगिन क्रेडेन्शियल प्रविष्ट करा.
+                        </p>
+                    </div>
+
+                    <!-- Mode Switcher: Citizen Login / Sign Up / Officer Login -->
+                    <div class="auth-mode-pills">
+                        <button type="button" class="auth-mode-btn active" id="tab2-mode-citizen" onclick="setTab2AuthMode('citizen')">
+                            👤 Citizen Login
+                        </button>
+                        <button type="button" class="auth-mode-btn" id="tab2-mode-signup" onclick="setTab2AuthMode('signup')">
+                            ✨ Sign Up / Create
+                        </button>
+                        <button type="button" class="auth-mode-btn" id="tab2-mode-officer" onclick="setTab2AuthMode('officer')">
+                            🛡️ Officer
+                        </button>
+                    </div>
+
+                    <!-- 1. CITIZEN LOGIN FORM -->
+                    <form id="tab2-form-citizen" onsubmit="return handleTab2Login(event)">
+                        <div class="alert-box" id="tab2-alert-citizen"></div>
+
+                        <div class="form-group">
+                            <label>मतदार नाव / अर्ज क्र. / मोबाईल / EPIC <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">👤</span>
+                                <input type="text" class="input-field" id="tab2_citizen_id" placeholder="उदा. राहुल शिंदे / MHAPP2609278412 / 9876543210" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:14px;">
+                            <label>पासवर्ड किंवा जन्मतारीख (Password / DOB) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" class="input-field" id="tab2_citizen_pass" placeholder="पासवर्ड किंवा जन्मतारीख (YYYY-MM-DD)" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit" id="tab2_btn_login" style="margin-top:18px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Login & Access e-EPIC Card (लॉगिन करा)
+                        </button>
+
+                        <div class="switch-link">
+                            New applicant or set custom password? <a onclick="setTab2AuthMode('signup')">Create Account / Sign Up here</a>
+                        </div>
+                    </form>
+
+                    <!-- 2. SIGN UP / CREATE ACCOUNT FORM -->
+                    <form id="tab2-form-signup" style="display:none;" onsubmit="return handleTab2Signup(event)">
+                        <div class="alert-box" id="tab2-alert-signup"></div>
+
+                        <div class="form-group">
+                            <label>पूर्ण नाव (Full Name as in Form 6) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">👤</span>
+                                <input type="text" class="input-field" id="tab2_su_name" placeholder="उदा. राहुल रमेश शिंदे" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:14px;">
+                            <label>मोबाईल क्रमांक (Mobile Number) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">📱</span>
+                                <input type="tel" maxlength="10" class="input-field" id="tab2_su_mobile" placeholder="10-digit mobile" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:14px;">
+                            <label>अर्ज क्रमांक / EPIC (Application ID - Optional)</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">📋</span>
+                                <input type="text" class="input-field" id="tab2_su_app_id" placeholder="उदा. MHAPP2609278412 (ऐच्छिक)">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:14px;">
+                            <label>नवीन पासवर्ड तयार करा (Create Password) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔑</span>
+                                <input type="password" class="input-field" id="tab2_su_pass" placeholder="किमान ६ अक्षरे/अंक" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit btn-signup-action" id="tab2_btn_signup" style="margin-top:18px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            Create Account & Proceed to e-EPIC (खाते तयार करा)
+                        </button>
+
+                        <div class="switch-link">
+                            Already registered? <a onclick="setTab2AuthMode('citizen')">Back to Citizen Login</a>
+                        </div>
+                    </form>
+
+                    <!-- 3. OFFICER LOGIN FORM -->
+                    <form id="tab2-form-officer" style="display:none;" onsubmit="return handleTab2OfficerLogin(event)">
+                        <div class="alert-box" id="tab2-alert-officer"></div>
+
+                        <div class="form-group">
+                            <label>अधिकारी वापरकर्ता नाव (Officer Username) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🛡️</span>
+                                <input type="text" class="input-field" id="tab2_off_user" placeholder="उदा. epic_admin / sec_officer" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:14px;">
+                            <label>पासवर्ड (Password) <span class="req-star">*</span></label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" class="input-field" id="tab2_off_pass" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit" id="tab2_btn_off_login" style="margin-top:18px; background:linear-gradient(135deg, #0f172a, #1e293b);">
+                            🛡️ Officer Authorized Login
+                        </button>
+
+                        <div class="switch-link">
+                            Citizen Applicant? <a onclick="setTab2AuthMode('citizen')">Back to Citizen Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── SUB-VIEW 2B: AUTHENTICATED e-EPIC DOWNLOAD & TRACKING VIEW ── -->
+            <div id="tab2-authenticated-view" style="{% if is_logged_in %}display:block;{% else %}display:none;{% endif %}">
+                
+                <!-- Authenticated User Banner -->
+                <div class="user-auth-banner">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:22px;">✅</span>
+                        <div>
+                            <div style="font-size:14px; font-weight:800; color:#0369a1;">
+                                Authenticated: <span id="auth-banner-name">{{ user.user_name if user else 'Citizen' }}</span>
+                            </div>
+                            <div style="font-size:11.5px; color:#64748b;">
+                                Role: <span id="auth-banner-role">{{ user.user_role if user else 'Registered Applicant' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="handleInlineLogout()" class="btn-cam" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding:6px 14px; font-size:12px;">
+                        🚪 Switch Account / Logout
+                    </button>
+                </div>
+
+                <div class="search-tabs">
+                    <button type="button" class="tab-btn active" id="tab-btn-ref" onclick="switchSearchMode('ref')">
+                        📋 By Application ID (MHAPP...)
+                    </button>
+                    <button type="button" class="tab-btn" id="tab-btn-epic" onclick="switchSearchMode('epic')">
+                        🪪 By Voter ID (EPIC)
+                    </button>
+                    <button type="button" class="tab-btn" id="tab-btn-mobile" onclick="switchSearchMode('mobile')">
+                        📱 By Mobile Number
+                    </button>
+                </div>
+
+                <!-- Search Input Box -->
+                <div class="input-row">
+                    <div class="form-group">
+                        <label id="search-input-label">Enter Application ID (अर्जाचा क्रमांक):</label>
+                        <div class="input-field-wrap" style="position:relative;">
+                            <span class="input-icon">🔍</span>
+                            <input type="text" class="input-field" id="search-query" placeholder="उदा. MHAPP2609278412" value="{{ user.user_id if user and user.user_id and user.user_id != 'Guest' else '' }}">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-search" id="btn-search-status" onclick="executeStatusCheck()">
+                        <span>Check Status</span> →
+                    </button>
+                </div>
+
+                <div id="extra-dob-row" style="margin-top:14px; display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label>जन्मतारीख (Date of Birth - Verification):</label>
+                        <input type="date" class="form-control" id="search-dob">
+                    </div>
+                </div>
+
+                <!-- Real-Time Status Result Display -->
+                <div id="result-container" style="margin-top:28px;">
+                    
+                    <!-- PENDING STATUS CARD -->
+                    <div id="res-card-pending" class="status-card pending" style="display:none;">
+                        <div style="display:flex; align-items:flex-start; gap:16px;">
+                            <div style="font-size:36px;">⏳</div>
+                            <div style="flex:1;">
+                                <div class="user-pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a; margin-bottom:6px;">
+                                    🟡 UNDER REVIEW BY CONSTITUENCY ERO
+                                </div>
+                                <h3 style="font-size:18px; font-weight:900; color:#0f172a;" id="pending-voter-name">Applicant Name</h3>
+                                <p style="font-size:13.5px; color:#475569; margin:4px 0 14px;">
+                                    Application ID: <strong id="pending-app-id" style="font-family:monospace; color:#0369a1;">MHAPP0000</strong> • Jurisdiction: <strong id="pending-jurisdiction">Constituency</strong>
+                                </p>
+
+                                <div class="step-roadmap" style="background:#ffffff; padding:18px; border-radius:16px; border:1px solid #fef08a;">
+                                    <div class="step-point">
+                                        <div class="step-circle done">✓</div>
+                                        <div class="step-label">Form 6 Submitted</div>
+                                    </div>
+                                    <div class="step-point">
+                                        <div class="step-circle active">2</div>
+                                        <div class="step-label">Scrutiny by ERO</div>
+                                    </div>
+                                    <div class="step-point">
+                                        <div class="step-circle wait">3</div>
+                                        <div class="step-label">Card Download</div>
+                                    </div>
+                                </div>
+
+                                <p style="font-size:12.5px; color:#78350f; background:rgba(245,158,11,0.1); padding:10px 14px; border-radius:10px; margin-top:10px;">
+                                    ℹ️ <strong>Statutory Notice:</strong> In accordance with Election Commission protocols, your official digital Voter ID Card (e-EPIC) and Voting QR Pass will unlock for download as soon as your constituency Electoral Registration Officer (ERO) certifies the entry.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APPROVED STATUS CARD -->
+                    <div id="res-card-approved" class="status-card approved" style="display:none;">
+                        <div style="display:flex; align-items:flex-start; gap:16px;">
+                            <div style="font-size:36px;">✅</div>
+                            <div style="flex:1;">
+                                <div class="user-pill" style="background:#dcfce7; color:#166534; border-color:#86efac; margin-bottom:6px;">
+                                    🟢 ELECTORAL ROLL ENTRY CERTIFIED & APPROVED
+                                </div>
+                                <h3 style="font-size:20px; font-weight:900; color:#0f172a;" id="appr-voter-name">Certified Voter Name</h3>
+                                <p style="font-size:13.5px; color:#475569; margin:4px 0 14px;">
+                                    Permanent Voter ID (EPIC): <strong id="appr-epic-id" style="font-family:monospace; color:#16a34a; font-size:16px;">MH00NV000000</strong>
+                                </p>
+
+                                <!-- Previews Grid -->
+                                <div class="card-preview-grid">
+                                    <div class="preview-pane">
+                                        <div style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px;">OFFICIAL VOTER ID CARD (e-EPIC)</div>
+                                        <img id="img-card-preview" src="" alt="Voter ID Card">
+                                        <div>
+                                            <a href="#" id="link-download-card" class="btn-download-action btn-dl-green">
+                                                📥 Download Official Voter ID Card
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="preview-pane">
+                                        <div style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px;">DIGITAL VOTING PASS (_qr.png)</div>
+                                        <img id="img-pass-preview" src="" alt="Voting Pass">
+                                        <div>
+                                            <a href="#" id="link-download-pass" class="btn-download-action btn-dl-blue">
+                                                📱 Download Digital Voting Pass
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align:center; margin-top:14px;">
+                                    <a href="#" id="link-view-cert" target="_blank" class="btn-download-action btn-dl-purple" style="padding:10px 24px;">
+                                        🖨️ View & Print Official e-EPIC Certificate Slip
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REJECTED STATUS CARD -->
+                    <div id="res-card-rejected" class="status-card rejected" style="display:none;">
+                        <div style="display:flex; align-items:flex-start; gap:16px;">
+                            <div style="font-size:36px;">❌</div>
+                            <div style="flex:1;">
+                                <div class="user-pill" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5; margin-bottom:6px;">
+                                    🔴 APPLICATION DISQUALIFIED / REJECTED
+                                </div>
+                                <h3 style="font-size:18px; font-weight:900; color:#0f172a;" id="rej-voter-name">Applicant Name</h3>
+                                <p style="font-size:13.5px; color:#475569; margin:6px 0;" id="rej-remarks">Reason for rejection.</p>
+                                <p style="font-size:12px; color:#991b1b;">You may re-apply using Form No. 6 with updated documentation.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ── ASTRO CANVAS ANIMATION & SCRIPTS ── -->
+    <script>
+        // Server authentication state
+        window.IS_USER_LOGGED_IN = {{ 'true' if is_logged_in else 'false' }};
+
+        // Astro Golden Embers Canvas
+        const canvas = document.getElementById('astroCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.2 + 0.6;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = -Math.random() * 0.5 - 0.2;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.color = Math.random() > 0.5 ? '255, 153, 51' : '2, 132, 199';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0 || this.x < 0 || this.x > canvas.width) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+        function animateAstro() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateAstro);
+        }
+        animateAstro();
+
+        // ── PRIMARY TAB SWITCHER (Form 6 vs Download & Track) ──
+        function switchPrimaryTab(tab) {
+            const btnForm6 = document.getElementById('btn-tab-form6');
+            const btnDownload = document.getElementById('btn-tab-download');
+            const viewForm6 = document.getElementById('view-form6');
+            const viewDownload = document.getElementById('view-download');
+            const welcomeCard = document.getElementById('welcome-selection-card');
+
+            if (welcomeCard) welcomeCard.style.display = 'none';
+
+            if (tab === 'form6') {
+                if (btnForm6) btnForm6.classList.add('active');
+                if (btnDownload) btnDownload.classList.remove('active');
+                if (viewForm6) viewForm6.style.display = 'block';
+                if (viewDownload) viewDownload.style.display = 'none';
+                startWebcamStream();
+                setTimeout(() => {
+                    if (viewForm6) viewForm6.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            } else if (tab === 'download') {
+                if (btnDownload) btnDownload.classList.add('active');
+                if (btnForm6) btnForm6.classList.remove('active');
+                if (viewDownload) viewDownload.style.display = 'block';
+                if (viewForm6) viewForm6.style.display = 'none';
+                stopWebcamStream();
+
+                const gateEl = document.getElementById('tab2-login-gate');
+                const authEl = document.getElementById('tab2-authenticated-view');
+                if (window.IS_USER_LOGGED_IN) {
+                    if (gateEl) gateEl.style.display = 'none';
+                    if (authEl) authEl.style.display = 'block';
+                    const q = document.getElementById('search-query').value.trim();
+                    if (q) executeStatusCheck();
+                } else {
+                    if (gateEl) gateEl.style.display = 'block';
+                    if (authEl) authEl.style.display = 'none';
+                    setTimeout(() => {
+                        const inputEl = document.getElementById('tab2_citizen_id');
+                        if (inputEl) inputEl.focus();
+                    }, 80);
+                }
+                setTimeout(() => {
+                    if (viewDownload) viewDownload.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            }
+        }
+
+        function showSelectionOverview() {
+            const btnForm6 = document.getElementById('btn-tab-form6');
+            const btnDownload = document.getElementById('btn-tab-download');
+            const viewForm6 = document.getElementById('view-form6');
+            const viewDownload = document.getElementById('view-download');
+            const welcomeCard = document.getElementById('welcome-selection-card');
+
+            if (btnForm6) btnForm6.classList.remove('active');
+            if (btnDownload) btnDownload.classList.remove('active');
+            if (viewForm6) viewForm6.style.display = 'none';
+            if (viewDownload) viewDownload.style.display = 'none';
+            if (welcomeCard) welcomeCard.style.display = 'block';
+
+            stopWebcamStream();
+            const topNavGrid = document.getElementById('topNavCardsGrid');
+            if (topNavGrid) topNavGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── TAB 2 AUTHENTICATION MODE SWITCHER (Citizen / Sign Up / Officer) ──
+        function setTab2AuthMode(mode) {
+            document.getElementById('tab2-mode-citizen').classList.toggle('active', mode === 'citizen');
+            document.getElementById('tab2-mode-signup').classList.toggle('active', mode === 'signup');
+            document.getElementById('tab2-mode-officer').classList.toggle('active', mode === 'officer');
+
+            document.getElementById('tab2-form-citizen').style.display = (mode === 'citizen') ? 'block' : 'none';
+            document.getElementById('tab2-form-signup').style.display = (mode === 'signup') ? 'block' : 'none';
+            document.getElementById('tab2-form-officer').style.display = (mode === 'officer') ? 'block' : 'none';
+
+            // Clear alerts
+            hideAlert('tab2-alert-citizen');
+            hideAlert('tab2-alert-signup');
+            hideAlert('tab2-alert-officer');
+        }
+
+        function showAlert(elemId, msg, isSuccess=false) {
+            const el = document.getElementById(elemId);
+            if (!el) return;
+            el.textContent = msg;
+            el.className = isSuccess ? 'alert-box success' : 'alert-box';
+            el.style.display = 'flex';
+        }
+
+        function hideAlert(elemId) {
+            const el = document.getElementById(elemId);
+            if (el) el.style.display = 'none';
+        }
+
+        // ── CITIZEN LOGIN AJAX HANDLER ──
+        async function handleTab2Login(e) {
+            e.preventDefault();
+            const ident = document.getElementById('tab2_citizen_id').value.trim();
+            const pass  = document.getElementById('tab2_citizen_pass').value.trim();
+            const btn   = document.getElementById('tab2_btn_login');
+
+            if (!ident) {
+                showAlert('tab2-alert-citizen', 'Please enter your Full Name, Application ID, Mobile, or EPIC.');
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Verifying credentials...';
+            hideAlert('tab2-alert-citizen');
+
+            try {
+                const resp = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'citizen',
+                        identifier: ident,
+                        dob: pass
+                    })
+                });
+
+                const data = await resp.json();
+                btn.disabled = false;
+                btn.innerHTML = 'Login & Access e-EPIC Card (लॉगिन करा)';
+
+                if (data.status === 'success') {
+                    showAlert('tab2-alert-citizen', data.message || 'Login Successful! Unlocking e-EPIC...', true);
+                    window.IS_USER_LOGGED_IN = true;
+
+                    // Update Top Nav
+                    const userName = (data.user && data.user.user_name) ? data.user.user_name : ident;
+                    const userId   = (data.user && data.user.user_id) ? data.user.user_id : ident;
+                    document.getElementById('user-display-name').textContent = userName;
+                    document.getElementById('nav-logout-btn').style.display = 'inline-flex';
+                    document.getElementById('auth-banner-name').textContent = userName;
+                    document.getElementById('auth-banner-role').textContent = (data.user && data.user.user_role) || 'Registered Applicant';
+
+                    setTimeout(() => {
+                        document.getElementById('tab2-login-gate').style.display = 'none';
+                        document.getElementById('tab2-authenticated-view').style.display = 'block';
+                        document.getElementById('search-query').value = userId;
+                        executeStatusCheck();
+                    }, 400);
+                } else {
+                    showAlert('tab2-alert-citizen', data.message || 'Login failed. Please verify credentials.');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = 'Login & Access e-EPIC Card (लॉगिन करा)';
+                showAlert('tab2-alert-citizen', 'Network error: ' + err.message);
+            }
+
+            return false;
+        }
+
+        // ── SIGN UP AJAX HANDLER ──
+        async function handleTab2Signup(e) {
+            e.preventDefault();
+            const name   = document.getElementById('tab2_su_name').value.trim();
+            const mobile = document.getElementById('tab2_su_mobile').value.trim();
+            const form6  = document.getElementById('tab2_su_app_id').value.trim();
+            const pass   = document.getElementById('tab2_su_pass').value.trim();
+            const btn    = document.getElementById('tab2_btn_signup');
+
+            if (!name || !mobile || !pass) {
+                showAlert('tab2-alert-signup', 'Please fill in Full Name, Mobile, and Password.');
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Creating account...';
+            hideAlert('tab2-alert-signup');
+
+            try {
+                const resp = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullname: name,
+                        mobile: mobile,
+                        form6_ref: form6,
+                        password: pass
+                    })
+                });
+
+                const data = await resp.json();
+                btn.disabled = false;
+                btn.innerHTML = 'Create Account & Proceed to e-EPIC (खाते तयार करा)';
+
+                if (data.status === 'success') {
+                    showAlert('tab2-alert-signup', data.message || 'Account created successfully!', true);
+                    window.IS_USER_LOGGED_IN = true;
+
+                    document.getElementById('user-display-name').textContent = name;
+                    document.getElementById('nav-logout-btn').style.display = 'inline-flex';
+                    document.getElementById('auth-banner-name').textContent = name;
+
+                    setTimeout(() => {
+                        document.getElementById('tab2-login-gate').style.display = 'none';
+                        document.getElementById('tab2-authenticated-view').style.display = 'block';
+                        document.getElementById('search-query').value = form6 ? form6 : mobile;
+                        executeStatusCheck();
+                    }, 400);
+                } else {
+                    showAlert('tab2-alert-signup', data.message || 'Registration failed.');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = 'Create Account & Proceed to e-EPIC (खाते तयार करा)';
+                showAlert('tab2-alert-signup', 'Network error: ' + err.message);
+            }
+
+            return false;
+        }
+
+        // ── OFFICER LOGIN AJAX HANDLER ──
+        async function handleTab2OfficerLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('tab2_off_user').value.trim();
+            const pass = document.getElementById('tab2_off_pass').value.trim();
+            const btn  = document.getElementById('tab2_btn_off_login');
+
+            if (!user || !pass) {
+                showAlert('tab2-alert-officer', 'Please enter username and password.');
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Authenticating Officer...';
+            hideAlert('tab2-alert-officer');
+
+            try {
+                const resp = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'officer',
+                        username: user,
+                        password: pass
+                    })
+                });
+
+                const data = await resp.json();
+                btn.disabled = false;
+                btn.innerHTML = '🛡️ Officer Authorized Login';
+
+                if (data.status === 'success') {
+                    showAlert('tab2-alert-officer', 'Authenticated! Unlocking Portal...', true);
+                    window.IS_USER_LOGGED_IN = true;
+
+                    document.getElementById('user-display-name').textContent = `Officer (${user})`;
+                    document.getElementById('nav-logout-btn').style.display = 'inline-flex';
+                    document.getElementById('auth-banner-name').textContent = `Officer: ${user}`;
+                    document.getElementById('auth-banner-role').textContent = 'Authorized Portal Administrator';
+
+                    setTimeout(() => {
+                        document.getElementById('tab2-login-gate').style.display = 'none';
+                        document.getElementById('tab2-authenticated-view').style.display = 'block';
+                    }, 400);
+                } else {
+                    showAlert('tab2-alert-officer', data.message || 'Invalid Officer credentials.');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '🛡️ Officer Authorized Login';
+                showAlert('tab2-alert-officer', 'Network error: ' + err.message);
+            }
+
+            return false;
+        }
+
+        // ── LOGOUT HANDLER ──
+        async function handleInlineLogout() {
+            try {
+                await fetch('/logout');
+            } catch(e){}
+            window.IS_USER_LOGGED_IN = false;
+            document.getElementById('user-display-name').textContent = 'First-Time Applicant';
+            document.getElementById('nav-logout-btn').style.display = 'none';
+            document.getElementById('tab2-login-gate').style.display = 'block';
+            document.getElementById('tab2-authenticated-view').style.display = 'none';
+            document.getElementById('result-container').style.display = 'none';
+            document.getElementById('search-query').value = '';
+        }
+
+        // ── DISTRICTS & LOCAL BODIES DATA ──
+        let mahaDistricts = {};
+        let districtLocalBodies = {};
+
+        async function loadJurisdictionData() {
+            try {
+                const [r1, r2] = await Promise.all([
+                    fetch('/get_maharashtra_districts').then(r => r.json()),
+                    fetch('/get_district_local_bodies').then(r => r.json())
+                ]);
+                if (r1.status === 'success') mahaDistricts = r1.data;
+                if (r2.status === 'success') districtLocalBodies = r2.data;
+
+                populateDistricts();
+            } catch (err) {
+                console.warn('Jurisdiction load error:', err);
+            }
+        }
+
+        function populateDistricts() {
+            const distSelect = document.getElementById('f6_district');
+            distSelect.innerHTML = '<option value="">-- जिल्हा निवडा (Select District) --</option>';
+            Object.keys(mahaDistricts).sort().forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                distSelect.appendChild(opt);
+            });
+        }
+
+        function onDistrictChange() {
+            const dist = document.getElementById('f6_district').value;
+            const constSelect = document.getElementById('f6_constituency');
+            constSelect.innerHTML = '<option value="">-- मतदारसंघ निवडा (Constituency) --</option>';
+
+            if (dist && mahaDistricts[dist]) {
+                mahaDistricts[dist].forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    constSelect.appendChild(opt);
+                });
+            }
+
+            // Populate local bodies
+            const lbData = districtLocalBodies[dist] || {};
+            setLbOptions('sel_mnc', lbData.mahanagarpalika || []);
+            setLbOptions('sel_zp', lbData.zilha_parishad || []);
+            setLbOptions('sel_ps', lbData.panchayat_samiti || []);
+            setLbOptions('sel_np', lbData.nagar_parishad || []);
+            setLbOptions('sel_npt', lbData.nagar_panchayat || []);
+        }
+
+        function setLbOptions(elementId, items) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.innerHTML = '<option value="">-- निवडा --</option>';
+            items.forEach(it => {
+                const opt = document.createElement('option');
+                opt.value = it;
+                opt.textContent = it;
+                el.appendChild(opt);
+            });
+        }
+
+        function toggleLbSelect(type) {
+            const chk = document.getElementById('chk_' + type);
+            const grp = document.getElementById('grp_' + type);
+            if (chk && grp) {
+                grp.style.display = chk.checked ? 'block' : 'none';
+            }
+        }
+
+        // ── LIVE AGE VALIDATION ──
+        function validateAgeLive(dobValue) {
+            const badge = document.getElementById('age-validation-badge');
+            if (!dobValue) { badge.style.display = 'none'; return; }
+            
+            const dob = new Date(dobValue);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            badge.style.display = 'block';
+            if (age >= 18) {
+                badge.style.color = '#16a34a';
+                badge.innerText = `✓ Eligible: Age ${age} Years (पात्र: वय ${age} वर्षे)`;
+            } else {
+                badge.style.color = '#dc2626';
+                badge.innerText = `⚠️ Ineligible: Age is ${age} (Must be 18+ to apply for Form 6)`;
+            }
+        }
+
+        // ── WEBCAM BIOMETRIC PHOTO CAPTURE ──
+        let videoStream = null;
+
+        function startWebcamStream() {
+            const video = document.getElementById('f6-webcam-video');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+            if (videoStream) return;
+
+            navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } })
+                .then(stream => {
+                    videoStream = stream;
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    document.getElementById('f6-photo-canvas').style.display = 'none';
+                })
+                .catch(err => {
+                    console.log('Webcam not accessible:', err);
+                });
+        }
+
+        function stopWebcamStream() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(t => t.stop());
+                videoStream = null;
+            }
+        }
+
+        function captureLivePhoto() {
+            const video = document.getElementById('f6-webcam-video');
+            const canvas = document.getElementById('f6-photo-canvas');
+            if (!videoStream || !video.videoWidth) {
+                alert('Camera stream is not active. Please allow camera permissions or upload a photo file.');
+                return;
+            }
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx2 = canvas.getContext('2d');
+            ctx2.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const base64Photo = canvas.toDataURL('image/jpeg', 0.92);
+            document.getElementById('f6_photo_input').value = base64Photo;
+
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+            document.getElementById('f6-btn-capture').style.display = 'none';
+            document.getElementById('f6-btn-retake').style.display = 'inline-flex';
+        }
+
+        function retakeLivePhoto() {
+            const video = document.getElementById('f6-webcam-video');
+            const canvas = document.getElementById('f6-photo-canvas');
+            document.getElementById('f6_photo_input').value = '';
+            canvas.style.display = 'none';
+            video.style.display = 'block';
+            document.getElementById('f6-btn-capture').style.display = 'inline-flex';
+            document.getElementById('f6-btn-retake').style.display = 'none';
+        }
+
+        function handlePhotoFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64 = evt.target.result;
+                document.getElementById('f6_photo_input').value = base64;
+                const canvas = document.getElementById('f6-photo-canvas');
+                const video = document.getElementById('f6-webcam-video');
+                const img = new Image();
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const c = canvas.getContext('2d');
+                    c.drawImage(img, 0, 0);
+                    video.style.display = 'none';
+                    canvas.style.display = 'block';
+                    document.getElementById('f6-btn-capture').style.display = 'none';
+                    document.getElementById('f6-btn-retake').style.display = 'inline-flex';
+                };
+                img.src = base64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ── FORM NO. 6 FILE UPLOAD HANDLERS ──
+        function handleForm6FileSelect(input) {
+            const preview = document.getElementById('form6FilePreview');
+            const nameSpan = document.getElementById('form6FileName');
+            const titleEl = document.getElementById('form6UploadTitle');
+
+            if (input.files && input.files[0]) {
+                const f = input.files[0];
+                const sizeMb = (f.size / (1024 * 1024)).toFixed(2);
+                nameSpan.textContent = `${f.name} (${sizeMb} MB)`;
+                preview.style.display = 'flex';
+                titleEl.textContent = '✓ Form No. 6 Attached: ' + f.name;
+            }
+        }
+
+        function clearForm6File(e) {
+            e.stopPropagation();
+            const input = document.getElementById('form6FileInput');
+            if (input) input.value = '';
+            document.getElementById('form6FilePreview').style.display = 'none';
+            document.getElementById('form6UploadTitle').textContent = 'Click or Drag & Drop Signed Form No. 6 Here';
+        }
+
+        // ── LIVE AADHAAR NUMBER FORMATTING & LIVE VALIDATION ──
+        function formatAadhaarLive(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 12) val = val.substring(0, 12);
+            
+            // Format 4-4-4
+            let formatted = '';
+            for (let i = 0; i < val.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += val[i];
+            }
+            input.value = formatted;
+
+            const badge = document.getElementById('aadhaar-input-badge');
+            if (val.length === 12) {
+                badge.style.display = 'block';
+                badge.style.color = '#0284c7';
+                badge.innerText = `✓ 12-Digit Aadhaar format complete. Please upload & verify card below.`;
+            } else if (val.length > 0) {
+                badge.style.display = 'block';
+                badge.style.color = '#d97706';
+                badge.innerText = `⚠️ ${12 - val.length} more digits required (12 digits total).`;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Reset verification flag if number changed
+            document.getElementById('f6_aadhaar_verified').value = '0';
+            const statusBox = document.getElementById('aadhaarVerifyStatusBox');
+            if (statusBox) statusBox.style.display = 'none';
+            const badgePill = document.getElementById('aadhaar-verif-badge-pill');
+            if (badgePill) {
+                badgePill.style.background = '#fef3c7';
+                badgePill.style.color = '#92400e';
+                badgePill.innerText = '⏳ Aadhaar Verification Required';
+            }
+        }
+
+        // ── AADHAAR CARD FILE SELECTION & AUTO VERIFICATION ──
+        let selectedAadhaarFile = null;
+
+        function handleAadhaarFileSelect(input) {
+            const statusBox = document.getElementById('aadhaarVerifyStatusBox');
+            const label = document.getElementById('aadhaarUploadLabel');
+
+            if (input.files && input.files[0]) {
+                selectedAadhaarFile = input.files[0];
+                const sizeMb = (selectedAadhaarFile.size / (1024 * 1024)).toFixed(2);
+                label.innerHTML = `✓ Attached: <strong>${selectedAadhaarFile.name}</strong> (${sizeMb} MB)`;
+                // Auto-trigger verification
+                triggerAadhaarVerification();
+            }
+        }
+
+        async function triggerAadhaarVerification() {
+            const aadhaarInput = document.getElementById('f6_aadhaar').value.trim();
+            const rawDigits = aadhaarInput.replace(/\D/g, '');
+            const statusBox = document.getElementById('aadhaarVerifyStatusBox');
+            const badgePill = document.getElementById('aadhaar-verif-badge-pill');
+            const fileInput = document.getElementById('aadhaarFileInput');
+            const verifyBtn = document.getElementById('btn-verify-aadhaar');
+
+            const fn = document.getElementById('f6_first_name').value.trim();
+            const rn = document.getElementById('f6_relative_name').value.trim();
+            const ln = document.getElementById('f6_last_name').value.trim();
+            const dob = document.getElementById('f6_dob').value.trim();
+            const fullName = `${fn} ${rn} ${ln}`.trim();
+
+            if (rawDigits.length !== 12) {
+                alert('Please enter your complete 12-digit Aadhaar Number first.');
+                document.getElementById('f6_aadhaar').focus();
+                return;
+            }
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Please select or upload your Aadhaar Card image (JPG / PNG / PDF) for verification.');
+                fileInput.click();
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            statusBox.style.display = 'block';
+            statusBox.style.background = '#eff6ff';
+            statusBox.style.border = '1px solid #bfdbfe';
+            statusBox.style.color = '#1e40af';
+            statusBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="animation:spin 1s linear infinite; display:inline-block;">🔄</span>
+                    <div>
+                        <strong>Scanning Aadhaar Card: Cross-Verifying UID, Name & Date of Birth...</strong>
+                        <div style="font-size:11.5px; margin-top:2px;">Checking: UID: ${rawDigits.slice(0,4)} ${rawDigits.slice(4,8)} ${rawDigits.slice(8)} • Name: ${fullName || 'Applicant'} • DOB: ${dob || 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = 'Verifying...';
+
+            let clientOcrText = '';
+
+            // Step 1: In-Browser Client OCR via Tesseract.js (if image file)
+            if (typeof Tesseract !== 'undefined' && file.type.startsWith('image/')) {
+                try {
+                    const ocrRes = await Tesseract.recognize(file, 'eng', {
+                        logger: m => {
+                            if (m.status === 'recognizing text' && m.progress) {
+                                const pct = Math.round(m.progress * 100);
+                                statusBox.innerHTML = `
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span>🔄</span>
+                                        <div>
+                                            <strong>AI Optical Character Recognition: ${pct}%</strong>
+                                            <div style="font-size:11.5px;">Scanning Aadhaar Number, Name & DOB on card image...</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    });
+                    clientOcrText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text : '';
+                    document.getElementById('f6_aadhaar_ocr_text').value = clientOcrText;
+                } catch (tErr) {
+                    console.log('Client OCR note:', tErr);
+                }
+            }
+
+            // Step 2: Backend Multi-Engine Verification
+            const formData = new FormData();
+            formData.append('aadhaar_no', rawDigits);
+            formData.append('name', fullName);
+            formData.append('first_name', fn);
+            formData.append('last_name', ln);
+            formData.append('dob', dob);
+            formData.append('aadhaar_file', file);
+            formData.append('ocr_text', clientOcrText);
+
+            try {
+                const resp = await fetch('/api/verify_aadhaar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await resp.json();
+
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<span>🔍 Re-Verify</span>';
+
+                const chk = result.checks || {};
+                const uidOk  = chk.aadhaar_number ? chk.aadhaar_number.matched : false;
+                const nameOk = chk.name ? chk.name.matched : false;
+                const dobOk  = chk.dob ? chk.dob.matched : false;
+
+                const checkHtml = `
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:10px; font-size:12px;">
+                        <div style="background:${uidOk ? '#dcfce7' : '#fee2e2'}; color:${uidOk ? '#166534' : '#991b1b'}; padding:6px 10px; border-radius:8px; border:1px solid ${uidOk ? '#86efac' : '#fca5a5'}; text-align:center;">
+                            ${uidOk ? '✅' : '❌'} <strong>UID Number</strong>: ${uidOk ? 'Matched' : 'Not Found'}
+                        </div>
+                        <div style="background:${nameOk ? '#dcfce7' : '#fee2e2'}; color:${nameOk ? '#166534' : '#991b1b'}; padding:6px 10px; border-radius:8px; border:1px solid ${nameOk ? '#86efac' : '#fca5a5'}; text-align:center;">
+                            ${nameOk ? '✅' : '❌'} <strong>Name</strong>: ${nameOk ? 'Matched' : 'Not Found'}
+                        </div>
+                        <div style="background:${dobOk ? '#dcfce7' : '#fee2e2'}; color:${dobOk ? '#166534' : '#991b1b'}; padding:6px 10px; border-radius:8px; border:1px solid ${dobOk ? '#86efac' : '#fca5a5'}; text-align:center;">
+                            ${dobOk ? '✅' : '❌'} <strong>Date of Birth</strong>: ${dobOk ? 'Matched' : 'Not Found'}
+                        </div>
+                    </div>
+                `;
+
+                if (result.status === 'success' && result.verified) {
+                    document.getElementById('f6_aadhaar_verified').value = '1';
+                    statusBox.style.background = '#dcfce7';
+                    statusBox.style.border = '1.5px solid #86efac';
+                    statusBox.style.color = '#166534';
+                    statusBox.innerHTML = `
+                        <div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:22px;">✅</span>
+                                <div>
+                                    <div style="font-size:13.5px; font-weight:900;">Aadhaar Verification Successful (UID, Name & DOB Matched)!</div>
+                                    <div style="font-size:12px; margin-top:2px;">
+                                        All 3 identity parameters (Aadhaar Number <strong>${rawDigits.slice(0,4)} ${rawDigits.slice(4,8)} ${rawDigits.slice(8)}</strong>, Name <strong>${fullName}</strong>, and DOB <strong>${dob}</strong>) verified against uploaded card.
+                                    </div>
+                                </div>
+                            </div>
+                            ${checkHtml}
+                        </div>
+                    `;
+                    badgePill.style.background = '#dcfce7';
+                    badgePill.style.color = '#166534';
+                    badgePill.innerText = '✅ Aadhaar Verified (All Matched)';
+                } else {
+                    document.getElementById('f6_aadhaar_verified').value = '0';
+                    statusBox.style.background = '#fee2e2';
+                    statusBox.style.border = '1.5px solid #fca5a5';
+                    statusBox.style.color = '#991b1b';
+                    statusBox.innerHTML = `
+                        <div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:22px;">❌</span>
+                                <div>
+                                    <div style="font-size:13.5px; font-weight:900;">Aadhaar Verification Incomplete / Mismatch!</div>
+                                    <div style="font-size:12px; margin-top:2px;">
+                                        ${result.message || 'Please ensure your Aadhaar Number, Name, and Date of Birth match the uploaded Aadhaar Card image exactly.'}
+                                    </div>
+                                </div>
+                            </div>
+                            ${checkHtml}
+                        </div>
+                    `;
+                    badgePill.style.background = '#fee2e2';
+                    badgePill.style.color = '#991b1b';
+                    badgePill.innerText = '❌ Verification Failed';
+                }
+            } catch (netErr) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<span>🔍 Re-Verify</span>';
+                statusBox.style.background = '#fee2e2';
+                statusBox.style.border = '1px solid #fca5a5';
+                statusBox.style.color = '#991b1b';
+                statusBox.innerHTML = `⚠️ Verification connection error: ${netErr.message}`;
+            }
+        }
+
+        // ── FORM NO. 6 SUBMISSION ──
+        let lastCreatedAppId = '';
+
+        async function handleForm6Submit(e) {
+            e.preventDefault();
+            const fn = document.getElementById('f6_first_name').value.trim();
+            const rn = document.getElementById('f6_relative_name').value.trim();
+            const ln = document.getElementById('f6_last_name').value.trim();
+            const photo = document.getElementById('f6_photo_input').value;
+            const aadhaarVal = document.getElementById('f6_aadhaar').value.replace(/\D/g, '');
+            const isAadhaarVerified = document.getElementById('f6_aadhaar_verified').value;
+
+            if (!fn || !rn || !ln) {
+                alert('Please enter First Name, Relative Name and Surname.');
+                return false;
+            }
+
+            if (aadhaarVal.length !== 12) {
+                alert('Please enter a valid 12-digit Aadhaar Number (१२ अंकी आधार क्रमांक प्रविष्ट करा).');
+                document.getElementById('f6_aadhaar').focus();
+                return false;
+            }
+
+            if (isAadhaarVerified !== '1') {
+                alert('Aadhaar Card Verification Required: Please upload your Aadhaar Card and verify that the 12-digit Aadhaar number matches before submitting Form No. 6.');
+                document.getElementById('aadhaarUploadContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            if (!photo) {
+                alert('Please capture a live biometric photo or upload your photo before submitting.');
+                return false;
+            }
+
+            document.getElementById('f6_full_name_hidden').value = `${fn} ${rn} ${ln}`;
+
+            const submitBtn = document.getElementById('f6_submit_btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting Form No. 6 & Routing to ERO...';
+
+            const formData = new FormData(document.getElementById('form-form6-application'));
+
+            try {
+                const resp = await fetch('/api/apply_form6', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await resp.json();
+
+                if (data.status === 'success') {
+                    lastCreatedAppId = data.application_id;
+                    document.getElementById('res-app-id').innerText = data.application_id;
+                    document.getElementById('form6-form-container').style.display = 'none';
+                    document.getElementById('form6-success-box').style.display = 'block';
+                    stopWebcamStream();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    alert('Submission Error: ' + (data.message || 'Unknown error occurred.'));
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Form No. 6 & Generate Application ID (अर्ज सादर करा)';
+                }
+            } catch (err) {
+                alert('Network Error: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Form No. 6 & Generate Application ID (अर्ज सादर करा)';
+            }
+
+            return false;
+        }
+
+        function copyAppId() {
+            if (lastCreatedAppId) {
+                navigator.clipboard.writeText(lastCreatedAppId);
+                alert('Copied Application ID: ' + lastCreatedAppId);
+            }
+        }
+
+        function trackThisApplication() {
+            if (lastCreatedAppId) {
+                switchPrimaryTab('download');
+                // Pre-fill in login gate or search query
+                const identInput = document.getElementById('tab2_citizen_id');
+                if (identInput) identInput.value = lastCreatedAppId;
+                const searchInp = document.getElementById('search-query');
+                if (searchInp) searchInp.value = lastCreatedAppId;
+            }
+        }
+
+        function resetForm6() {
+            document.getElementById('form-form6-application').reset();
+            retakeLivePhoto();
+            document.getElementById('form6-form-container').style.display = 'block';
+            document.getElementById('form6-success-box').style.display = 'none';
+            document.getElementById('f6_submit_btn').disabled = false;
+            document.getElementById('f6_submit_btn').innerHTML = 'Submit Form No. 6 & Generate Application ID (अर्ज सादर करा)';
+            startWebcamStream();
+        }
+
+        // ── SEARCH & STATUS TRACKING ──
+        let searchMode = 'ref';
+
+        function switchSearchMode(mode) {
+            searchMode = mode;
+            document.getElementById('tab-btn-ref').classList.toggle('active', mode === 'ref');
+            document.getElementById('tab-btn-epic').classList.toggle('active', mode === 'epic');
+            document.getElementById('tab-btn-mobile').classList.toggle('active', mode === 'mobile');
+
+            const label = document.getElementById('search-input-label');
+            const inp = document.getElementById('search-query');
+
+            if (mode === 'ref') {
+                label.innerText = 'Enter Application ID (अर्जाचा क्रमांक):';
+                inp.placeholder = 'उदा. MHAPP2609278412';
+            } else if (mode === 'epic') {
+                label.innerText = 'Enter Voter ID Number (EPIC):';
+                inp.placeholder = 'उदा. MH23NV849201';
+            } else {
+                label.innerText = 'Enter Registered 10-Digit Mobile Number:';
+                inp.placeholder = 'उदा. 9876543210';
+            }
+        }
+
+        async function executeStatusCheck() {
+            const query = document.getElementById('search-query').value.trim();
+            const dob = document.getElementById('search-dob').value.trim();
+
+            if (!query) {
+                alert('Please enter your Application ID, EPIC, or Mobile Number.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-search-status');
+            btn.innerHTML = 'Verifying...';
+            btn.disabled = true;
+
+            const resContainer = document.getElementById('result-container');
+            const cardPending  = document.getElementById('res-card-pending');
+            const cardAppr     = document.getElementById('res-card-approved');
+            const cardRej      = document.getElementById('res-card-rejected');
+
+            cardPending.style.display = 'none';
+            cardAppr.style.display    = 'none';
+            cardRej.style.display     = 'none';
+
+            try {
+                const resp = await fetch('/api/check_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, dob: dob })
+                });
+
+                const data = await resp.json();
+                btn.innerHTML = '<span>Check Status</span> →';
+                btn.disabled = false;
+
+                if (data.status === 'NOT_FOUND' || data.status === 'error') {
+                    alert(data.message || 'No record found. Please verify details.');
+                    return;
+                }
+
+                resContainer.style.display = 'block';
+
+                if (data.status === 'PENDING') {
+                    cardPending.style.display = 'block';
+                    document.getElementById('pending-voter-name').innerText = data.voter.name || 'Applicant';
+                    document.getElementById('pending-app-id').innerText = data.voter.application_id || data.voter.v_id;
+                    document.getElementById('pending-jurisdiction').innerText = `${data.voter.constituency} (${data.voter.district})`;
+                } else if (data.status === 'APPROVED') {
+                    cardAppr.style.display = 'block';
+                    document.getElementById('appr-voter-name').innerText = data.voter.name || 'Voter';
+                    document.getElementById('appr-epic-id').innerText = data.voter.v_id;
+                    document.getElementById('img-card-preview').src = data.card_preview_url + '?t=' + Date.now();
+                    document.getElementById('img-pass-preview').src = data.pass_preview_url + '?t=' + Date.now();
+                    document.getElementById('link-download-card').href = data.download_card_url;
+                    document.getElementById('link-download-pass').href = data.download_pass_url;
+                    document.getElementById('link-view-cert').href = data.certificate_url;
+                } else if (data.status === 'REJECTED') {
+                    cardRej.style.display = 'block';
+                    document.getElementById('rej-voter-name').innerText = data.voter.name || 'Applicant';
+                    document.getElementById('rej-remarks').innerText = data.voter.ero_remarks || 'Disqualified by ERO.';
+                }
+
+            } catch (err) {
+                alert('Connection Error: ' + err.message);
+                btn.innerHTML = '<span>Check Status</span> →';
+                btn.disabled = false;
+            }
+        }
+
+        // ── LANGUAGE TOGGLE ──
+        function setPortalLang(lang) {
+            document.getElementById('btn-lang-mr').classList.toggle('active', lang === 'mr');
+            document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+        }
+
+        // Initializer
+        window.addEventListener('DOMContentLoaded', () => {
+            loadJurisdictionData();
+            startWebcamStream();
+        });
+    </script>
+</body>
+</html>

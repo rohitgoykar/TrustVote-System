@@ -6,8 +6,8 @@ vote_bp = Blueprint('vote', __name__)
 
 @vote_bp.route('/verify', methods=['POST'])
 def verify():
-    if not session.get('booth_logged_in'):
-        return jsonify({"status": "Error", "message": "Unauthorized: Booth Officer not logged in"}), 401
+    if not (session.get('booth_logged_in') or session.get('admin_logged_in') or session.get('officer_logged_in') or session.get('aro_logged_in') or session.get('ero_logged_in')):
+        return jsonify({"status": "Error", "message": "सत्र संपले आहे (Unauthorized: Session expired)"}), 401
     try:
         req      = request.json or {}
         vid      = req.get('qr', '').replace("ID:", "").strip()
@@ -16,8 +16,8 @@ def verify():
 
         booth_id = session.get('booth_id', 1)
         booth_code = session.get('booth_code', 'BOOTH-001')
-        booth_officer = session.get('booth_username', 'Booth Officer')
-        region = session.get('booth_location', 'Pune Central')
+        booth_officer = session.get('booth_username') or session.get('admin_username') or session.get('aro_username') or session.get('ero_username') or 'Booth Officer'
+        region = session.get('booth_location') or session.get('aro_location') or 'Polling Station'
         now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         if not face_ok:

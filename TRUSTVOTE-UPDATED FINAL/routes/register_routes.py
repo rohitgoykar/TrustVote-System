@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 import base64
 import qrcode
 from datetime import datetime
@@ -77,8 +78,20 @@ def register():
     if not session.get('officer_logged_in'):
         return jsonify({"status": "Error", "message": "Unauthorized: Officer not logged in"}), 401
     try:
-        data       = request.form
-        vid        = data['v_id'].strip()
+        reg_type   = data.get('reg_type', 'first_time').strip().lower()
+        is_existing = (reg_type == 'existing')
+        vid        = (data.get('v_id') or '').strip().upper()
+        
+        app_id = None
+        if not is_existing:
+            # Generate official Application ID for first-time voter applicant
+            app_id = f"MHAPP{datetime.now().strftime('%y%m%d')}{random.randint(1000, 9999)}"
+            if not vid:
+                vid = app_id
+        else:
+            if not vid:
+                vid = f"MH{datetime.now().strftime('%y%m%d')}{random.randint(1000, 9999)}"
+
         name       = data['name'].strip()
         photo_data = data['photo']
         dob        = data['dob'].strip()
@@ -120,9 +133,9 @@ def register():
             today_dt = datetime.now()
             age = today_dt.year - dob_date.year - ((today_dt.month, today_dt.day) < (dob_date.month, dob_date.day))
             if age < 18:
-                return jsonify({"status": "Error", "message": "️ Eligibility Error: Voter must be 18 years of age or older to register."})
+                return jsonify({"status": "Error", "message": "⚠️ Eligibility Error: Voter must be 18 years of age or older to register."})
         except Exception as e:
-            return jsonify({"status": "Error", "message": f"️ Invalid Date of Birth format: {e}"})
+            return jsonify({"status": "Error", "message": f"⚠️ Invalid Date of Birth format: {e}"})
 
         # NULL means "not registered for this election"
         # 1 means "registered and eligible to vote"
@@ -154,7 +167,7 @@ def register():
             ext_const = existing['constituency'] or 'Shivaji Nagar'
             return jsonify({
                 "status": "Error",
-                "message": f"️ Cross-Constituency Duplicate Blocked: Citizen '{existing['name']}' (Voter ID: {vid}) is already registered in Constituency: '{ext_const}', District: '{ext_dist}'. Dual-constituency registration is strictly prohibited by SEC Maharashtra."
+                "message": f"⚠️ Cross-Constituency Duplicate Blocked: Citizen '{existing['name']}' (Voter ID: {vid}) is already registered in Constituency: '{ext_const}', District: '{ext_dist}'. Dual-constituency registration is strictly prohibited by SEC Maharashtra."
             })
 
         # ── 2. Decode new photo and check for duplicate face ─────────────────
@@ -190,8 +203,34 @@ def register():
 
             return jsonify({
                 "status": "Error",
-                "message": f"️ Biometric Cross-Constituency Duplicate Detected: This citizen's face is already registered as '{dup_name}' (Voter ID: {dup_vid}) in Constituency: '{dup_const}', District: '{dup_dist}'. Multiple registrations across constituencies are blocked."
+                "message": f"⚠️ Biometric Cross-Constituency Duplicate Detected: This citizen's face is already registered as '{dup_name}' (Voter ID: {dup_vid}) in Constituency: '{dup_const}', District: '{dup_dist}'. Multiple registrations across constituencies are blocked."
             })
+
+        # ── Form 6 Specific Details ──────────────────────────────────────────
+        relative_type = data.get('relative_type', 'Father').strip()
+        relative_name = data.get('relative_name', '').strip()
+        if not relative_name and data.get('father_name'):
+            relative_name = data.get('father_name').strip()
+        mobile = data.get('mobile', '').strip()
+        email = data.get('email', '').strip()
+        aadhaar_no = data.get('aadhaar_no', '').strip()
+        address_line = data.get('address_line', '').strip()
+        pincode = data.get('pincode', '').strip()
+        taluka = data.get('taluka', '').strip()
+        dob_proof_type = data.get('dob_proof_type', '').strip()
+
+        # Handle Form 6 File Upload (PDF / Image)
+        form6_filename = None
+        form6_file = request.files.get('form6_upload') or request.files.get('form6_file')
+        if form6_file and form6_file.filename:
+            f6_dir = os.path.join(STORAGE_DIR, "form6_uploads")
+            os.makedirs(f6_dir, exist_ok=True)
+            ext = os.path.splitext(form6_file.filename)[1].lower()
+            if not ext:
+                ext = ".pdf"
+            form6_filename = f"{vid}_form6{ext}"
+            form6_path = os.path.join(f6_dir, form6_filename)
+            form6_file.save(form6_path)
 
         # ── 3. Save photo (only after all duplicate checks pass) ──────────────
         p_path = os.path.join(STORAGE_DIR, vid + ".jpg")
@@ -199,6 +238,9 @@ def register():
             f.write(base64.b64decode(photo_data.split(",")[1]))
 
         # ── 4. Save to DB ────────────────────────────────────────────────────
+        ero_status_val = 'APPROVED' if is_existing else 'PENDING'
+        ero_remarks_val = 'Existing Certified Voter Enrolment' if is_existing else 'Form 6 Application (First-Time Voter) — Forwarded to Constituency ERO'
+
         conn_ins = None
         try:
             conn_ins = get_db_connection()
@@ -209,12 +251,19 @@ def register():
                                        mahanagarpalika, nagar_parishad, nagar_panchayat,
                                        gram_panchayat_name, panchayat_samiti_name, zilha_parishad_name,
                                        mahanagarpalika_name, nagar_parishad_name, nagar_panchayat_name,
-                                       reg_date, dob, assigned_booth_id)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                       reg_date, dob, assigned_booth_id,
+                                       form6_file, relative_type, relative_name, mobile, email,
+                                       aadhaar_no, address_line, pincode, taluka, dob_proof_type,
+                                       ero_status, ero_remarks, application_id)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                           ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (vid, name, data['gender'], p_path, district, constituency,
                  gp, ps, zp, mnc, np, npt,
                  gp_name, ps_name, zp_name, mnc_name, np_name, npt_name,
-                 today, dob, assigned_booth_id)
+                 today, dob, assigned_booth_id,
+                 form6_filename, relative_type, relative_name, mobile, email,
+                 aadhaar_no, address_line, pincode, taluka, dob_proof_type,
+                 ero_status_val, ero_remarks_val, app_id)
             )
             conn_ins.commit()
         finally:
@@ -222,25 +271,35 @@ def register():
                 try: conn_ins.close()
                 except Exception: pass
 
-        # Generate encrypted QR token containing voter details & face
-        encrypted_token = encrypt_voter_data(vid, name, dob, data['gender'], p_path)
-        
-        # Make low-density QR code
-        qr = qrcode.QRCode(
-            version=None,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(encrypted_token)
-        qr.make(fit=True)
-        qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_img.save(os.path.join(ID_CARDS_DIR, vid + "_qr.png"))
-        
-        create_voter_card(vid, name, dob, data['gender'], p_path, district, constituency)
-        create_voting_pass(vid, name, district, constituency)
+        # If existing voter -> Generate card immediately
+        if is_existing:
+            try:
+                os.makedirs(ID_CARDS_DIR, exist_ok=True)
+                encrypted_token = encrypt_voter_data(vid, name, dob, data['gender'], p_path)
+                qr = qrcode.QRCode(
+                    version=None,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(encrypted_token)
+                qr.make(fit=True)
+                qr_img = qr.make_image(fill_color="black", back_color="white")
+                qr_img.save(os.path.join(ID_CARDS_DIR, vid + "_qr.png"))
 
-        return jsonify({"status": "Success", "v_id": vid})
+                create_voter_card(vid, name, dob, data['gender'], p_path, district, constituency)
+                create_voting_pass(vid, name, district, constituency)
+            except Exception as card_e:
+                print(f"[Existing Reg] Card generation note: {card_e}")
+
+        return jsonify({
+            "status": "Success",
+            "v_id": vid,
+            "application_id": app_id,
+            "reg_type": reg_type,
+            "ero_status": ero_status_val,
+            "message": "Existing voter enrolled successfully." if is_existing else f"Form 6 Application submitted. Application ID: {app_id}"
+        })
 
     except Exception as e:
         return jsonify({"status": "Error", "message": str(e)})
@@ -268,7 +327,7 @@ def check_voter_id():
                 'name': row['name'],
                 'district': row['district'],
                 'constituency': row['constituency'],
-                'message': f"️ Voter ID '{vid}' is already registered under '{row['name']}' in Constituency '{row['constituency']}' ({row['district']})."
+                'message': f"⚠️ Voter ID '{vid}' is already registered under '{row['name']}' in Constituency '{row['constituency']}' ({row['district']})."
             })
         return jsonify({'exists': False})
     except Exception as e:
@@ -282,59 +341,176 @@ def check_voter_id():
 def success_page(vid):
     if not session.get('officer_logged_in'):
         return redirect(url_for('officer.officer_login'))
+    
+    voter_info = None
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT v_id, application_id, name, district, constituency, ero_status, ero_remarks FROM voters WHERE v_id = ? OR application_id = ?", (vid, vid))
+        voter_info = cursor.fetchone()
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+    v_name = voter_info['name'] if voter_info else 'Applicant'
+    v_dist = voter_info['district'] if voter_info else 'Maharashtra'
+    v_const = voter_info['constituency'] if voter_info else 'Constituency'
+    v_status = (voter_info['ero_status'] if voter_info else 'PENDING').upper()
+    v_app_id = (voter_info['application_id'] if voter_info and voter_info['application_id'] else vid)
+
     return render_template_string("""
     <!DOCTYPE html>
     <html lang="mr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TrustVote - नोंदणी यशस्वी</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <title>TrustVote - नोंदणी पावती (Registration Receipt)</title>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
         <style>
-            * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+            * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', 'Inter', sans-serif; }
             body {
-                background: #f8fafc;
+                background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #f0fdf4 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 20px;
+                padding: 24px;
             }
             .success-card {
-                background: white;
-                border-radius: 24px;
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 28px;
                 padding: 40px;
-                max-width: 520px;
+                max-width: 640px;
                 width: 100%;
                 text-align: center;
-                box-shadow: 0 20px 40px -15px rgba(0,0,0,0.07);
-                border: 1px solid #e2e8f0;
+                box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.8);
+                backdrop-filter: blur(12px);
             }
             .badge-icon {
                 width: 72px;
                 height: 72px;
-                background: #f0fdf4;
-                color: #16a34a;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 20px;
+                margin: 0 auto 18px;
                 font-size: 32px;
             }
-            h1 { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
-            p { font-size: 14px; color: #64748b; margin-bottom: 24px; }
-            .v-id { font-size: 20px; font-weight: 800; color: #16a34a; letter-spacing: 1px; }
+            .badge-icon.approved { background: #f0fdf4; color: #16a34a; border: 2px solid #86efac; }
+            .badge-icon.pending  { background: #eff6ff; color: #2563eb; border: 2px solid #bfdbfe; }
+            h1 { font-size: 22px; font-weight: 900; color: #0f172a; margin-bottom: 6px; }
+            p { font-size: 13.5px; color: #64748b; margin-bottom: 20px; }
+            
+            .app-id-banner {
+                background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+                color: white;
+                border-radius: 20px;
+                padding: 22px;
+                margin-bottom: 24px;
+                box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+                text-align: center;
+            }
+            .app-id-title {
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                color: #bfdbfe;
+                margin-bottom: 6px;
+            }
+            .app-id-code {
+                font-size: 24px;
+                font-weight: 900;
+                font-family: 'JetBrains Mono', monospace;
+                letter-spacing: 2px;
+                background: rgba(255, 255, 255, 0.15);
+                display: inline-block;
+                padding: 6px 18px;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                margin-bottom: 8px;
+            }
+            .app-id-note {
+                font-size: 12px;
+                color: #dbeafe;
+                line-height: 1.5;
+            }
+
+            .portal-cta-box {
+                background: #f0fdf4;
+                border: 2px solid #86efac;
+                border-radius: 18px;
+                padding: 18px;
+                margin-bottom: 24px;
+                text-align: left;
+            }
+            .portal-cta-header {
+                font-size: 13px;
+                font-weight: 800;
+                color: #166534;
+                margin-bottom: 6px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .portal-cta-desc {
+                font-size: 12px;
+                color: #15803d;
+                margin-bottom: 12px;
+                line-height: 1.5;
+            }
+
+            .step-box {
+                background: #f8fafc;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 20px;
+                margin-bottom: 24px;
+                text-align: left;
+            }
+            .step-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+            .step-item:last-child { margin-bottom: 0; }
+            .step-num {
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: 800;
+                flex-shrink: 0;
+            }
+            .step-done { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+            .step-active { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+            .step-wait { background: #e2e8f0; color: #64748b; }
+            .step-text h4 { font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+            .step-text p { font-size: 12px; color: #64748b; margin-bottom: 0; }
+
             .btn {
                 display: block;
-                padding: 14px;
+                padding: 13px 18px;
                 border-radius: 12px;
                 font-weight: 700;
-                font-size: 14px;
+                font-size: 13.5px;
                 text-decoration: none;
-                margin-bottom: 12px;
+                margin-bottom: 10px;
                 transition: all 0.2s;
+                text-align: center;
             }
+            .btn-portal {
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                color: white;
+                box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            }
+            .btn-portal:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45); }
             .btn-primary { background: #16a34a; color: white; }
             .btn-primary:hover { background: #15803d; }
             .btn-outline { background: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1; }
@@ -343,39 +519,134 @@ def success_page(vid):
     </head>
     <body>
         <div class="success-card">
-            <div class="badge-icon">✓</div>
-            <h1>मतदार नोंदणी यशस्वी!</h1>
-            <p>Voter ID: <span class="v-id">{{ vid }}</span></p>
-            <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:16px; padding:16px; margin-bottom:20px; text-align:left;">
-                <div style="font-size:12px; font-weight:700; color:#475569; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">Download Official Documents:</div>
-                <a href="/download_card/{{ vid }}" class="btn btn-primary" style="text-align:center;">
-                    Download Official Voter Identity Card
-                </a>
-                <a href="/download_qr/{{ vid }}" class="btn btn-outline" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; text-align:center;">
-                    Download Scanner QR Code (_qr.png)
-                </a>
-            </div>
-            <a href="/register_page" class="btn btn-outline">नवीन मतदार नोंदणी करा</a>
-            <a href="/booth/login" class="btn btn-outline" style="background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">Go to Polling Booth Scanner</a>
-            <a href="/" class="btn btn-outline" style="border:none; color:#64748b;">मुख्यपृष्ठावर जा</a>
+            {% if v_status == 'APPROVED' %}
+                <div class="badge-icon approved">✓</div>
+                <h1>मतदार नोंदणी यशस्वी! (Voter Enrolled)</h1>
+                <p>Voter ID: <span style="font-family:monospace; font-weight:800; color:#0284c7;">{{ vid }}</span></p>
+
+                <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:16px; padding:16px; margin-bottom:20px; text-align:left;">
+                    <div style="font-size:12px; font-weight:700; color:#475569; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">Download Certified Documents:</div>
+                    <a href="/download_card/{{ vid }}" class="btn btn-primary">
+                        📥 Download Official Voter Identity Card
+                    </a>
+                    <a href="/download_qr/{{ vid }}" class="btn btn-outline" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
+                        📱 Download Scanner QR Code (_qr.png)
+                    </a>
+                </div>
+            {% else %}
+                <div class="badge-icon pending">📋</div>
+                <h1>Form No. 6 Application Submitted!</h1>
+                <p>Applicant: <strong>{{ v_name }}</strong> • {{ v_const }} ({{ v_dist }})</p>
+
+                <!-- ── OFFICIAL APPLICATION ID GENERATED ── -->
+                <div class="app-id-banner">
+                    <div class="app-id-title">Generated Application ID (अर्जाचा क्रमांक)</div>
+                    <div class="app-id-code">{{ v_app_id }}</div>
+                    <div class="app-id-note">
+                        Please note down this <strong>Application ID</strong>. The applicant can log in to the <strong>First-Time Voter e-EPIC Portal</strong> using this ID and their Date of Birth.
+                    </div>
+                </div>
+
+                <!-- ── FIRST-TIME VOTER EPIC PORTAL CTA ── -->
+                <div class="portal-cta-box">
+                    <div class="portal-cta-header">
+                        <span>🚀</span> FIRST TIME VOTER EPIC PORTAL (Standalone Web App)
+                    </div>
+                    <div class="portal-cta-desc">
+                        First-time applicants can track their Form 6 verification and instantly download their official digital <strong>e-EPIC Voter Card & QR Pass</strong> upon ERO approval at port <strong>5001</strong>.
+                    </div>
+                    <a href="http://127.0.0.1:5001/login" target="_blank" class="btn btn-portal" style="margin-bottom:0;">
+                        🔗 Go to First-Time Voter e-EPIC Portal (Port 5001) →
+                    </a>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-item">
+                        <div class="step-num step-done">✓</div>
+                        <div class="step-text">
+                            <h4>Step 1: Form 6 Registered & Application ID Generated</h4>
+                            <p>Application ID: <code>{{ v_app_id }}</code> successfully assigned and saved.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num step-active">2</div>
+                        <div class="step-text">
+                            <h4>Step 2: Forwarded to Constituency ERO (Current Stage)</h4>
+                            <p>Assigned to ERO for <strong>{{ v_const }} ({{ v_dist }})</strong> for statutory verification.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num step-wait">3</div>
+                        <div class="step-text">
+                            <h4>Step 3: ERO Approval & e-EPIC Card Generation</h4>
+                            <p>Log into <a href="http://127.0.0.1:5001/login" target="_blank" style="color:#2563eb; font-weight:700;">First-Time Voter Portal</a> with Application ID + DOB to download card once certified.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <a href="/register_page" class="btn btn-primary">
+                + नवीन मतदार नोंदणी करा (New Registration)
+            </a>
+            <a href="/" class="btn btn-outline" style="border:none; color:#64748b;">
+                मुख्यपृष्ठावर जा (Home)
+            </a>
         </div>
     </body>
     </html>
-    """, vid=vid)
+    """, vid=vid, v_name=v_name, v_dist=v_dist, v_const=v_const, v_status=v_status, v_app_id=v_app_id)
 
 @register_bp.route('/download_card/<vid>')
 def download_card(vid):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT v_id, name, ero_status, ero_remarks FROM voters WHERE v_id = ?", (vid,))
+        voter = cursor.fetchone()
+        if not voter:
+            return "Voter record not found", 404
+        if (voter['ero_status'] or 'PENDING').upper() != 'APPROVED':
+            return f"""
+            <div style="font-family:sans-serif; text-align:center; padding:40px;">
+                <h2 style="color:#d97706;">⚠️ Voter ID Card Pending ERO Approval</h2>
+                <p>Voter ID Card for <strong>{vid}</strong> ({voter['name']}) has not been certified yet.</p>
+                <p>Status: <strong>{voter['ero_status']}</strong></p>
+                <p>Remarks: {voter['ero_remarks']}</p>
+                <p>The card will be available for download once the Electoral Registration Officer (ERO) approves the application.</p>
+            </div>
+            """, 403
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
     card_path = os.path.join(ID_CARDS_DIR, f"{vid}_final_card.png")
     if os.path.exists(card_path):
         return send_file(card_path, as_attachment=True, download_name=f"VoterCard_{vid}.png")
-    return "Card file not found", 404
+    return "Card file is being generated upon ERO approval", 404
 
 @register_bp.route('/download_qr/<vid>')
 def download_qr(vid):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT v_id, name, ero_status FROM voters WHERE v_id = ?", (vid,))
+        voter = cursor.fetchone()
+        if not voter:
+            return "Voter record not found", 404
+        if (voter['ero_status'] or 'PENDING').upper() != 'APPROVED':
+            return "QR Pass is pending ERO approval", 403
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
     pass_path = os.path.join(ID_CARDS_DIR, f"{vid}_qr_pass.png")
     if os.path.exists(pass_path):
         return send_file(pass_path, as_attachment=True, download_name=f"VotingPass_{vid}.png")
     qr_path = os.path.join(ID_CARDS_DIR, f"{vid}_qr.png")
     if os.path.exists(qr_path):
         return send_file(qr_path, as_attachment=True, download_name=f"ScannerQR_{vid}.png")
-    return "QR file not found", 404
+    return "QR file not found", 404

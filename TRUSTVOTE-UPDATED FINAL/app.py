@@ -28,11 +28,18 @@ from routes.vote_routes import vote_bp
 from routes.admin_routes import admin_bp
 from routes.officer_routes import officer_bp
 
+from datetime import timedelta
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 1. SETUP
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 app.secret_key = 'super_secret_trustvote_key'
+app.config['SESSION_COOKIE_NAME'] = 'trustvote_session'
+app.config['SESSION_COOKIE_PATH'] = '/'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024   # 32MB for base64 images
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True

@@ -140,7 +140,7 @@ class Blockchain:
             print("[Blockchain] Genesis Block #0 created successfully.")
 
     @classmethod
-    def add_vote_block(cls, conn, vid: str, voter_name: str, election: str, booth_officer: str, region: str, booth_id: int, booth_code: str, timestamp: str = None):
+    def add_vote_block(cls, conn, vid: str, voter_name: str, election: str, booth_officer: str, region: str, booth_id: int, booth_code: str, timestamp: str = None, transaction_id: str = None, offline_token: str = None):
         """
         Mines and appends an immutable vote block to the blockchain ledger.
         """
@@ -172,27 +172,53 @@ class Blockchain:
         )
 
         cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO blockchain_ledger (
-                block_index, timestamp, voter_id, voter_id_hash, voter_name,
-                election, booth_code, booth_id, booth_officer, region,
-                previous_hash, block_hash, nonce, is_verified
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-        """, (
-            new_block.index,
-            new_block.timestamp,
-            vid,
-            new_block.voter_id_hash,
-            voter_name,
-            new_block.election,
-            new_block.booth_code,
-            new_block.booth_id,
-            new_block.booth_officer,
-            new_block.region,
-            new_block.previous_hash,
-            new_block.hash,
-            new_block.nonce
-        ))
+        try:
+            cursor.execute("""
+                INSERT INTO blockchain_ledger (
+                    block_index, timestamp, voter_id, voter_id_hash, voter_name,
+                    election, booth_code, booth_id, booth_officer, region,
+                    previous_hash, block_hash, nonce, is_verified, transaction_id, offline_token
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+            """, (
+                new_block.index,
+                new_block.timestamp,
+                vid,
+                new_block.voter_id_hash,
+                voter_name,
+                new_block.election,
+                new_block.booth_code,
+                new_block.booth_id,
+                new_block.booth_officer,
+                new_block.region,
+                new_block.previous_hash,
+                new_block.hash,
+                new_block.nonce,
+                transaction_id,
+                offline_token
+            ))
+        except Exception:
+            # Fallback for legacy columns
+            cursor.execute("""
+                INSERT INTO blockchain_ledger (
+                    block_index, timestamp, voter_id, voter_id_hash, voter_name,
+                    election, booth_code, booth_id, booth_officer, region,
+                    previous_hash, block_hash, nonce, is_verified
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+            """, (
+                new_block.index,
+                new_block.timestamp,
+                vid,
+                new_block.voter_id_hash,
+                voter_name,
+                new_block.election,
+                new_block.booth_code,
+                new_block.booth_id,
+                new_block.booth_officer,
+                new_block.region,
+                new_block.previous_hash,
+                new_block.hash,
+                new_block.nonce
+            ))
         conn.commit()
 
         return new_block
