@@ -1,0 +1,24 @@
+services:
+  # 1. Main TrustVote System (Admin, Booth Officer, Verification, Blockchain)
+  - type: web
+    name: trustvote-election-system
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.9
+
+  # 2. First-Time Voter e-EPIC Download Portal & Form 6
+  - type: web
+    name: trustvote-voter-portal
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn voter_portal_app:app
+    envVars:
+      - key: PORTAL_SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.9

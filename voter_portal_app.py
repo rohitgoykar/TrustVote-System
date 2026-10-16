@@ -25,6 +25,8 @@ TRUSTVOTE_DB = os.path.abspath(os.path.join(BASE_DIR, "..", "TRUSTVOTE-UPDATED F
 LOCAL_DB = os.path.join(BASE_DIR, "voters.db")
 
 def get_db_path():
+    if os.path.exists(LOCAL_DB):
+        return LOCAL_DB
     if os.path.exists(TRUSTVOTE_DB):
         return TRUSTVOTE_DB
     return LOCAL_DB
@@ -38,7 +40,9 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 # TrustVote storage sync paths
 TRUSTVOTE_STORAGE = os.path.abspath(os.path.join(BASE_DIR, "..", "TRUSTVOTE-UPDATED FINAL (1)", "storage"))
 TRUSTVOTE_ID_CARDS = os.path.abspath(os.path.join(BASE_DIR, "..", "TRUSTVOTE-UPDATED FINAL (1)", "id_cards"))
-if os.path.exists(TRUSTVOTE_ID_CARDS):
+if os.path.exists(ID_CARDS_DIR):
+    ACTIVE_ID_CARDS_DIR = ID_CARDS_DIR
+elif os.path.exists(TRUSTVOTE_ID_CARDS):
     ACTIVE_ID_CARDS_DIR = TRUSTVOTE_ID_CARDS
 else:
     ACTIVE_ID_CARDS_DIR = ID_CARDS_DIR
