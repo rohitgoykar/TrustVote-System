@@ -75,9 +75,10 @@ def get_booths_list():
 
 @register_bp.route('/register', methods=['POST'])
 def register():
-    if not session.get('officer_logged_in'):
+    if not (session.get('officer_logged_in') or session.get('admin_logged_in') or session.get('ero_logged_in') or session.get('aro_logged_in')):
         return jsonify({"status": "Error", "message": "Unauthorized: Officer not logged in"}), 401
     try:
+        data = request.form if request.form else (request.json or {})
         reg_type   = data.get('reg_type', 'first_time').strip().lower()
         is_existing = (reg_type == 'existing')
         vid        = (data.get('v_id') or '').strip().upper()
@@ -92,12 +93,13 @@ def register():
             if not vid:
                 vid = f"MH{datetime.now().strftime('%y%m%d')}{random.randint(1000, 9999)}"
 
-        name       = data['name'].strip()
-        photo_data = data['photo']
-        dob        = data['dob'].strip()
-        district   = data.get('district', 'Pune').strip()
-        constituency = data.get('constituency', 'Shivaji Nagar').strip()
-        assigned_booth_id = int(data.get('assigned_booth_id', 0))
+        name       = (data.get('name') or '').strip()
+        photo_data = data.get('photo', '')
+        dob        = (data.get('dob') or '').strip()
+        gender     = (data.get('gender') or 'Male').strip()
+        district   = (data.get('district') or 'Pune').strip()
+        constituency = (data.get('constituency') or 'Shivaji Nagar').strip()
+        assigned_booth_id = int(data.get('assigned_booth_id', 0) or 0)
         today      = datetime.now().strftime('%Y-%m-%d')
 
         # Local Body Selection Names
@@ -257,7 +259,7 @@ def register():
                                        ero_status, ero_remarks, application_id)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (vid, name, data['gender'], p_path, district, constituency,
+                (vid, name, gender, p_path, district, constituency,
                  gp, ps, zp, mnc, np, npt,
                  gp_name, ps_name, zp_name, mnc_name, np_name, npt_name,
                  today, dob, assigned_booth_id,
@@ -275,7 +277,7 @@ def register():
         if is_existing:
             try:
                 os.makedirs(ID_CARDS_DIR, exist_ok=True)
-                encrypted_token = encrypt_voter_data(vid, name, dob, data['gender'], p_path)
+                encrypted_token = encrypt_voter_data(vid, name, dob, gender, p_path)
                 qr = qrcode.QRCode(
                     version=None,
                     error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -287,7 +289,7 @@ def register():
                 qr_img = qr.make_image(fill_color="black", back_color="white")
                 qr_img.save(os.path.join(ID_CARDS_DIR, vid + "_qr.png"))
 
-                create_voter_card(vid, name, dob, data['gender'], p_path, district, constituency)
+                create_voter_card(vid, name, dob, gender, p_path, district, constituency)
                 create_voting_pass(vid, name, district, constituency)
             except Exception as card_e:
                 print(f"[Existing Reg] Card generation note: {card_e}")
