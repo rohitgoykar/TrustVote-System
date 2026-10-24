@@ -159,6 +159,10 @@ def ensure_db_schema():
             add_col('aadhaar_card_file', 'TEXT')
             add_col('aadhaar_verified', 'INTEGER DEFAULT 0')
             add_col('assigned_booth_id', 'INTEGER')
+            # Cross-service card storage: base64 blobs (written by main TrustVote app)
+            add_col('card_image_b64', 'TEXT')
+            add_col('qr_image_b64',   'TEXT')
+            add_col('pass_image_b64',  'TEXT')
             conn.commit()
         conn.close()
     except Exception as e:
@@ -1099,6 +1103,7 @@ def check_voter_status():
                    v.reg_date, v.assigned_booth_id, v.form6_file, v.relative_type, v.relative_name,
                    v.mobile, v.email, v.aadhaar_no, v.address_line, v.pincode, v.taluka,
                    v.ero_status, v.ero_remarks, v.ero_decided_by, v.ero_decided_at,
+                   v.card_image_b64, v.qr_image_b64, v.pass_image_b64,
                    b.booth_code, b.booth_name, b.polling_station
             FROM voters v
             LEFT JOIN booths b ON v.assigned_booth_id = b.id
@@ -1191,8 +1196,28 @@ def check_voter_status():
             pass_file = os.path.join(ACTIVE_ID_CARDS_DIR, f"{vid}_qr_pass.png")
             qr_file   = os.path.join(ACTIVE_ID_CARDS_DIR, f"{vid}_qr.png")
 
-            # On-demand generation if missing
-            if not os.path.exists(card_file) or not os.path.exists(pass_file):
+            # ── Pull base64 blobs stored by the main TrustVote registration service ──
+            db_card_b64 = voter.get('card_image_b64') or ''
+            db_qr_b64   = voter.get('qr_image_b64')   or ''
+            db_pass_b64 = voter.get('pass_image_b64')  or ''
+
+            # Restore files from DB blobs when disk files are missing (Render isolated FS)
+            def restore_from_b64(path, b64_data):
+                if b64_data and not os.path.exists(path):
+                    try:
+                        with open(path, "wb") as _f:
+                            _f.write(base64.b64decode(b64_data))
+                        return True
+                    except Exception as _re:
+                        print(f"[Portal] Restore from b64 note ({path}): {_re}")
+                return os.path.exists(path)
+
+            card_on_disk = restore_from_b64(card_file, db_card_b64)
+            restore_from_b64(qr_file, db_qr_b64)
+            restore_from_b64(pass_file, db_pass_b64)
+
+            # On-demand generation if card still missing (first-time voter approved by ERO)
+            if not card_on_disk:
                 p_path = voter.get('photo') or os.path.join(STORAGE_DIR, f"{vid}.jpg")
                 v_name = voter.get('name') or 'Citizen'
                 v_dob  = voter.get('dob') or '2000-01-01'
@@ -1203,21 +1228,49 @@ def check_voter_status():
                 try:
                     if encrypt_voter_data and create_voter_card and create_voting_pass:
                         encrypted_token = encrypt_voter_data(vid, v_name, v_dob, v_gen, p_path)
-                        qr = qrcode.QRCode(
+                        # Use ERROR_CORRECT_M + larger box_size for reliable scanner decoding
+                        qr_gen = qrcode.QRCode(
                             version=None,
-                            error_correction=qrcode.constants.ERROR_CORRECT_L,
-                            box_size=10,
+                            error_correction=qrcode.constants.ERROR_CORRECT_M,
+                            box_size=12,
                             border=4,
                         )
-                        qr.add_data(encrypted_token)
-                        qr.make(fit=True)
-                        qr_img = qr.make_image(fill_color="black", back_color="white")
-                        qr_img.save(qr_file)
+                        qr_gen.add_data(encrypted_token)
+                        qr_gen.make(fit=True)
+                        qr_pil = qr_gen.make_image(fill_color="black", back_color="white")
+                        qr_pil.save(qr_file)
 
-                        create_voter_card(vid, v_name, v_dob, v_gen, p_path, v_dist, v_const)
-                        create_voting_pass(vid, v_name, v_dist, v_const)
+                        gen_card = create_voter_card(vid, v_name, v_dob, v_gen, p_path, v_dist, v_const)
+                        gen_pass = create_voting_pass(vid, v_name, v_dist, v_const)
+
+                        # Store newly-generated cards back into DB for future cross-service access
+                        try:
+                            _c = _q = _p = None
+                            if gen_card and os.path.exists(gen_card):
+                                with open(gen_card, "rb") as _f: _c = base64.b64encode(_f.read()).decode()
+                            if os.path.exists(qr_file):
+                                with open(qr_file, "rb") as _f: _q = base64.b64encode(_f.read()).decode()
+                            if gen_pass and os.path.exists(gen_pass):
+                                with open(gen_pass, "rb") as _f: _p = base64.b64encode(_f.read()).decode()
+                            _conn_upd = get_db()
+                            try:
+                                _conn_upd.execute(
+                                    "UPDATE voters SET card_image_b64=?, qr_image_b64=?, pass_image_b64=? WHERE v_id=?",
+                                    (_c, _q, _p, vid)
+                                )
+                                _conn_upd.commit()
+                            finally:
+                                try: _conn_upd.close()
+                                except Exception: pass
+                        except Exception as _be:
+                            print(f"[Portal] Save b64 back note: {_be}")
+
                 except Exception as gen_err:
                     print(f"[Voter Portal] On-demand card generation warning for {vid}: {gen_err}")
+
+            # Determine if card is available (either on disk or as b64 in DB)
+            card_available = os.path.exists(card_file) or bool(db_card_b64)
+            pass_available = os.path.exists(pass_file) or bool(db_pass_b64)
 
             return jsonify({
                 'status': 'APPROVED',
@@ -1246,6 +1299,8 @@ def check_voter_status():
                     'ero_decided_by': voter.get('ero_decided_by') or 'Constituency ERO',
                     'ero_decided_at': voter.get('ero_decided_at') or 'Certified'
                 },
+                'card_available': card_available,
+                'pass_available': pass_available,
                 'card_preview_url': f"/id_cards/{vid}_final_card.png",
                 'pass_preview_url': f"/id_cards/{vid}_qr_pass.png",
                 'download_card_url': f"/download/card/{vid}",
@@ -1270,11 +1325,15 @@ def download_card(vid):
     """
     Downloads the Voter ID Card PNG.
     Strictly verifies that the applicant is APPROVED by constituency ERO.
+    Falls back to DB-stored base64 blob when file is missing (Render isolated FS).
     """
     vid = vid.strip().upper()
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT v_id, ero_status FROM voters WHERE UPPER(v_id) = ? OR UPPER(application_id) = ?", (vid, vid))
+    cursor.execute(
+        "SELECT v_id, ero_status, card_image_b64 FROM voters WHERE UPPER(v_id) = ? OR UPPER(application_id) = ?",
+        (vid, vid)
+    )
     row = cursor.fetchone()
     conn.close()
 
@@ -1291,7 +1350,18 @@ def download_card(vid):
         card_path = os.path.join(ID_CARDS_DIR, f"{actual_vid}_final_card.png")
 
     if not os.path.exists(card_path):
-        abort(404, "Voter ID Card file not found.")
+        # Serve from DB base64 blob (cross-service Render fix)
+        card_b64 = row['card_image_b64'] if row['card_image_b64'] else None
+        if card_b64:
+            import io
+            img_bytes = base64.b64decode(card_b64)
+            return send_file(
+                io.BytesIO(img_bytes),
+                mimetype='image/png',
+                as_attachment=True,
+                download_name=f"Voter_ID_Card_{actual_vid}.png"
+            )
+        abort(404, "Voter ID Card file not found. Please contact your ERO office.")
 
     return send_file(
         card_path,
@@ -1307,11 +1377,15 @@ def download_pass(vid):
     """
     Downloads the Digital Voting Pass PNG.
     Strictly verifies that the applicant is APPROVED by constituency ERO.
+    Falls back to DB-stored base64 blob when file is missing (Render isolated FS).
     """
     vid = vid.strip().upper()
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT v_id, ero_status FROM voters WHERE UPPER(v_id) = ? OR UPPER(application_id) = ?", (vid, vid))
+    cursor.execute(
+        "SELECT v_id, ero_status, pass_image_b64 FROM voters WHERE UPPER(v_id) = ? OR UPPER(application_id) = ?",
+        (vid, vid)
+    )
     row = cursor.fetchone()
     conn.close()
 
@@ -1328,7 +1402,18 @@ def download_pass(vid):
         pass_path = os.path.join(ID_CARDS_DIR, f"{actual_vid}_qr_pass.png")
 
     if not os.path.exists(pass_path):
-        abort(404, "Voting Pass file not found.")
+        # Serve from DB base64 blob (cross-service Render fix)
+        pass_b64 = row['pass_image_b64'] if row['pass_image_b64'] else None
+        if pass_b64:
+            import io
+            img_bytes = base64.b64decode(pass_b64)
+            return send_file(
+                io.BytesIO(img_bytes),
+                mimetype='image/png',
+                as_attachment=True,
+                download_name=f"Digital_Voting_Pass_{actual_vid}.png"
+            )
+        abort(404, "Voting Pass file not found. Please contact your ERO office.")
 
     return send_file(
         pass_path,
@@ -1375,7 +1460,52 @@ def view_certificate(vid):
 def serve_id_card_preview(filename):
     if os.path.exists(os.path.join(ACTIVE_ID_CARDS_DIR, filename)):
         return send_from_directory(ACTIVE_ID_CARDS_DIR, filename)
-    return send_from_directory(ID_CARDS_DIR, filename)
+    if os.path.exists(os.path.join(ID_CARDS_DIR, filename)):
+        return send_from_directory(ID_CARDS_DIR, filename)
+
+    # Fall back to DB base64 blob for cross-service Render access
+    # filename format: <vid>_final_card.png | <vid>_qr_pass.png | <vid>_qr.png
+    import io as _io
+    try:
+        parts = filename.rsplit('_', 2)
+        vid_key = None
+        col_key = None
+        if filename.endswith('_final_card.png'):
+            vid_key = filename[:-len('_final_card.png')]
+            col_key = 'card_image_b64'
+        elif filename.endswith('_qr_pass.png'):
+            vid_key = filename[:-len('_qr_pass.png')]
+            col_key = 'pass_image_b64'
+        elif filename.endswith('_qr.png'):
+            vid_key = filename[:-len('_qr.png')]
+            col_key = 'qr_image_b64'
+
+        if vid_key and col_key:
+            _conn = get_db()
+            try:
+                _cur = _conn.cursor()
+                _cur.execute(
+                    f"SELECT {col_key} FROM voters WHERE UPPER(v_id) = ? OR UPPER(application_id) = ?",
+                    (vid_key.upper(), vid_key.upper())
+                )
+                _row = _cur.fetchone()
+            finally:
+                try: _conn.close()
+                except Exception: pass
+
+            if _row and _row[0]:
+                img_bytes = base64.b64decode(_row[0])
+                # Also save to disk for future requests
+                try:
+                    _out_path = os.path.join(ACTIVE_ID_CARDS_DIR, filename)
+                    os.makedirs(ACTIVE_ID_CARDS_DIR, exist_ok=True)
+                    with open(_out_path, 'wb') as _f: _f.write(img_bytes)
+                except Exception: pass
+                return send_file(_io.BytesIO(img_bytes), mimetype='image/png')
+    except Exception as _pe:
+        print(f"[Portal] id_cards preview b64 fallback note: {_pe}")
+
+    abort(404)
 
 
 @app.route('/storage/<path:filename>', methods=['GET'])

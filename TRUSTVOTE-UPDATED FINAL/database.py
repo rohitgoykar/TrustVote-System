@@ -260,6 +260,10 @@ def init_db():
     add_col_if_missing("officers", "constituency", "TEXT")
     add_col_if_missing("voted_log", "booth_id", "INTEGER")
     add_col_if_missing("voted_log", "booth_code", "TEXT")
+    # Cross-service card storage: base64 blobs for Render isolated filesystem fix
+    add_col_if_missing("voters", "card_image_b64", "TEXT")
+    add_col_if_missing("voters", "qr_image_b64",   "TEXT")
+    add_col_if_missing("voters", "pass_image_b64",  "TEXT")
 
     # (Optional officer mobile updates only if table has records)
     cursor.execute("UPDATE officers SET mobile = '9876543210' WHERE mobile IS NULL OR mobile = ''")

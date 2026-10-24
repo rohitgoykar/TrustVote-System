@@ -278,19 +278,48 @@ def register():
             try:
                 os.makedirs(ID_CARDS_DIR, exist_ok=True)
                 encrypted_token = encrypt_voter_data(vid, name, dob, gender, p_path)
+                # Use ERROR_CORRECT_M + larger box_size for reliable scanner decoding
                 qr = qrcode.QRCode(
                     version=None,
-                    error_correction=qrcode.constants.ERROR_CORRECT_L,
-                    box_size=10,
+                    error_correction=qrcode.constants.ERROR_CORRECT_M,
+                    box_size=12,
                     border=4,
                 )
                 qr.add_data(encrypted_token)
                 qr.make(fit=True)
                 qr_img = qr.make_image(fill_color="black", back_color="white")
-                qr_img.save(os.path.join(ID_CARDS_DIR, vid + "_qr.png"))
+                qr_path = os.path.join(ID_CARDS_DIR, vid + "_qr.png")
+                qr_img.save(qr_path)
 
-                create_voter_card(vid, name, dob, gender, p_path, district, constituency)
-                create_voting_pass(vid, name, district, constituency)
+                card_file = create_voter_card(vid, name, dob, gender, p_path, district, constituency)
+                pass_file = create_voting_pass(vid, name, district, constituency)
+
+                # ── Store cards as base64 in DB for cross-service access (Render fix) ──
+                try:
+                    card_b64 = qr_b64 = pass_b64 = None
+                    if card_file and os.path.exists(card_file):
+                        with open(card_file, "rb") as _f:
+                            card_b64 = base64.b64encode(_f.read()).decode()
+                    if qr_path and os.path.exists(qr_path):
+                        with open(qr_path, "rb") as _f:
+                            qr_b64 = base64.b64encode(_f.read()).decode()
+                    if pass_file and os.path.exists(pass_file):
+                        with open(pass_file, "rb") as _f:
+                            pass_b64 = base64.b64encode(_f.read()).decode()
+
+                    conn_upd = get_db_connection()
+                    try:
+                        conn_upd.execute(
+                            "UPDATE voters SET card_image_b64=?, qr_image_b64=?, pass_image_b64=? WHERE v_id=?",
+                            (card_b64, qr_b64, pass_b64, vid)
+                        )
+                        conn_upd.commit()
+                    finally:
+                        try: conn_upd.close()
+                        except Exception: pass
+                except Exception as b64_e:
+                    print(f"[Existing Reg] Base64 store note: {b64_e}")
+
             except Exception as card_e:
                 print(f"[Existing Reg] Card generation note: {card_e}")
 
