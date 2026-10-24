@@ -250,7 +250,7 @@ def booth_send_otp():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT o.id, o.username, o.password, o.mobile, o.location, o.role, o.booth_id,
-                   b.booth_code, b.booth_name, b.region
+                   b.booth_code, b.booth_name, b.region, b.district, b.constituency
             FROM officers o
             LEFT JOIN booths b ON o.booth_id = b.id
             WHERE o.username=? AND o.role='Booth Officer'
@@ -280,6 +280,8 @@ def booth_send_otp():
         booth_code = officer['booth_code'] or f"BOOTH-00{booth_id}"
         booth_name = officer['booth_name'] or f"Booth {booth_id} - {officer['location']}"
         booth_region = officer['region'] or officer['location'] or "Default Region"
+        booth_district = officer['district'] or 'Pune'
+        booth_constituency = officer['constituency'] or 'Shivaji Nagar'
 
         # Save in session for 2-step verification
         session['pending_booth_officer_id'] = officer['id']
@@ -289,6 +291,8 @@ def booth_send_otp():
         session['pending_booth_code'] = booth_code
         session['pending_booth_name'] = booth_name
         session['pending_booth_location'] = booth_region
+        session['pending_booth_district'] = booth_district
+        session['pending_booth_constituency'] = booth_constituency
         session['pending_booth_otp'] = otp_code
         session['pending_booth_otp_time'] = time.time()
 
@@ -362,9 +366,13 @@ def booth_verify_otp():
     session['booth_code'] = booth_code
     session['booth_name'] = booth_name
     session['booth_location'] = booth_location
+    session['booth_district'] = session.get('pending_booth_district', 'Pune')
+    session['booth_constituency'] = session.get('pending_booth_constituency', 'Shivaji Nagar')
 
     session.pop('pending_booth_otp', None)
     session.pop('pending_booth_otp_time', None)
+    session.pop('pending_booth_district', None)
+    session.pop('pending_booth_constituency', None)
 
     return jsonify({
         'status': 'success',
@@ -392,7 +400,7 @@ def booth_login_api():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT o.id, o.username, o.mobile, o.location, o.booth_id,
-                   b.booth_code, b.booth_name, b.region
+                   b.booth_code, b.booth_name, b.region, b.district, b.constituency
             FROM officers o
             LEFT JOIN booths b ON o.booth_id = b.id
             WHERE o.username=? AND o.password=? AND o.role='Booth Officer'
@@ -404,6 +412,8 @@ def booth_login_api():
             booth_code = officer['booth_code'] or f"BOOTH-00{booth_id}"
             booth_name = officer['booth_name'] or f"Booth {booth_id} - {officer['location']}"
             booth_region = officer['region'] or officer['location'] or "Default Region"
+            booth_district = officer['district'] or 'Pune'
+            booth_constituency = officer['constituency'] or 'Shivaji Nagar'
 
             cursor.execute("UPDATE booths SET status='ONLINE', last_active=? WHERE id=?", (now_str, booth_id))
             cursor.execute("""
@@ -420,6 +430,8 @@ def booth_login_api():
             session['booth_code'] = booth_code
             session['booth_name'] = booth_name
             session['booth_location'] = booth_region
+            session['booth_district'] = booth_district
+            session['booth_constituency'] = booth_constituency
 
             return jsonify({
                 'status': 'success',

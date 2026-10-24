@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, session
 from database import get_db_connection
+from routes.verify_routes import is_voter_in_booth_constituency
 
 vote_bp = Blueprint('vote', __name__)
 
@@ -77,6 +78,29 @@ def verify():
                 return jsonify({
                     "status":  "Error",
                     "message": f"{voter_name}, your voter registration has expired. Please re-register."
+                })
+
+            # ── Constituency Verification Check ──
+            voter_booth_id = result[3] if len(result) > 3 else None
+            voter_const = (result[5] if len(result) > 5 else '') or ''
+            booth_const = session.get('booth_constituency')
+            if not booth_const:
+                cursor.execute("SELECT constituency FROM booths WHERE id = ?", (booth_id,))
+                b_curr = cursor.fetchone()
+                if b_curr:
+                    booth_const = b_curr['constituency'] or ''
+                    session['booth_constituency'] = booth_const
+
+            is_allowed, c_err = is_voter_in_booth_constituency(voter_const, booth_const, voter_booth_id, booth_id)
+            if not is_allowed:
+                cursor.execute("""
+                    INSERT INTO booth_activity_log (booth_id, officer_username, action, details, timestamp)
+                    VALUES (?, ?, 'CROSS_CONSTITUENCY_VOTE_BLOCKED', ?, ?)
+                """, (booth_id, booth_officer, f"Cross-constituency vote blocked for {voter_name} ({vid}) at booth {booth_code}", now_str))
+                conn.commit()
+                return jsonify({
+                    "status": "Error",
+                    "message": c_err
                 })
 
             # ── 1. If eligible (1), record the vote ──────────────────────────────

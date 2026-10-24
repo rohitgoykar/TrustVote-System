@@ -21,6 +21,45 @@ def is_officer_authorized():
         session.get('ero_logged_in')
     )
 
+def normalize_constituency(val):
+    """Normalizes constituency string by removing script in parentheses and punctuation."""
+    if not val:
+        return ""
+    base = str(val).split('(')[0]
+    return re.sub(r'[^a-zA-Z0-9]', '', base).lower()
+
+def is_voter_in_booth_constituency(voter_constituency, booth_constituency, voter_booth_id, current_booth_id):
+    """
+    Validates if a voter is eligible to scan and vote at the current polling booth.
+    A voter can ONLY scan and vote at a booth belonging to their registered constituency.
+    """
+    try:
+        if voter_booth_id and current_booth_id and int(voter_booth_id) == int(current_booth_id):
+            return True, ""
+    except Exception:
+        pass
+
+    norm_voter = normalize_constituency(voter_constituency)
+    norm_booth = normalize_constituency(booth_constituency)
+
+    if not norm_booth or norm_booth in ['all', 'general', 'default', 'authorizedpollingstation']:
+        return True, ""
+    if not norm_voter:
+        return True, ""
+
+    if norm_voter == norm_booth or norm_voter in norm_booth or norm_booth in norm_voter:
+        return True, ""
+
+    clean_voter_c = str(voter_constituency).split('(')[0].strip()
+    clean_booth_c = str(booth_constituency).split('(')[0].strip()
+    msg = (
+        f"🚫 मतदारसंघ विसंगती (Cross-Constituency Blocked): "
+        f"मतदार '{clean_voter_c}' मतदारसंघात नोंदणीकृत आहे. "
+        f"परंतु हे मतदान केंद्र '{clean_booth_c}' मतदारसंघात आहे. "
+        f"तुम्ही केवळ तुमच्या नोंदणीकृत मतदारसंघातील केंद्रावरच मतदान करू शकता."
+    )
+    return False, msg
+
 def ensure_booth_context():
     """Ensure session has valid booth defaults if logged in under another election officer role."""
     if not session.get('booth_id'):
@@ -37,6 +76,27 @@ def ensure_booth_context():
         session['booth_code'] = 'BOOTH-001'
     if not session.get('booth_location'):
         session['booth_location'] = session.get('aro_location') or session.get('ero_location') or 'Authorized Polling Station'
+
+    if not session.get('booth_constituency') or not session.get('booth_district'):
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            b_id = session.get('booth_id', 1)
+            b_code = session.get('booth_code')
+            cursor.execute("SELECT id, booth_code, booth_name, district, constituency FROM booths WHERE id = ? OR booth_code = ? LIMIT 1", (b_id, b_code))
+            b_info = cursor.fetchone()
+            if b_info:
+                session['booth_district'] = b_info['district'] or 'Pune'
+                session['booth_constituency'] = b_info['constituency'] or 'Shivaji Nagar'
+                session['booth_code'] = b_info['booth_code'] or session.get('booth_code', 'BOOTH-001')
+                session['booth_name'] = b_info['booth_name'] or session.get('booth_name', 'Polling Station')
+        except Exception as e:
+            print(f"[BoothContext] Lookup note: {e}")
+        finally:
+            if conn:
+                try: conn.close()
+                except Exception: pass
 
 @verify_bp.route('/scan')
 def scan_page():
@@ -128,8 +188,8 @@ def scan_qr_image():
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Check ERO Electoral-Roll Decision
-            cursor.execute("SELECT ero_status, ero_remarks, name FROM voters WHERE v_id = ?", (vid,))
+            # Check ERO Electoral-Roll Decision & Constituency Assignment
+            cursor.execute("SELECT ero_status, ero_remarks, name, district, constituency, assigned_booth_id FROM voters WHERE v_id = ?", (vid,))
             v_ero = cursor.fetchone()
             if v_ero:
                 ero_st = (v_ero['ero_status'] or 'PENDING').upper()
@@ -143,6 +203,29 @@ def scan_qr_image():
                     return jsonify({
                         "status": "Error",
                         "message": f"⏳ Electoral-Roll Alert: Form 6 registration for '{voter['name']}' ({vid}) is currently PENDING verification by the Constituency ERO. Only APPROVED voters can cast votes."
+                    })
+
+                # ── CONSTITUENCY ENFORCEMENT CHECK ──
+                b_id = session.get('booth_id', 1)
+                b_const = session.get('booth_constituency') or ''
+                if not b_const:
+                    cursor.execute("SELECT constituency FROM booths WHERE id = ?", (b_id,))
+                    b_row = cursor.fetchone()
+                    if b_row:
+                        b_const = b_row['constituency'] or ''
+                        session['booth_constituency'] = b_const
+
+                v_const = v_ero['constituency'] or ''
+                v_booth_id = v_ero['assigned_booth_id']
+
+                is_allowed, c_err = is_voter_in_booth_constituency(v_const, b_const, v_booth_id, b_id)
+                if not is_allowed:
+                    return jsonify({
+                        "status": "Error",
+                        "message": c_err,
+                        "mismatch": True,
+                        "voter_constituency": str(v_const).split('(')[0].strip(),
+                        "booth_constituency": str(b_const).split('(')[0].strip()
                     })
 
             if election:
@@ -223,8 +306,8 @@ def decrypt_qr():
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Check ERO Electoral-Roll Decision
-            cursor.execute("SELECT ero_status, ero_remarks, name FROM voters WHERE v_id = ?", (vid,))
+            # Check ERO Electoral-Roll Decision & Constituency Assignment
+            cursor.execute("SELECT ero_status, ero_remarks, name, district, constituency, assigned_booth_id FROM voters WHERE v_id = ?", (vid,))
             v_ero = cursor.fetchone()
             if v_ero:
                 ero_st = (v_ero['ero_status'] or 'PENDING').upper()
@@ -238,6 +321,29 @@ def decrypt_qr():
                     return jsonify({
                         "status": "Error",
                         "message": f"⏳ Electoral-Roll Alert: Form 6 registration for '{voter['name']}' ({vid}) is currently PENDING verification by the Constituency ERO. Only APPROVED voters can cast votes."
+                    })
+
+                # ── CONSTITUENCY ENFORCEMENT CHECK ──
+                b_id = session.get('booth_id', 1)
+                b_const = session.get('booth_constituency') or ''
+                if not b_const:
+                    cursor.execute("SELECT constituency FROM booths WHERE id = ?", (b_id,))
+                    b_row = cursor.fetchone()
+                    if b_row:
+                        b_const = b_row['constituency'] or ''
+                        session['booth_constituency'] = b_const
+
+                v_const = v_ero['constituency'] or ''
+                v_booth_id = v_ero['assigned_booth_id']
+
+                is_allowed, c_err = is_voter_in_booth_constituency(v_const, b_const, v_booth_id, b_id)
+                if not is_allowed:
+                    return jsonify({
+                        "status": "Error",
+                        "message": c_err,
+                        "mismatch": True,
+                        "voter_constituency": str(v_const).split('(')[0].strip(),
+                        "booth_constituency": str(b_const).split('(')[0].strip()
                     })
 
             if election:
